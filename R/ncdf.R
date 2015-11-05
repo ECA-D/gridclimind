@@ -706,6 +706,35 @@ get.quantiles.object <- function(thresholds, idx) {
   return(result)
 }
 
+#' A curry function used only for the Huglin Index
+#' This function curries the cdx.funcs so that the current subset (cur_sub) is retrieved with the cdx function
+#' It is placed inside compute.indices.for.stripe
+#' 
+#' @export
+curry_in_subset_for_huglin <- function(cdx.funcs, cur_sub){
+  cdx.names = names(cdx.funcs)
+  cdx.funcs <- lapply(cdx.names, function(function_name) {
+    f = cdx.funcs[[function_name]]
+    if(grepl('^hi', function_name)) {
+      return(functional::Curry(f, cur_sub = cur_sub))
+    } else {
+      return(f)
+    }
+  })
+  names(cdx.funcs) = cdx.names
+  return(cdx.funcs)
+}
+
+#' Get latitude
+#' It is used inside compute.indices.for.stripe
+#' @export
+get.lat <- function(open_file_list, variable.name.map) {
+  #var.name <- variable.name.map[[names(v.f.idx)[1]]]
+  y.dim <- ncdf4.helpers::nc.get.dim.for.axis(open_file_list[[1]], variable.name.map, "Y")
+  return(y.dim$vals)
+}
+
+
 #' Compute Climdex indices for a subset / stripe
 #'
 #' Compute Climdex indices for a subset / stripe
@@ -762,6 +791,12 @@ compute.indices.for.stripe <- function(subset, cdx.funcs, ts, base.range, dim.ax
   northern.hemisphere <- get.northern.hemisphere.booleans(subset, f[[v.f.idx[1]]], variable.name.map[names(v.f.idx)[1]], projection)
   
   thresholds <- if(is.null(thresholds.netcdf)) NULL else get.thresholds.chunk(subset, cdx.funcs, thresholds.netcdf, t.f.idx, thresholds.name.map)
+  
+  #Retrieve current latitude using subset for Huglin Index
+  latitudes = get.lat(f, variable.name.map[names(v.f.idx)[1]])
+  cur_sub <- latitudes[subset[['Y']]]
+  cdx.funcs <- curry_in_subset_for_huglin(cdx.funcs, cur_sub)
+  
   return(lapply(1:(dim(data.list[[1]])[2]), function(x) {
     dat.list <- sapply(names(data.list), function(name) { data.list[[name]][,x] }, simplify=FALSE)
     ## Fast-path the all-NA case.
