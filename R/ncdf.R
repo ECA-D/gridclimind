@@ -144,11 +144,25 @@ all.the.same <- function(dat) {
 #' }
 #'
 #' @export
-create.climdex.cmip5.filenames <- function(fn.split, vars.list) {
+
+get.split.filename.eobs <- function (eobs.file) 
+{
+  split.path <- strsplit(eobs.file, "/")[[1]]
+  fn.split <- strsplit(tail(split.path, n = 1), "_")[[1]]
+  names(fn.split) <- c("var", "resolution", 
+                       "version", "trange", rep(NA, max(0, length(fn.split) - 6)))
+  fn.split[length(fn.split)] <- strsplit(fn.split[length(fn.split)], 
+                                         "\\.")[[1]][1]
+  fn.split[c("tstart", "tend")] <- strsplit(fn.split["trange"], 
+                                            "-")[[1]]
+  fn.split
+}
+
+create.climdex.eobs.filenames <- function(fn.split, vars.list) {
   time.res <- c("yr", "mon")[grepl("_mon$", vars.list) + 1]
   time.range <- substr(fn.split[c('tstart', 'tend')], 1, 4)
   
-  paste(paste(vars.list, fn.split['model'], fn.split['emissions'], fn.split['run'], sapply(time.res, function(x) { paste(time.range, switch(x, yr=c("", ""), mon=c("01", "12")), sep="", collapse="-") }), sep="_"), ".nc", sep="")
+  paste(paste(vars.list, fn.split['resolution'], fn.split['version'],sapply(time.res, function(x) { paste(time.range, switch(x, yr=c("", ""), mon=c("01", "12")), sep="", collapse="-") }), sep="_"), ".nc", sep="")
 }
 
 #' Returns a list of Climdex variables given constraints
@@ -177,7 +191,7 @@ create.climdex.cmip5.filenames <- function(fn.split, vars.list) {
 #' @export
 get.climdex.variable.list <- function(source.data.present, time.resolution=c("all", "annual", "monthly"), climdex.vars.subset=NULL) {
   time.res <- match.arg(time.resolution)
-  annual.only <- c("fdETCCDI", "suETCCDI", "idETCCDI", "trETCCDI", "gslETCCDI", "wsdiETCCDI", "csdiETCCDI", "sdiiETCCDI", "r10mmETCCDI", "r20mmETCCDI", "r1mmETCCDI", "cddETCCDI", "cwdETCCDI", "r95pETCCDI", "r99pETCCDI", "prcptotETCCDI", "altcddETCCDI", "altcwdETCCDI", "altcsdiETCCDI", "altwsdiETCCDI")
+  annual.only <- c("gslETCCDI", "wsdiETCCDI", "csdiETCCDI", "cddETCCDI", "cwdETCCDI", "altcddETCCDI", "altcwdETCCDI", "altcsdiETCCDI", "altwsdiETCCDI")
   vars.by.src.data.reqd <- list(tmax=c("suETCCDI", "idETCCDI", "txxETCCDI", "txnETCCDI", "tx10pETCCDI", "tx90pETCCDI", "wsdiETCCDI", "altwsdiETCCDI"),
                                 tmin=c("fdETCCDI", "trETCCDI", "tnxETCCDI", "tnnETCCDI", "tn10pETCCDI", "tn90pETCCDI", "csdiETCCDI", "altcsdiETCCDI"),
                                 prec=c("rx1dayETCCDI", "rx5dayETCCDI", "sdiiETCCDI", "r10mmETCCDI", "r20mmETCCDI", "r1mmETCCDI", "cddETCCDI", "cwdETCCDI", "r95pETCCDI", "r99pETCCDI", "prcptotETCCDI", "altcddETCCDI", "altcwdETCCDI"),
@@ -222,13 +236,21 @@ get.climdex.variable.list <- function(source.data.present, time.resolution=c("al
 #' @export
 get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
   func.names <- c("climdex.fd", "climdex.su", "climdex.id", "climdex.tr", "climdex.gsl",
-                 "climdex.txx", "climdex.tnx", "climdex.txn", "climdex.tnn", "climdex.tn10p", "climdex.tx10p", "climdex.tn90p", "climdex.tx90p",
-                 "climdex.txx", "climdex.tnx", "climdex.txn", "climdex.tnn", "climdex.tn10p", "climdex.tx10p", "climdex.tn90p", "climdex.tx90p",
-                 "climdex.wsdi", "climdex.csdi",
-                 "climdex.dtr", "climdex.rx1day", "climdex.rx5day",
-                 "climdex.dtr", "climdex.rx1day", "climdex.rx5day",
-                 "climdex.sdii", "climdex.r10mm", "climdex.r20mm", "climdex.rnnmm", "climdex.cdd", "climdex.cwd", "climdex.r95ptot", "climdex.r99ptot", "climdex.prcptot",
-                 "climdex.cdd", "climdex.cwd", "climdex.csdi", "climdex.wsdi")
+                  "climdex.fd", "climdex.su", "climdex.id", "climdex.tr",
+                  
+                  "climdex.txx", "climdex.tnx", "climdex.txn", "climdex.tnn", "climdex.tn10p", "climdex.tx10p", "climdex.tn90p", "climdex.tx90p",
+                  "climdex.txx", "climdex.tnx", "climdex.txn", "climdex.tnn", "climdex.tn10p", "climdex.tx10p", "climdex.tn90p", "climdex.tx90p",
+                  
+                  "climdex.wsdi", "climdex.csdi",
+                  
+                  "climdex.dtr", "climdex.rx1day", "climdex.rx5day",
+                  "climdex.dtr", "climdex.rx1day", "climdex.rx5day",
+                  
+                  "climdex.sdii", "climdex.r10mm", "climdex.r20mm", "climdex.rnnmm", "climdex.cdd", "climdex.cwd", "climdex.r95ptot", "climdex.r99ptot", "climdex.prcptot",
+                  "climdex.sdii", "climdex.r10mm", "climdex.r20mm", "climdex.rnnmm", "climdex.r95ptot", "climdex.r99ptot", "climdex.prcptot",
+                  
+                  "climdex.cdd", "climdex.cwd", "climdex.csdi", "climdex.wsdi")
+  
   
   el <- list()
   af <- list(freq="annual")
@@ -239,23 +261,37 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
   altwcsdi.opts <- list(spells.can.span.years=TRUE)
   rx5day.opts <- list(center.mean.on.last.day=fclimdex.compatible)
   r1mm.opts <- list(threshold=1)
-  options <- list(el, el, el, el, el,
-                  mf, mf, mf, mf, mf, mf, mf, mf,
-                  af, af, af, af, af, af, af, af,
-                  wcsdi.opts, wcsdi.opts,
-                  mf, mf, c(mf, rx5day.opts),
-                  af, af, c(af, rx5day.opts),
-                  el, el, el, r1mm.opts, cwdd.opts, cwdd.opts, el, el, el,
-                  altcwdd.opts, altcwdd.opts, altwcsdi.opts, altwcsdi.opts)
-
+  options <- list( af, af, af, af, el,
+                           mf, mf, mf, mf,
+                           
+                           mf, mf, mf, mf, mf, mf, mf, mf,
+                           af, af, af, af, af, af, af, af,
+                           
+                           wcsdi.opts, wcsdi.opts,
+                           
+                           mf, mf, c(mf, rx5day.opts),
+                           af, af, c(af, rx5day.opts),
+                           
+                           af, af, af, c(af, r1mm.opts), cwdd.opts, cwdd.opts, af, af, af,
+                           mf, mf, mf, c(mf, r1mm.opts), mf, mf, mf,
+                           altcwdd.opts, altcwdd.opts, altwcsdi.opts, altwcsdi.opts)
+  
   func <- lapply(1:length(func.names), function(n) do.call(functional::Curry, c(list(getFromNamespace(func.names[n], 'climdex.pcic')), options[[n]])))
-  names(func) <- c("fdETCCDI_yr", "suETCCDI_yr", "idETCCDI_yr", "trETCCDI_yr", "gslETCCDI_yr",
+  
+  names(func) <- c("fdETCCDI_yr", "suETCCDI_yr", "idETCCDI_yr","trETCCDI_yr", "gslETCCDI_yr",
+                   "fdETCCDI_mon", "suETCCDI_mon", "idETCCDI_mon","trETCCDI_mon",
+                   
                    "txxETCCDI_mon", "tnxETCCDI_mon", "txnETCCDI_mon", "tnnETCCDI_mon", "tn10pETCCDI_mon", "tx10pETCCDI_mon", "tn90pETCCDI_mon", "tx90pETCCDI_mon",
-                   "txxETCCDI_yr", "tnxETCCDI_yr", "txnETCCDI_yr", "tnnETCCDI_yr", "tn10pETCCDI_yr", "tx10pETCCDI_yr", "tn90pETCCDI_yr", "tx90pETCCDI_yr",
+                   "txxETCCDI_yr",  "tnxETCCDI_yr",  "txnETCCDI_yr",  "tnnETCCDI_yr",  "tn10pETCCDI_yr",  "tx10pETCCDI_yr",  "tn90pETCCDI_yr",  "tx90pETCCDI_yr",
+                   
                    "wsdiETCCDI_yr", "csdiETCCDI_yr",
+                   
                    "dtrETCCDI_mon", "rx1dayETCCDI_mon", "rx5dayETCCDI_mon",
                    "dtrETCCDI_yr", "rx1dayETCCDI_yr", "rx5dayETCCDI_yr",
+                   
                    "sdiiETCCDI_yr", "r10mmETCCDI_yr", "r20mmETCCDI_yr", "r1mmETCCDI_yr", "cddETCCDI_yr", "cwdETCCDI_yr", "r95pETCCDI_yr", "r99pETCCDI_yr", "prcptotETCCDI_yr",
+                   "sdiiETCCDI_mon", "r10mmETCCDI_mon", "r20mmETCCDI_mon", "r1mmETCCDI_mon", "r95pETCCDI_mon", "r99pETCCDI_mon", "prcptotETCCDI_mon",
+                   
                    "altcddETCCDI_yr", "altcwdETCCDI_yr", "altcsdiETCCDI_yr", "altwsdiETCCDI_yr")
 
   return(func[vars.list])
@@ -288,65 +324,116 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
 #'
 #' @export
 get.climdex.variable.metadata <- function(vars.list, template.filename) {
-  all.data <- data.frame(long.name=c("Number of Frost Days", "Number of Summer Days", "Number of Icing Days", "Number of Tropical Nights", "Growing Season Length",
-                          "Monthly Maximum of Daily Maximum Temperature", "Monthly Maximum of Daily Minimum Temperature",
-                          "Monthly Minimum of Daily Maximum Temperature", "Monthly Minimum of Daily Minimum Temperature",
-                          "Percentage of Days when Daily Minimum Temperature is Below the 10th Percentile", "Percentage of Days when Daily Maximum Temperature is Below the 10th Percentile",
-                          "Percentage of Days when Daily Minimum Temperature is Above the 90th Percentile", "Percentage of Days when Daily Maximum Temperature is Above the 90th Percentile",
-                          "Annual Maximum of Daily Maximum Temperature", "Annual Maximum of Daily Minimum Temperature",
-                          "Annual Minimum of Daily Maximum Temperature", "Annual Minimum of Daily Minimum Temperature",
-                          "Percentage of Days when Daily Minimum Temperature is Below the 10th Percentile", "Percentage of Days when Daily Maximum Temperature is Below the 10th Percentile",
-                          "Percentage of Days when Daily Minimum Temperature is Above the 90th Percentile", "Percentage of Days when Daily Maximum Temperature is Above the 90th Percentile",
-                          "Warm Spell Duration Index", "Cold Spell Duration Index",
-                          "Mean Diurnal Temperature Range", "Monthly Maximum 1-day Precipitation", "Monthly Maximum Consecutive 5-day Precipitation",
-                          "Mean Diurnal Temperature Range", "Annual Maximum 1-day Precipitation", "Annual Maximum Consecutive 5-day Precipitation",
-                          "Simple Precipitation Intensity Index", "Annual Count of Days with At Least 10mm of Precipitation",
-                          "Annual Count of Days with At Least 20mm of Precipitation", "Annual Count of Days with At Least 1mm of Precipitation",
-                          "Maximum Number of Consecutive Days with Less Than 1mm of Precipitation", "Maximum Number of Consecutive Days with At Least 1mm of Precipitation",
-                          "Annual Total Precipitation when Daily Precipitation Exceeds the 95th Percentile of Wet Day Precipitation",
-                          "Annual Total Precipitation when Daily Precipitation Exceeds the 99th Percentile of Wet Day Precipitation", "Annual Total Precipitation in Wet Days",
-                          "Maximum Number of Consecutive Days Per Year with Less Than 1mm of Precipitation", "Maximum Number of Consecutive Days Per Year with At Least 1mm of Precipitation",
-                          "Cold Spell Duration Index Spanning Years", "Warm Spell Duration Index Spanning Years"),
-                        var.name=c("fdETCCDI", "suETCCDI", "idETCCDI", "trETCCDI", "gslETCCDI",
-                          "txxETCCDI", "tnxETCCDI", "txnETCCDI", "tnnETCCDI", "tn10pETCCDI", "tx10pETCCDI", "tn90pETCCDI", "tx90pETCCDI",
-                          "txxETCCDI", "tnxETCCDI", "txnETCCDI", "tnnETCCDI", "tn10pETCCDI", "tx10pETCCDI", "tn90pETCCDI", "tx90pETCCDI",
-                          "wsdiETCCDI", "csdiETCCDI",
-                          "dtrETCCDI", "rx1dayETCCDI", "rx5dayETCCDI",
-                          "dtrETCCDI", "rx1dayETCCDI", "rx5dayETCCDI",
-                          "sdiiETCCDI", "r10mmETCCDI", "r20mmETCCDI", "r1mmETCCDI", "cddETCCDI", "cwdETCCDI", "r95pETCCDI", "r99pETCCDI", "prcptotETCCDI",
-                          "altcddETCCDI", "altcwdETCCDI", "altcsdiETCCDI", "altwsdiETCCDI"),
-                        units=c("days", "days", "days", "days", "days",
-                          "degrees_C", "degrees_C", "degrees_C", "degrees_C", "%", "%", "%", "%",
-                          "degrees_C", "degrees_C", "degrees_C", "degrees_C", "%", "%", "%", "%",
-                          "days", "days",
-                          "degrees_C", "mm", "mm",
-                          "degrees_C", "mm", "mm",
-                          "mm d-1", "days", "days", "days", "days", "days", "mm", "mm", "mm",
-                          "days", "days", "days", "days"),
-                        annual=c(T, T, T, T, T,
-                          F, F, F, F, F, F, F, F,
-                          T, T, T, T, T, T, T, T,
-                          T, T,
-                          F, F, F,
-                          T, T, T,
-                          T, T, T, T, T, T, T, T, T,
-                          T, T, T, T),
-                        base.period.attr=c(F, F, F, F, F,
-                          F, F, F, F, T, T, T, T,
-                          F, F, F, F, T, T, T, T,
-                          T, T,
-                          F, F, F,
-                          F, F, F,
-                          F, F, F, F, F, F, T, T, F,
-                          F, F, T, T),
-                         row.names=c("fdETCCDI_yr", "suETCCDI_yr", "idETCCDI_yr", "trETCCDI_yr", "gslETCCDI_yr",
-                           "txxETCCDI_mon", "tnxETCCDI_mon", "txnETCCDI_mon", "tnnETCCDI_mon", "tn10pETCCDI_mon", "tx10pETCCDI_mon", "tn90pETCCDI_mon", "tx90pETCCDI_mon",
-                           "txxETCCDI_yr", "tnxETCCDI_yr", "txnETCCDI_yr", "tnnETCCDI_yr", "tn10pETCCDI_yr", "tx10pETCCDI_yr", "tn90pETCCDI_yr", "tx90pETCCDI_yr",
-                           "wsdiETCCDI_yr", "csdiETCCDI_yr",
-                           "dtrETCCDI_mon", "rx1dayETCCDI_mon", "rx5dayETCCDI_mon",
-                           "dtrETCCDI_yr", "rx1dayETCCDI_yr", "rx5dayETCCDI_yr",
-                           "sdiiETCCDI_yr", "r10mmETCCDI_yr", "r20mmETCCDI_yr", "r1mmETCCDI_yr", "cddETCCDI_yr", "cwdETCCDI_yr", "r95pETCCDI_yr", "r99pETCCDI_yr", "prcptotETCCDI_yr",
-                           "altcddETCCDI_yr", "altcwdETCCDI_yr", "altcsdiETCCDI_yr", "altwsdiETCCDI_yr"),
+  all.data <- data.frame(long.name=c("Annual Number of Frost Days", "Annual Number of Summer Days", "Annual Number of Icing Days", "Annual Number of Tropical Nights", "Growing Season Length",
+                                     "Monthly Number of Frost Days", "Monthly Number of Summer Days", "Monthly Number of Icing Days", "Monthly Number of Tropical Nights",
+                                     
+                                     "Monthly Maximum of Daily Maximum Temperature", "Monthly Maximum of Daily Minimum Temperature",
+                                     "Monthly Minimum of Daily Maximum Temperature", "Monthly Minimum of Daily Minimum Temperature",
+                                     
+                                     "Percentage of Days when Daily Minimum Temperature is Below the 10th Percentile", "Percentage of Days when Daily Maximum Temperature is Below the 10th Percentile",
+                                     "Percentage of Days when Daily Minimum Temperature is Above the 90th Percentile", "Percentage of Days when Daily Maximum Temperature is Above the 90th Percentile",
+                                     "Annual Maximum of Daily Maximum Temperature", "Annual Maximum of Daily Minimum Temperature",
+                                     "Annual Minimum of Daily Maximum Temperature", "Annual Minimum of Daily Minimum Temperature",
+                                     "Percentage of Days when Daily Minimum Temperature is Below the 10th Percentile", "Percentage of Days when Daily Maximum Temperature is Below the 10th Percentile",
+                                     "Percentage of Days when Daily Minimum Temperature is Above the 90th Percentile", "Percentage of Days when Daily Maximum Temperature is Above the 90th Percentile",
+                                     
+                                     "Warm Spell Duration Index", "Cold Spell Duration Index",
+                                     
+                                     "Mean Diurnal Temperature Range", "Monthly Maximum 1-day Precipitation", "Monthly Maximum Consecutive 5-day Precipitation",
+                                     "Mean Diurnal Temperature Range", "Annual Maximum 1-day Precipitation", "Annual Maximum Consecutive 5-day Precipitation",
+                                     
+                                     "Annual Simple Precipitation Intensity Index", "Annual Count of Days with At Least 10mm of Precipitation",
+                                     "Annual Count of Days with At Least 20mm of Precipitation", "Annual Count of Days with At Least 1mm of Precipitation",
+                                     "Maximum Number of Consecutive Days with Less Than 1mm of Precipitation", "Maximum Number of Consecutive Days with At Least 1mm of Precipitation",
+                                     "Annual Total Precipitation when Daily Precipitation Exceeds the 95th Percentile of Wet Day Precipitation",
+                                     "Annual Total Precipitation when Daily Precipitation Exceeds the 99th Percentile of Wet Day Precipitation", "Annual Total Precipitation in Wet Days",
+                                     
+                                     "Monthly Simple Precipitation Intensity Index", "Monthly Count of Days with At Least 10mm of Precipitation",
+                                     "Monthly Count of Days with At Least 20mm of Precipitation", "Monthly Count of Days with At Least 1mm of Precipitation",
+                                     "Monthly Total Precipitation when Daily Precipitation Exceeds the 95th Percentile of Wet Day Precipitation",
+                                     "Monthly Total Precipitation when Daily Precipitation Exceeds the 99th Percentile of Wet Day Precipitation", "Monthly Total Precipitation in Wet Days",
+                                     
+                                     "Maximum Number of Consecutive Days Per Year with Less Than 1mm of Precipitation", "Maximum Number of Consecutive Days Per Year with At Least 1mm of Precipitation",
+                                     "Cold Spell Duration Index Spanning Years", "Warm Spell Duration Index Spanning Years"),
+                         
+                         var.name=c("fdETCCDI", "suETCCDI","idETCCDI", "trETCCDI", "gslETCCDI",
+                                    "fdETCCDI", "suETCCDI","idETCCDI", "trETCCDI",
+                                    
+                                    "txxETCCDI", "tnxETCCDI", "txnETCCDI", "tnnETCCDI", "tn10pETCCDI", "tx10pETCCDI", "tn90pETCCDI", "tx90pETCCDI",
+                                    "txxETCCDI", "tnxETCCDI", "txnETCCDI", "tnnETCCDI", "tn10pETCCDI", "tx10pETCCDI", "tn90pETCCDI", "tx90pETCCDI",
+                                    
+                                    "wsdiETCCDI", "csdiETCCDI",
+                                    
+                                    "dtrETCCDI", "rx1dayETCCDI", "rx5dayETCCDI",
+                                    "dtrETCCDI", "rx1dayETCCDI", "rx5dayETCCDI",
+                                    
+                                    "sdiiETCCDI", "r10mmETCCDI", "r20mmETCCDI", "r1mmETCCDI", "cddETCCDI", "cwdETCCDI",  "r95pETCCDI", "r99pETCCDI", "prcptotETCCDI",
+                                    "sdiiETCCDI", "r10mmETCCDI", "r20mmETCCDI", "r1mmETCCDI", "r95pETCCDI", "r99pETCCDI", "prcptotETCCDI",
+                                    
+                                    "altcddETCCDI", "altcwdETCCDI", "altcsdiETCCDI", "altwsdiETCCDI"),
+                         
+                         units=c( "days", "days", "days","days", "days",
+                                 "days", "days", "days","days",
+                                 
+                                 "degrees_C", "degrees_C", "degrees_C", "degrees_C", "%", "%", "%", "%",
+                                 "degrees_C", "degrees_C", "degrees_C", "degrees_C", "%", "%", "%", "%",
+                                 
+                                 "days", "days",
+                                 
+                                 "degrees_C", "mm", "mm",
+                                 "degrees_C", "mm", "mm",
+                                 
+                                 "mm d-1", "days", "days", "days", "days", "days", "mm", "mm", "mm",
+                                 "mm d-1", "days", "days", "days", "mm", "mm", "mm",
+                                 
+                                 "days", "days", "days", "days"),
+                         annual=c(T, T, T, T, T,
+                                  F, F, F, F,
+                                  
+                                  F, F, F, F, F, F, F, F,
+                                  T, T, T, T, T, T, T, T,
+                                  
+                                  T, T,
+                                  
+                                  F, F, F,
+                                  T, T, T,
+                                  
+                                  T, T, T, T, T, T, T, T, T,
+                                  F, F, F, F, F, F, F,
+                                  
+                                  T, T, T, T),
+                         
+                         base.period.attr=c(F, F, F, F, F,
+                                            F, F, F, F,
+                                            
+                                            F, F, F, F, T, T, T, T,
+                                            F, F, F, F, T, T, T, T,
+                                            
+                                            T, T,
+                                            
+                                            F, F, F,
+                                            F, F, F,
+                                            
+                                            F, F, F, F, F, F, T, T, F,
+                                            F, F, F, F, T, T, F,
+                                            
+                                            F, F, T, T),
+                         
+                         row.names=c( "fdETCCDI_yr", "suETCCDI_yr", "idETCCDI_yr", "trETCCDI_yr", "gslETCCDI_yr",
+                                      "fdETCCDI_mon", "suETCCDI_mon", "idETCCDI_mon", "trETCCDI_mon",
+                                      
+                                      "txxETCCDI_mon", "tnxETCCDI_mon", "txnETCCDI_mon", "tnnETCCDI_mon", "tn10pETCCDI_mon", "tx10pETCCDI_mon", "tn90pETCCDI_mon", "tx90pETCCDI_mon",
+                                      "txxETCCDI_yr", "tnxETCCDI_yr", "txnETCCDI_yr", "tnnETCCDI_yr", "tn10pETCCDI_yr", "tx10pETCCDI_yr", "tn90pETCCDI_yr", "tx90pETCCDI_yr",
+                                      
+                                      "wsdiETCCDI_yr", "csdiETCCDI_yr",
+                                      
+                                      "dtrETCCDI_mon", "rx1dayETCCDI_mon", "rx5dayETCCDI_mon",
+                                      "dtrETCCDI_yr", "rx1dayETCCDI_yr", "rx5dayETCCDI_yr",
+                                      
+                                      "sdiiETCCDI_yr", "r10mmETCCDI_yr", "r20mmETCCDI_yr", "r1mmETCCDI_yr", "cddETCCDI_yr", "cwdETCCDI_yr", "r95pETCCDI_yr", "r99pETCCDI_yr", "prcptotETCCDI_yr",
+                                      "sdiiETCCDI_mon", "r10mmETCCDI_mon", "r20mmETCCDI_mon", "r1mmETCCDI_mon", "r95pETCCDI_mon", "r99pETCCDI_mon", "prcptotETCCDI_mon",
+                                      
+                                      "altcddETCCDI_yr", "altcwdETCCDI_yr", "altcsdiETCCDI_yr", "altwsdiETCCDI_yr"),
                          stringsAsFactors=FALSE)
 
   standard.name.lookup <- c(fdETCCDI="number_frost_days", suETCCDI="number_summer_days", idETCCDI="number_icing_days", trETCCDI="number_tropical_nights", gslETCCDI="growing_season_length",
@@ -363,7 +450,7 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
   
   all.data$standard.name <- standard.name.lookup[all.data$var.name]
 
-  all.data$filename <- create.climdex.cmip5.filenames(ncdf4.helpers::get.split.filename.cmip5(template.filename), rownames(all.data))
+  all.data$filename <- create.climdex.eobs.filenames(get.split.filename.eobs(template.filename), rownames(all.data))
   return(all.data[vars.list,])
 }
 
@@ -502,6 +589,7 @@ get.ts <- function(f) {
   ts.list[[1]]
 }
 
+
 ## Compute all indices for a single grid box
 #' Compute Climdex indices using provided data.
 #' 
@@ -596,16 +684,17 @@ flatten.dims <- function(dat, reduce.dims, names.subset) {
 #' \donttest{get.data(f, "pr", list(Y=3), "kg m-2 s-1", "kg m-2 s-1", c(X="lon",Y="lat",T="time"))}
 #'
 #' @export
-get.data <- function(f, v, subset, src.units, dest.units, dim.axes) {
+get.data <- function(f, v, subset, src.units, dim.axes) {
   stopifnot(inherits(f, "ncdf4"))
-  dat <- if(!missing(src.units) && !missing(dest.units))
-    udunits2::ud.convert(ncdf4.helpers::nc.get.var.subset.by.axes(f, v, subset), src.units, dest.units)
-  else
-    ncdf4.helpers::nc.get.var.subset.by.axes(f, v, subset)
-    
+  #dat <- if(!missing(src.units) && !missing(dest.units))
+  # udunits2::ud.convert(ncdf4.helpers::nc.get.var.subset.by.axes(f, v, subset), src.units, dest.units)
+  #else
+  dat <- ncdf4.helpers::nc.get.var.subset.by.axes(f, v, subset)
+  
   reduce.dims <- which(dim.axes %in% c("X", "Y", "Z"))
   return(t(flatten.dims(dat, reduce.dims=reduce.dims)))
 }
+
 
 ## Produce slab of northern.hemisphere booleans of the same shape as the data.
 #' Determine what portions of a subset are within the northern hemisphere.
@@ -780,12 +869,12 @@ get.lat <- function(open_file_list, variable.name.map) {
 #' }
 #'
 #' @export
-compute.indices.for.stripe <- function(subset, cdx.funcs, ts, base.range, dim.axes, v.f.idx, variable.name.map, src.units, dest.units, t.f.idx, thresholds.name.map, fclimdex.compatible=TRUE, projection=NULL, f, thresholds.netcdf) {
+compute.indices.for.stripe <- function(subset, cdx.funcs, ts, base.range, dim.axes, v.f.idx, variable.name.map, src.units, t.f.idx, thresholds.name.map, fclimdex.compatible=TRUE, projection=NULL, f, thresholds.netcdf) {
   f <- if(missing(f)) get("f", .GlobalEnv) else f
   thresholds.netcdf <- if(missing(thresholds.netcdf)) get("thresholds.netcdf", .GlobalEnv) else thresholds.netcdf
   
   ## Dimension order: Time, Space for each Var in list
-  data.list <- sapply(names(v.f.idx), function(x) { gc(); get.data(f[[v.f.idx[x]]], variable.name.map[x], subset, src.units[x], dest.units[x], dim.axes) }, simplify=FALSE)
+  data.list <- sapply(names(v.f.idx), function(x) { gc(); get.data(f[[v.f.idx[x]]], variable.name.map[x], subset, src.units[x], dim.axes) }, simplify=FALSE)
   gc()
 
   northern.hemisphere <- get.northern.hemisphere.booleans(subset, f[[v.f.idx[1]]], variable.name.map[names(v.f.idx)[1]], projection)
@@ -962,9 +1051,9 @@ write.climdex.results <- function(climdex.results, chunk.subset, cdx.ncfile, dim
 #' }
 #'
 #' @export
-get.quantiles.for.stripe <- function(subset, ts, base.range, dim.axes, v.f.idx, variable.name.map, src.units, dest.units, f) {
+get.quantiles.for.stripe <- function(subset, ts, base.range, dim.axes, v.f.idx, variable.name.map, src.units, f) {
   f <- if(missing(f)) get("f", .GlobalEnv) else f
-  data.list <- sapply(names(v.f.idx), function(x) { gc(); get.data(f[[v.f.idx[x]]], variable.name.map[x], subset, src.units[x], dest.units[x], dim.axes) }, simplify=FALSE)
+  data.list <- sapply(names(v.f.idx), function(x) { gc(); get.data(f[[v.f.idx[x]]], variable.name.map[x], subset, src.units[x], dim.axes) }, simplify=FALSE)
   gc()
 
   r <- 1:(dim(data.list[[1]])[2])
@@ -1186,7 +1275,7 @@ create.file.metadata <- function(f, variable.name.map) {
     stop("Variable(s) present in more than one input file.")
 
   ## Get units and specify destination units
-  dest.units <- c(prec="kg m-2 d-1", tmax="degrees_C", tmin="degrees_C", tavg="degrees_C")
+  dest.units <- c(prec="mm", tmax="degrees_C", tmin="degrees_C", tavg="degrees_C")
   dest.units <- dest.units[names(dest.units) %in% names(v.f.idx)]
 
   ## Get projection
@@ -1218,8 +1307,8 @@ get.thresholds.metadata <- function(var.names) {
                         tx90thresh=list(units="degrees_C", longname="90th_percentile_running_baseline_tasmax", has.time=TRUE, q.path=c("tmax", "outbase", "q90")),
                         tn10thresh=list(units="degrees_C", longname="10th_percentile_running_baseline_tasmin", has.time=TRUE, q.path=c("tmin", "outbase", "q10")),
                         tn90thresh=list(units="degrees_C", longname="90th_percentile_running_baseline_tasmin", has.time=TRUE, q.path=c("tmin", "outbase", "q90")),
-                        r95thresh=list(units="kg m-2 d-1", longname="95th_percentile_baseline_wet_day_pr", has.time=FALSE, q.path=c("prec", "q95")),
-                        r99thresh=list(units="kg m-2 d-1", longname="99th_percentile_baseline_wet_day_pr", has.time=FALSE, q.path=c("prec", "q99")))
+                        r95thresh=list(units="mm", longname="95th_percentile_baseline_wet_day_pr", has.time=FALSE, q.path=c("prec", "q95")),
+                        r99thresh=list(units="mm", longname="99th_percentile_baseline_wet_day_pr", has.time=FALSE, q.path=c("prec", "q99")))
   return(threshold.dat[sapply(threshold.dat, function(x) { x$q.path[1] %in% var.names })])
 }
 
@@ -1259,7 +1348,7 @@ unsquash.dims <- function(dat.dim, subset, f, n) {
 #' }
 #'
 #' @export
-create.thresholds.from.file <- function(input.files, output.file, author.data, variable.name.map=c(tmax="tasmax", tmin="tasmin", prec="pr", tavg="tas"), axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990), parallel=4, verbose=FALSE, max.vals.millions=10, cluster.type="SOCK") {
+create.thresholds.from.file <- function(input.files, output.file, author.data, variable.name.map=c(tmax="tx", tmin="tn", prec="rr", tavg="tg"), axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990), parallel=4, verbose=FALSE, max.vals.millions=20, cluster.type="SOCK") {
   if(!(is.logical(parallel) || is.numeric(parallel)))
     stop("'parallel' option must be logical or numeric.")
 
@@ -1299,13 +1388,13 @@ create.thresholds.from.file <- function(input.files, output.file, author.data, v
     snow::clusterEvalQ(cluster, f <<- lapply(input.files, ncdf4::nc_open, readunlim=FALSE))
 
     ## Compute subsets and fire jobs off; collect and write out chunk-at-a-time
-    parLapplyLBFiltered(cluster, subsets, get.quantiles.for.stripe, f.meta$ts, base.range, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, f.meta$src.units, f.meta$dest.units, local.filter.func=write.thresholds.data)
+    parLapplyLBFiltered(cluster, subsets, get.quantiles.for.stripe, f.meta$ts, base.range, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, f.meta$src.units, local.filter.func=write.thresholds.data)
 
     snow::stopCluster(cluster)
   } else {
     ##try(getFromNamespace('nc_set_chunk_cache', 'ncdf4')(1024 * 2048, 1009), silent=TRUE)
 
-    lapply(subsets, function(x) { write.thresholds.data(get.quantiles.for.stripe(x, f.meta$ts, base.range, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, f.meta$src.units, f.meta$dest.units, f), x) })
+    lapply(subsets, function(x) { write.thresholds.data(get.quantiles.for.stripe(x, f.meta$ts, base.range, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, f.meta$src.units, f), x) })
 
     lapply(f, ncdf4::nc_close)
   }
@@ -1440,7 +1529,7 @@ get.thresholds.f.idx <- function(thresholds.files, thresholds.name.map) {
 #' }
 #'
 #' @export
-create.indices.from.files <- function(input.files, out.dir, output.filename.template, author.data, climdex.vars.subset=NULL, climdex.time.resolution=c("all", "annual", "monthly"), variable.name.map=c(tmax="tasmax", tmin="tasmin", prec="pr", tavg="tas"), axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990), parallel=4, verbose=FALSE, thresholds.files=NULL, thresholds.name.map=c(tx10thresh="tx10thresh", tn10thresh="tn10thresh", tx90thresh="tx90thresh", tn90thresh="tn90thresh", r95thresh="r95thresh", r99thresh="r99thresh"), max.vals.millions=10, cluster.type="SOCK") {
+create.indices.from.files <- function(input.files, out.dir, output.filename.template, author.data, climdex.vars.subset=NULL, climdex.time.resolution=c("all", "annual", "monthly"), variable.name.map=c(tmax="tx", tmin="tn", prec="rr", tavg="tg"), axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990), parallel=4, verbose=FALSE, thresholds.files=NULL, thresholds.name.map=c(tx10thresh="tx10thresh", tn10thresh="tn10thresh", tx90thresh="tx90thresh", tn90thresh="tn90thresh", r95thresh="r95thresh", r99thresh="r99thresh"), max.vals.millions=20, cluster.type="SOCK") {
   if(!(is.logical(parallel) || is.numeric(parallel)))
     stop("'parallel' option must be logical or numeric.")
 
@@ -1474,7 +1563,7 @@ create.indices.from.files <- function(input.files, out.dir, output.filename.temp
     snow::clusterEvalQ(cluster, thresholds.netcdf <<- thresholds.open(thresholds.files))
 
     ## Meat...
-    parLapplyLBFiltered(cluster, subsets, compute.indices.for.stripe, cdx.funcs, f.meta$ts, base.range, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, f.meta$src.units, f.meta$dest.units, t.f.idx, thresholds.name.map, fclimdex.compatible, f.meta$projection, local.filter.func=function(x, x.sub) {
+    parLapplyLBFiltered(cluster, subsets, compute.indices.for.stripe, cdx.funcs, f.meta$ts, base.range, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, f.meta$src.units, t.f.idx, thresholds.name.map, fclimdex.compatible, f.meta$projection, local.filter.func=function(x, x.sub) {
       write.climdex.results(x, x.sub, cdx.ncfile, f.meta$dim.size, cdx.meta$var.name)
     })
 
@@ -1486,7 +1575,7 @@ create.indices.from.files <- function(input.files, out.dir, output.filename.temp
     ##try(getFromNamespace('nc_set_chunk_cache', 'ncdf4')(1024 * 2048, 1009), silent=TRUE)
     
     ## Meat...
-    lapply(subsets, function(x) { write.climdex.results(compute.indices.for.stripe(x, cdx.funcs, f.meta$ts, base.range, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, f.meta$src.units, f.meta$dest.units, t.f.idx, thresholds.name.map, fclimdex.compatible, f.meta$projection, f, thresholds.netcdf), x, cdx.ncfile, f.meta$dim.size, cdx.meta$var.name) })
+    lapply(subsets, function(x) { write.climdex.results(compute.indices.for.stripe(x, cdx.funcs, f.meta$ts, base.range, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, f.meta$src.units, t.f.idx, thresholds.name.map, fclimdex.compatible, f.meta$projection, f, thresholds.netcdf), x, cdx.ncfile, f.meta$dim.size, cdx.meta$var.name) })
 
     ## Clean-up.
     thresholds.close(thresholds.netcdf)
