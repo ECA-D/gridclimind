@@ -202,7 +202,7 @@ get.climdex.variable.list <- function(source.data.present, time.resolution=c("al
   vars.by.src.data.reqd <- list(tmax=c("csuETCCDI", "suETCCDI", "idETCCDI", "txxETCCDI", "txnETCCDI", "tx10pETCCDI", "tx90pETCCDI", "wsdiETCCDI", "altwsdiETCCDI"),
                                 tmin=c("cfdETCCDI", "fdETCCDI", "trETCCDI", "tnxETCCDI", "tnnETCCDI", "tn10pETCCDI", "tn90pETCCDI", "csdiETCCDI", "altcsdiETCCDI"),
                                 prec=c("spiETCCDI", "rx1dayETCCDI", "rx5dayETCCDI", "sdiiETCCDI", "r10mmETCCDI", "r20mmETCCDI", "r1mmETCCDI",
-                                       "cddETCCDI", "cwdETCCDI", "r95ptotETCCDI", "r99ptotETCCDI", "prcptotETCCDI", "altcddETCCDI", "altcwdETCCDI"),
+                                       "cddETCCDI", "cwdETCCDI", "r75ptotETCCDI", "r95ptotETCCDI", "r99ptotETCCDI", "prcptotETCCDI", "altcddETCCDI", "altcwdETCCDI"),
                                 tavg=c("hd17ETCCDI", "hiETCCDI", "gslETCCDI", "dtrETCCDI") )
   
   if(any(!(source.data.present %in% c("tmin", "tmax", "tavg", "prec"))))
@@ -276,7 +276,7 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
                   
                   "climdex.cdd", "climdex.cwd", "climdex.cdd", "climdex.cwd", "climdex.csdi", "climdex.wsdi")
   #
-  func.names <- c(func.names, "climdex.csu", "climdex.csu", "climdex.cfd", "climdex.cfd", "climdex.hd17", "climdex.hd17", "climdex.HI", "climdex.spi")
+  func.names <- c(func.names, "climdex.r75ptot", "climdex.csu", "climdex.csu", "climdex.cfd", "climdex.cfd", "climdex.hd17", "climdex.hd17", "climdex.HI", "climdex.spi")
   
   
   el <- list()
@@ -304,7 +304,7 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
                            c(af, altcwdd.opts), c(af, altcwdd.opts), c(mf, altcwdd.opts), c(mf, altcwdd.opts), altwcsdi.opts, altwcsdi.opts)
   
   #
-  options <- c(options, list(af, mf, af, mf, af, mf, af, mf))
+  options <- c(options, list(af, mf, af, mf, af, mf, af, mf, af, mf))
   
   func <- lapply(1:length(func.names), function(n) do.call(functional::Curry, c(list(getFromNamespace(func.names[n], 'climdex.pcic')), options[[n]])))
   
@@ -324,7 +324,7 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
                    
                    "altcddETCCDI_yr", "altcwdETCCDI_yr", "altcddETCCDI_mon", "altcwdETCCDI_mon", "altcsdiETCCDI_yr", "altwsdiETCCDI_yr", 
                    
-                   "csuETCCDI_yr", "csuETCCDI_mon", "cdfETCCDI_yr", "cdfETCCDI_mon", "hd17ETCCDI_yr", "hd17ETCCDI_mon", "hiETCCDI_yr", "spiETCCDI_mon")
+                   "r75ptotETCCDI_yr", "r75ptotETCCDI_mon", "csuETCCDI_yr", "csuETCCDI_mon", "cdfETCCDI_yr", "cdfETCCDI_mon", "hd17ETCCDI_yr", "hd17ETCCDI_mon", "hiETCCDI_yr", "spiETCCDI_mon")
 
   return(func[vars.list])
 }
@@ -472,14 +472,16 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
   ## Adding a new variable, explictily adding it as a new row in stead of introducing it in the large data.frame above. This
   ## makes it less likely that we have errors in lining up the variables. 
   ## TODO: Refactor the code above to add the rows like below, easier to read.
-  all.data = rbind(all.data,  csuETCCDI_yr = data.frame(long.name = 'Annual Number of Consecutive Summer days', var.name = 'csuETCCDI', units = 'days', annual = TRUE, base.period.attr = FALSE),
-                              csuETCCDI_mon = data.frame(long.name = 'Monthly Number of Consecutive Summer days', var.name = 'csuETCCDI', units = 'days', annual = FALSE, base.period.attr = FALSE),
-                              cfdETCCDI_yr = data.frame(long.name = 'Annual Number of Consecutive Frost days', var.name = 'cfdETCCDI', units = 'days', annual = TRUE, base.period.attr = FALSE),
-                              cfdETCCDI_mon = data.frame(long.name = 'Monthly Number of Consecutive Frost days', var.name = 'cfdETCCDI', units = 'days', annual = FALSE, base.period.attr = FALSE),
-                              hd17ETCCDI_yr = data.frame(long.name = 'Annual Heating Degree days', var.name = 'hd17ETCCDI', units = 'degrees_C', annual = TRUE, base.period.attr = FALSE),
-                              hd17ETCCDI_mon = data.frame(long.name = 'Monthly Heating Degree days', var.name = 'hd17ETCCDI', units = 'degrees_C', annual = FALSE, base.period.attr = FALSE),
-                              hiETCCDI_yr = data.frame(long.name = 'Huglin Index', var.name = 'hiETCCDI', units = 'degrees_C', annual = TRUE, base.period.attr = FALSE),
-                              spiETCCDI_mon = data.frame(long.name = 'Standardized Precipitation Index', var.name = 'spiETCCDI', units = '', annual = FALSE, base.period.attr = FALSE))
+  all.data = rbind(all.data, r75ptotETCCDI_yr = data.frame(long.name = 'Annual Total Precipitation when Daily Precipitation Exceeds the 75th Percentile of Wet Day Precipitation', var.name = 'r75ptotETCCDI', units = 'mm', annual = TRUE, base.period.attr = FALSE),
+                             r75ptotETCCDI_mon = data.frame(long.name = 'Monthly Total Precipitation when Daily Precipitation Exceeds the 75th Percentile of Wet Day Precipitation', var.name = 'r75ptotETCCDI', units = 'mm', annual = FALSE, base.period.attr = FALSE),
+                             csuETCCDI_yr = data.frame(long.name = 'Annual Number of Consecutive Summer days', var.name = 'csuETCCDI', units = 'days', annual = TRUE, base.period.attr = FALSE),
+                             csuETCCDI_mon = data.frame(long.name = 'Monthly Number of Consecutive Summer days', var.name = 'csuETCCDI', units = 'days', annual = FALSE, base.period.attr = FALSE),
+                             cfdETCCDI_yr = data.frame(long.name = 'Annual Number of Consecutive Frost days', var.name = 'cfdETCCDI', units = 'days', annual = TRUE, base.period.attr = FALSE),
+                             cfdETCCDI_mon = data.frame(long.name = 'Monthly Number of Consecutive Frost days', var.name = 'cfdETCCDI', units = 'days', annual = FALSE, base.period.attr = FALSE),
+                             hd17ETCCDI_yr = data.frame(long.name = 'Annual Heating Degree days', var.name = 'hd17ETCCDI', units = 'degrees_C', annual = TRUE, base.period.attr = FALSE),
+                             hd17ETCCDI_mon = data.frame(long.name = 'Monthly Heating Degree days', var.name = 'hd17ETCCDI', units = 'degrees_C', annual = FALSE, base.period.attr = FALSE),
+                             hiETCCDI_yr = data.frame(long.name = 'Huglin Index', var.name = 'hiETCCDI', units = 'degrees_C', annual = TRUE, base.period.attr = FALSE),
+                             spiETCCDI_mon = data.frame(long.name = 'Standardized Precipitation Index', var.name = 'spiETCCDI', units = '', annual = FALSE, base.period.attr = FALSE))
 
 
   standard.name.lookup <- c(fdETCCDI="number_frost_days", suETCCDI="number_summer_days", idETCCDI="number_icing_days", trETCCDI="number_tropical_nights", gslETCCDI="growing_season_length",
@@ -494,7 +496,7 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                             altcddETCCDI="maximum_number_consecutive_dry_days", altcwdETCCDI="maximum_number_consecutive_wet_days",
                             r95ptotETCCDI="total_precipitation_exceeding_95th_percentile", r99ptotETCCDI="total_precipitation_exceeding_99th_percentile", prcptotETCCDI="total_wet_day_precipitation")
   
-  standard.name.lookup <- c(standard.name.lookup, csu="consecutive_summer_days", cfd="consecutive_frost_days", hd17="heating_degree_days", hi="huglin_index", spi="standardized_precipitation_index")
+  standard.name.lookup <- c(standard.name.lookup, r75ptotETCCDI="total_precipitation_exceeding_75th_percentile", csuETCCDI="consecutive_summer_days", cfdETCCDI="consecutive_frost_days", hd17ETCCDI="heating_degree_days", hiETCCDI="huglin_index", spiETCCDI="standardized_precipitation_index")
   
   all.data$standard.name <- standard.name.lookup[all.data$var.name]
 
@@ -979,7 +981,7 @@ compute.indices.for.stripe <- function(subset, cdx.funcs, ts, base.range, dim.ax
 #'
 #' @export
 get.thresholds.chunk <- function(subset, cdx.funcs, thresholds.netcdf, t.f.idx, thresholds.name.map) {
-  var.thresh.map <- list(tx10thresh=c("tx10p"), tx90thresh=c("tx90p", "WSDI"), tn10thresh=c("tn10p", "CSDI"), tn90thresh=c("tn90p"), r95thresh=c("r95p"), r99thresh=c("r99p"))
+  var.thresh.map <- list(tx10thresh=c("tx10p"), tx90thresh=c("tx90p", "WSDI"), tn10thresh=c("tn10p", "CSDI"), tn90thresh=c("tn90p"), r75thresh=c("r75p"), r95thresh=c("r95p"), r99thresh=c("r99p"))
   
   cdx.names <- names(cdx.funcs)
   thresh.var.needed <- names(var.thresh.map)[sapply(var.thresh.map, function(x) { any(unlist(lapply(x, function(substr) { any(grepl(substr, cdx.names)) }))) })]
@@ -1356,6 +1358,7 @@ get.thresholds.metadata <- function(var.names) {
                         tx90thresh=list(units="degrees_C", longname="90th_percentile_running_baseline_tasmax", has.time=TRUE, q.path=c("tmax", "outbase", "q90")),
                         tn10thresh=list(units="degrees_C", longname="10th_percentile_running_baseline_tasmin", has.time=TRUE, q.path=c("tmin", "outbase", "q10")),
                         tn90thresh=list(units="degrees_C", longname="90th_percentile_running_baseline_tasmin", has.time=TRUE, q.path=c("tmin", "outbase", "q90")),
+                        r75thresh=list(units="mm", longname="75th_percentile_baseline_wet_day_pr", has.time=FALSE, q.path=c("prec", "q75")),
                         r95thresh=list(units="mm", longname="95th_percentile_baseline_wet_day_pr", has.time=FALSE, q.path=c("prec", "q95")),
                         r99thresh=list(units="mm", longname="99th_percentile_baseline_wet_day_pr", has.time=FALSE, q.path=c("prec", "q99")))
   return(threshold.dat[sapply(threshold.dat, function(x) { x$q.path[1] %in% var.names })])
@@ -1550,6 +1553,7 @@ get.thresholds.f.idx <- function(thresholds.files, thresholds.name.map) {
 #' \item{tn10thresh}{10th percentile for a 5-day running window of baseline daily minimum temperature.}
 #' \item{tx90thresh}{90th percentile for a 5-day running window of baseline daily maximum temperature.}
 #' \item{tn90thresh}{90th percentile for a 5-day running window of baseline daily minimum temperature.}
+#' \item{r75thresh}{75th percentile of daily precipitation in wet days (>=1 mm of rain).}
 #' \item{r95thresh}{95th percentile of daily precipitation in wet days (>=1 mm of rain).}
 #' \item{r99thresh}{99th percentile of daily precipitation in wet days (>=1 mm of rain).}
 #' }
@@ -1578,7 +1582,7 @@ get.thresholds.f.idx <- function(thresholds.files, thresholds.name.map) {
 #' }
 #'
 #' @export
-create.indices.from.files <- function(input.files, out.dir, output.filename.template, author.data, climdex.vars.subset=NULL, climdex.time.resolution=c("all", "annual", "monthly"), variable.name.map=c(tmax="tx", tmin="tn", prec="rr", tavg="tg"), axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990), parallel=4, verbose=FALSE, thresholds.files=NULL, thresholds.name.map=c(tx10thresh="tx10thresh", tn10thresh="tn10thresh", tx90thresh="tx90thresh", tn90thresh="tn90thresh", r95thresh="r95thresh", r99thresh="r99thresh"), max.vals.millions=20, cluster.type="SOCK") {
+create.indices.from.files <- function(input.files, out.dir, output.filename.template, author.data, climdex.vars.subset=NULL, climdex.time.resolution=c("all", "annual", "monthly"), variable.name.map=c(tmax="tx", tmin="tn", prec="rr", tavg="tg"), axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990), parallel=4, verbose=FALSE, thresholds.files=NULL, thresholds.name.map=c(tx10thresh="tx10thresh", tn10thresh="tn10thresh", tx90thresh="tx90thresh", tn90thresh="tn90thresh", r75thresh="r75thresh", r95thresh="r95thresh", r99thresh="r99thresh"), max.vals.millions=20, cluster.type="SOCK") {
   if(!(is.logical(parallel) || is.numeric(parallel)))
     stop("'parallel' option must be logical or numeric.")
 
