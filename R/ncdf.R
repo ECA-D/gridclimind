@@ -276,7 +276,7 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
                   
                   "climdex.cdd", "climdex.cwd", "climdex.cdd", "climdex.cwd", "climdex.csdi", "climdex.wsdi")
   #
-  func.names <- c(func.names, "climdex.r75ptot", "climdex.csu", "climdex.csu", "climdex.cfd", "climdex.cfd", "climdex.hd17", "climdex.hd17", "climdex.HI", "climdex.spi")
+  func.names <- c(func.names, "climdex.r75ptot", "climdex.r75ptot", "climdex.csu", "climdex.csu", "climdex.cfd", "climdex.cfd", "climdex.hd17", "climdex.hd17", "climdex.HI", "climdex.spi")
   
   
   el <- list()
@@ -668,12 +668,13 @@ get.ts <- function(f) {
 #' 
 #' @export
 compute.climdex.indices <- function(in.dat, cdx.funcs, ts, base.range, fclimdex.compatible) {
+  
   ci <- climdex.pcic::climdexInput.raw(
-                        in.dat$tmax, in.dat$tmin, in.dat$prec,
-                        if(is.null(in.dat$tmax)) NULL else ts,
-                        if(is.null(in.dat$tmin)) NULL else ts,
-                        if(is.null(in.dat$prec)) NULL else ts,
-                        tavg=in.dat$tavg, tavg.dates=if(is.null(in.dat$tavg)) NULL else ts,
+                        tmax = in.dat$tmax, tmin = in.dat$tmin, prec = in.dat$prec,  tavg=in.dat$tavg, 
+                        tmax.dates = if(is.null(in.dat$tmax)) NULL else ts,
+                        tmin.dates = if(is.null(in.dat$tmin)) NULL else ts,
+                        prec.dates = if(is.null(in.dat$prec)) NULL else ts,
+                        tavg.dates = if(is.null(in.dat$tavg)) NULL else ts,
                         base.range=base.range, northern.hemisphere=in.dat$northern.hemisphere,
                         quantiles=in.dat$quantiles)
   
