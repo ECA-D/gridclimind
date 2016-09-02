@@ -98,7 +98,7 @@ put.history.att <- function(f, v, definemode=FALSE) {
 
 put.ETCCDI.atts <- function(f, freq, orig.title, author.data, definemode=FALSE) {
   if("institution" %in% names(author.data))
-    ncdf4::ncatt_put(f, 0, "ETCCDI_institution", author.data$institution, definemode=definemode)
+    ncdf4::ncatt_put(f, 0, "Institute", author.data$institution, definemode=definemode)
   if("institution_id" %in% names(author.data))
     ncdf4::ncatt_put(f, 0, "ETCCDI_institution_id", author.data$institution_id, definemode=definemode)
   if("indices_archive" %in% names(author.data))
@@ -111,6 +111,8 @@ put.ETCCDI.atts <- function(f, freq, orig.title, author.data, definemode=FALSE) 
     ncdf4::ncatt_put(f, 0, "contact", author.data$contact, definemode=definemode)
   if("references" %in% names(author.data))
     ncdf4::ncatt_put(f, 0, "references", author.data$references, definemode=definemode)
+  if("references2" %in% names(author.data))
+    ncdf4::ncatt_put(f, 0, "references2", author.data$references, definemode=definemode)
 
   ncdf4::ncatt_put(f, 0, "frequency", freq, definemode=definemode)
   ncdf4::ncatt_put(f, 0, "creation_date", format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="GMT"), definemode=definemode)
@@ -197,11 +199,11 @@ get.split.filename.eobs <- function (eobs.file)
 #' @export
 get.climdex.variable.list <- function(source.data.present, time.resolution=c("all", "annual", "monthly"), climdex.vars.subset=NULL) {
   time.res <- match.arg(time.resolution)
-  annual.only <- c("hiETCCDI","gslETCCDI", "wsdiETCCDI", "csdiETCCDI", "cddETCCDI", "cwdETCCDI", "altcsdiETCCDI", "altwsdiETCCDI")
-  monthly.only <- c("spiETCCDI")
+  annual.only <- c("hiETCCDI","gslETCCDI",  "cddETCCDI", "cwdETCCDI",  "altcddETCCDI", "altcwdETCCDI", "csdiETCCDI", "altcsdiETCCDI", "wsdiETCCDI", "altwsdiETCCDI")
+  monthly.only <- c("spi3ETCCDI","spi6ETCCDI")
   vars.by.src.data.reqd <- list(tmax=c("csuETCCDI", "suETCCDI", "idETCCDI", "txxETCCDI", "txnETCCDI", "tx10pETCCDI", "tx90pETCCDI", "wsdiETCCDI", "altwsdiETCCDI"),
                                 tmin=c("cfdETCCDI", "fdETCCDI", "trETCCDI", "tnxETCCDI", "tnnETCCDI", "tn10pETCCDI", "tn90pETCCDI", "csdiETCCDI", "altcsdiETCCDI"),
-                                prec=c("spiETCCDI", "rx1dayETCCDI", "rx5dayETCCDI", "sdiiETCCDI", "r10mmETCCDI", "r20mmETCCDI", "r1mmETCCDI",
+                                prec=c("spi3ETCCDI", "spi6ETCCDI", "rx1dayETCCDI", "rx5dayETCCDI", "sdiiETCCDI", "r10mmETCCDI", "r20mmETCCDI", "r1mmETCCDI",
                                        "cddETCCDI", "cwdETCCDI", "r75ptotETCCDI", "r95ptotETCCDI", "r99ptotETCCDI", "prcptotETCCDI", "altcddETCCDI", "altcwdETCCDI"),
                                 tavg=c("hd17ETCCDI", "hiETCCDI", "gslETCCDI", "dtrETCCDI") )
   
@@ -266,7 +268,7 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
                   "climdex.txx", "climdex.tnx", "climdex.txn", "climdex.tnn", "climdex.tn10p", "climdex.tx10p", "climdex.tn90p", "climdex.tx90p",
                   "climdex.txx", "climdex.tnx", "climdex.txn", "climdex.tnn", "climdex.tn10p", "climdex.tx10p", "climdex.tn90p", "climdex.tx90p",
                   
-                  "climdex.wsdi", "climdex.csdi",
+                  "climdex.wsdi", "climdex.csdi", "climdex.wsdi", "climdex.csdi",
                   
                   "climdex.dtr", "climdex.rx1day", "climdex.rx5day",
                   "climdex.dtr", "climdex.rx1day", "climdex.rx5day",
@@ -274,9 +276,10 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
                   "climdex.sdii", "climdex.r10mm", "climdex.r20mm", "climdex.rnnmm", "climdex.cdd", "climdex.cwd", "climdex.r95ptot", "climdex.r99ptot", "climdex.prcptot",
                   "climdex.sdii", "climdex.r10mm", "climdex.r20mm", "climdex.rnnmm", "climdex.r95ptot", "climdex.r99ptot", "climdex.prcptot",
                   
-                  "climdex.cdd", "climdex.cwd", "climdex.cdd", "climdex.cwd", "climdex.csdi", "climdex.wsdi")
+                  "climdex.cdd", "climdex.cwd")
   #
-  func.names <- c(func.names, "climdex.r75ptot", "climdex.r75ptot", "climdex.csu", "climdex.csu", "climdex.cfd", "climdex.cfd", "climdex.hd17", "climdex.hd17", "climdex.HI", "climdex.spi")
+  func.names <- c(func.names, "climdex.r75ptot", "climdex.r75ptot", "climdex.csu", "climdex.csu", "climdex.cfd", "climdex.cfd",
+                  "climdex.hd17", "climdex.hd17", "climdex.HI", "climdex.spi3", "climdex.spi6")
   
   
   el <- list()
@@ -294,17 +297,17 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
                            mf, mf, mf, mf, mf, mf, mf, mf,
                            af, af, af, af, af, af, af, af,
                            
-                           wcsdi.opts, wcsdi.opts,
+                           c(af, wcsdi.opts), c(af, wcsdi.opts), c(af, altwcsdi.opts), c(af, altwcsdi.opts),
                            
                            mf, mf, c(mf, rx5day.opts),
                            af, af, c(af, rx5day.opts),
                            
-                           af, af, af, c(af, r1mm.opts), cwdd.opts, cwdd.opts, af, af, af,
+                           af, af, af, c(af, r1mm.opts), c(af,cwdd.opts), c(af,cwdd.opts), af, af, af,
                            mf, mf, mf, c(mf, r1mm.opts), mf, mf, mf,
-                           c(af, altcwdd.opts), c(af, altcwdd.opts), c(mf, altcwdd.opts), c(mf, altcwdd.opts), altwcsdi.opts, altwcsdi.opts)
+                           c(af, altcwdd.opts), c(af, altcwdd.opts))
   
-  #
-  options <- c(options, list(af, mf, af, mf, af, mf, af, mf, af, mf))
+  
+  options <- c(options, list(af, mf, af, mf, af, mf, af, mf, af, mf, mf))
   
   func <- lapply(1:length(func.names), function(n) do.call(functional::Curry, c(list(getFromNamespace(func.names[n], 'climdex.pcic')), options[[n]])))
   
@@ -314,7 +317,7 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
                    "txxETCCDI_mon", "tnxETCCDI_mon", "txnETCCDI_mon", "tnnETCCDI_mon", "tn10pETCCDI_mon", "tx10pETCCDI_mon", "tn90pETCCDI_mon", "tx90pETCCDI_mon",
                    "txxETCCDI_yr",  "tnxETCCDI_yr",  "txnETCCDI_yr",  "tnnETCCDI_yr",  "tn10pETCCDI_yr",  "tx10pETCCDI_yr",  "tn90pETCCDI_yr",  "tx90pETCCDI_yr",
                    
-                   "wsdiETCCDI_yr", "csdiETCCDI_yr",
+                   "wsdiETCCDI_yr", "csdiETCCDI_yr",  "altwsdiETCCDI_yr", "altcsdiETCCDI_yr",
                    
                    "dtrETCCDI_mon", "rx1dayETCCDI_mon", "rx5dayETCCDI_mon",
                    "dtrETCCDI_yr", "rx1dayETCCDI_yr", "rx5dayETCCDI_yr",
@@ -322,9 +325,10 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
                    "sdiiETCCDI_yr", "r10mmETCCDI_yr", "r20mmETCCDI_yr", "r1mmETCCDI_yr", "cddETCCDI_yr", "cwdETCCDI_yr", "r95ptotETCCDI_yr", "r99ptotETCCDI_yr", "prcptotETCCDI_yr",
                    "sdiiETCCDI_mon", "r10mmETCCDI_mon", "r20mmETCCDI_mon", "r1mmETCCDI_mon", "r95ptotETCCDI_mon", "r99ptotETCCDI_mon", "prcptotETCCDI_mon",
                    
-                   "altcddETCCDI_yr", "altcwdETCCDI_yr", "altcddETCCDI_mon", "altcwdETCCDI_mon", "altcsdiETCCDI_yr", "altwsdiETCCDI_yr", 
+                   "altcddETCCDI_yr", "altcwdETCCDI_yr", 
                    
-                   "r75ptotETCCDI_yr", "r75ptotETCCDI_mon", "csuETCCDI_yr", "csuETCCDI_mon", "cdfETCCDI_yr", "cdfETCCDI_mon", "hd17ETCCDI_yr", "hd17ETCCDI_mon", "hiETCCDI_yr", "spiETCCDI_mon")
+                   "r75ptotETCCDI_yr", "r75ptotETCCDI_mon", "csuETCCDI_yr", "csuETCCDI_mon", "cdfETCCDI_yr", "cdfETCCDI_mon",
+                   "hd17ETCCDI_yr", "hd17ETCCDI_mon", "hiETCCDI_yr", "spi3ETCCDI_mon", "spi6ETCCDI_mon")
 
   return(func[vars.list])
 }
@@ -369,7 +373,7 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                                      "Percentage of Days when Daily Minimum Temperature is Below the 10th Percentile", "Percentage of Days when Daily Maximum Temperature is Below the 10th Percentile",
                                      "Percentage of Days when Daily Minimum Temperature is Above the 90th Percentile", "Percentage of Days when Daily Maximum Temperature is Above the 90th Percentile",
                                      
-                                     "Warm Spell Duration Index", "Cold Spell Duration Index",
+                                     "Annnual Warm Spell Duration Index", "Annual Cold Spell Duration Index", "Annual Warm Spell Duration Index Spanning Years", "Annual Cold Spell Duration Index Spanning Years",
                                      
                                      "Mean Diurnal Temperature Range", "Monthly Maximum 1-day Precipitation", "Monthly Maximum Consecutive 5-day Precipitation",
                                      "Mean Diurnal Temperature Range", "Annual Maximum 1-day Precipitation", "Annual Maximum Consecutive 5-day Precipitation",
@@ -385,9 +389,7 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                                      "Monthly Total Precipitation when Daily Precipitation Exceeds the 95th Percentile of Wet Day Precipitation",
                                      "Monthly Total Precipitation when Daily Precipitation Exceeds the 99th Percentile of Wet Day Precipitation", "Monthly Total Precipitation in Wet Days",
                                      
-                                     "Maximum Number of Consecutive Days Per Year with Less Than 1mm of Precipitation", "Maximum Number of Consecutive Days Per Year with At Least 1mm of Precipitation",
-                                     "Maximum Number of Consecutive Days Per Month with Less Than 1mm of Precipitation", "Maximum Number of Consecutive Days Per Month with At Least 1mm of Precipitation",
-                                     "Cold Spell Duration Index Spanning Years", "Warm Spell Duration Index Spanning Years"),
+                                     "Maximum Number of Consecutive Days Per Year with Less Than 1mm of Precipitation", "Maximum Number of Consecutive Days Per Year with At Least 1mm of Precipitation"),
                          
                          var.name=c("fdETCCDI", "suETCCDI","idETCCDI", "trETCCDI", "gslETCCDI",
                                     "fdETCCDI", "suETCCDI","idETCCDI", "trETCCDI",
@@ -395,7 +397,7 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                                     "txxETCCDI", "tnxETCCDI", "txnETCCDI", "tnnETCCDI", "tn10pETCCDI", "tx10pETCCDI", "tn90pETCCDI", "tx90pETCCDI",
                                     "txxETCCDI", "tnxETCCDI", "txnETCCDI", "tnnETCCDI", "tn10pETCCDI", "tx10pETCCDI", "tn90pETCCDI", "tx90pETCCDI",
                                     
-                                    "wsdiETCCDI", "csdiETCCDI",
+                                    "wsdiETCCDI", "csdiETCCDI", "altwsdiETCCDI", "altcsdiETCCDI",
                                     
                                     "dtrETCCDI", "rx1dayETCCDI", "rx5dayETCCDI",
                                     "dtrETCCDI", "rx1dayETCCDI", "rx5dayETCCDI",
@@ -403,7 +405,7 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                                     "sdiiETCCDI", "r10mmETCCDI", "r20mmETCCDI", "r1mmETCCDI", "cddETCCDI", "cwdETCCDI",  "r95ptotETCCDI", "r99ptotETCCDI", "prcptotETCCDI",
                                     "sdiiETCCDI", "r10mmETCCDI", "r20mmETCCDI", "r1mmETCCDI", "r95ptotETCCDI", "r99ptotETCCDI", "prcptotETCCDI",
                                     
-                                    "altcddETCCDI", "altcwdETCCDI", "altcddETCCDI", "altcwdETCCDI", "altcsdiETCCDI", "altwsdiETCCDI"),
+                                    "altcddETCCDI", "altcwdETCCDI"),
                          
                          units=c( "days", "days", "days","days", "days",
                                  "days", "days", "days","days",
@@ -411,7 +413,7 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                                  "degrees_C", "degrees_C", "degrees_C", "degrees_C", "%", "%", "%", "%",
                                  "degrees_C", "degrees_C", "degrees_C", "degrees_C", "%", "%", "%", "%",
                                  
-                                 "days", "days",
+                                 "days", "days", "days", "days",
                                  
                                  "degrees_C", "mm", "mm",
                                  "degrees_C", "mm", "mm",
@@ -419,14 +421,14 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                                  "mm d-1", "days", "days", "days", "days", "days", "mm", "mm", "mm",
                                  "mm d-1", "days", "days", "days", "mm", "mm", "mm",
                                  
-                                 "days", "days", "days", "days", "days", "days"),
+                                 "days", "days"),
                          annual=c(T, T, T, T, T,
                                   F, F, F, F,
                                   
                                   F, F, F, F, F, F, F, F,
                                   T, T, T, T, T, T, T, T,
                                   
-                                  T, T,
+                                  T, T, T, T,
                                   
                                   F, F, F,
                                   T, T, T,
@@ -434,7 +436,7 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                                   T, T, T, T, T, T, T, T, T,
                                   F, F, F, F, F, F, F,
                                   
-                                  T, T, F, F, T, T),
+                                  T, T),
                          
                          base.period.attr=c(F, F, F, F, F,
                                             F, F, F, F,
@@ -442,7 +444,7 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                                             F, F, F, F, T, T, T, T,
                                             F, F, F, F, T, T, T, T,
                                             
-                                            T, T,
+                                            T, T, T, T,
                                             
                                             F, F, F,
                                             F, F, F,
@@ -450,7 +452,7 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                                             F, F, F, F, F, F, T, T, F,
                                             F, F, F, F, T, T, F,
                                             
-                                            F, F, F, F, T, T),
+                                            F, F),
                          
                          row.names=c( "fdETCCDI_yr", "suETCCDI_yr", "idETCCDI_yr", "trETCCDI_yr", "gslETCCDI_yr",
                                       "fdETCCDI_mon", "suETCCDI_mon", "idETCCDI_mon", "trETCCDI_mon",
@@ -458,7 +460,7 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                                       "txxETCCDI_mon", "tnxETCCDI_mon", "txnETCCDI_mon", "tnnETCCDI_mon", "tn10pETCCDI_mon", "tx10pETCCDI_mon", "tn90pETCCDI_mon", "tx90pETCCDI_mon",
                                       "txxETCCDI_yr", "tnxETCCDI_yr", "txnETCCDI_yr", "tnnETCCDI_yr", "tn10pETCCDI_yr", "tx10pETCCDI_yr", "tn90pETCCDI_yr", "tx90pETCCDI_yr",
                                       
-                                      "wsdiETCCDI_yr", "csdiETCCDI_yr",
+                                      "wsdiETCCDI_yr", "csdiETCCDI_yr", "altwsdiETCCDI_yr", "altcsdiETCCDI_yr",
                                       
                                       "dtrETCCDI_mon", "rx1dayETCCDI_mon", "rx5dayETCCDI_mon",
                                       "dtrETCCDI_yr", "rx1dayETCCDI_yr", "rx5dayETCCDI_yr",
@@ -466,7 +468,7 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                                       "sdiiETCCDI_yr", "r10mmETCCDI_yr", "r20mmETCCDI_yr", "r1mmETCCDI_yr", "cddETCCDI_yr", "cwdETCCDI_yr", "r95ptotETCCDI_yr", "r99ptotETCCDI_yr", "prcptotETCCDI_yr",
                                       "sdiiETCCDI_mon", "r10mmETCCDI_mon", "r20mmETCCDI_mon", "r1mmETCCDI_mon", "r95ptotETCCDI_mon", "r99ptotETCCDI_mon", "prcptotETCCDI_mon",
                                       
-                                      "altcddETCCDI_yr", "altcwdETCCDI_yr", "altcddETCCDI_mon", "altcwdETCCDI_mon", "altcsdiETCCDI_yr", "altwsdiETCCDI_yr"),
+                                      "altcddETCCDI_yr", "altcwdETCCDI_yr"),
                          stringsAsFactors=FALSE)
   
   ## Adding a new variable, explictily adding it as a new row in stead of introducing it in the large data.frame above. This
@@ -481,22 +483,50 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                              hd17ETCCDI_yr = data.frame(long.name = 'Annual Heating Degree days', var.name = 'hd17ETCCDI', units = 'degrees_C', annual = TRUE, base.period.attr = FALSE),
                              hd17ETCCDI_mon = data.frame(long.name = 'Monthly Heating Degree days', var.name = 'hd17ETCCDI', units = 'degrees_C', annual = FALSE, base.period.attr = FALSE),
                              hiETCCDI_yr = data.frame(long.name = 'Huglin Index', var.name = 'hiETCCDI', units = 'degrees_C', annual = TRUE, base.period.attr = FALSE),
-                             spiETCCDI_mon = data.frame(long.name = 'Standardized Precipitation Index', var.name = 'spiETCCDI', units = '', annual = FALSE, base.period.attr = FALSE))
+                             spi3ETCCDI_mon = data.frame(long.name = 'Standardized Precipitation Index 3-mon', var.name = 'spi3ETCCDI', units = '', annual = FALSE, base.period.attr = FALSE),
+                             spi6ETCCDI_mon = data.frame(long.name = 'Standardized Precipitation Index 6-mon', var.name = 'spi6ETCCDI', units = '', annual = FALSE, base.period.attr = FALSE))
 
 
-  standard.name.lookup <- c(fdETCCDI="number_frost_days", suETCCDI="number_summer_days", idETCCDI="number_icing_days", trETCCDI="number_tropical_nights", gslETCCDI="growing_season_length",
-                            txxETCCDI="maximum_daily_maximum_temperature", tnxETCCDI="maximum_daily_minimum_temperature", txnETCCDI="minimum_daily_maximum_temperature", tnnETCCDI="minimum_daily_minimum_temperature",
-                            tn10pETCCDI="percent_days_when_daily_minimum_temperature_below_10p", tx10pETCCDI="percent_days_when_daily_maximum_temperature_below_10p",
-                            tn90pETCCDI="percent_days_when_daily_minimum_temperature_above_90p", tx90pETCCDI="percent_days_when_daily_maximum_temperature_above_90p",
-                            wsdiETCCDI="warm_spell_duration_index", csdiETCCDI="cold_spell_duration_index", dtrETCCDI="diurnal_temperature_range",
-                            altwsdiETCCDI="warm_spell_duration_index", altcsdiETCCDI="cold_spell_duration_index",
-                            rx1dayETCCDI="maximum_1day_precipitation", rx5dayETCCDI="maximum_5day_precipitation", sdiiETCCDI="simple_precipitation_intensity_index",
-                            r10mmETCCDI="count_days_more_than_10mm_precipitation", r20mmETCCDI="count_days_more_than_20mm_precipitation", r1mmETCCDI="count_days_more_than_1mm_precipitation",
-                            cddETCCDI="maximum_number_consecutive_dry_days", cwdETCCDI="maximum_number_consecutive_wet_days",
-                            altcddETCCDI="maximum_number_consecutive_dry_days", altcwdETCCDI="maximum_number_consecutive_wet_days",
-                            r95ptotETCCDI="total_precipitation_exceeding_95th_percentile", r99ptotETCCDI="total_precipitation_exceeding_99th_percentile", prcptotETCCDI="total_wet_day_precipitation")
+  standard.name.lookup <- c(fdETCCDI="number_frost_days", 
+                            suETCCDI="number_summer_days", 
+                            idETCCDI="number_icing_days", 
+                            trETCCDI="number_tropical_nights", 
+                            gslETCCDI="growing_season_length",
+                            txxETCCDI="maximum_daily_maximum_temperature", 
+                            tnxETCCDI="maximum_daily_minimum_temperature", 
+                            txnETCCDI="minimum_daily_maximum_temperature", 
+                            tnnETCCDI="minimum_daily_minimum_temperature",
+                            tn10pETCCDI="percent_days_when_daily_minimum_temperature_below_10p", 
+                            tx10pETCCDI="percent_days_when_daily_maximum_temperature_below_10p",
+                            tn90pETCCDI="percent_days_when_daily_minimum_temperature_above_90p", 
+                            tx90pETCCDI="percent_days_when_daily_maximum_temperature_above_90p",
+                            wsdiETCCDI="warm_spell_duration_index", 
+                            csdiETCCDI="cold_spell_duration_index", 
+                            altwsdiETCCDI="warm_spell_duration_index", 
+                            altcsdiETCCDI="cold_spell_duration_index",
+                            dtrETCCDI="diurnal_temperature_range",
+                            rx1dayETCCDI="maximum_1day_precipitation", 
+                            rx5dayETCCDI="maximum_5day_precipitation", 
+                            sdiiETCCDI="simple_precipitation_intensity_index",
+                            r10mmETCCDI="count_days_more_than_10mm_precipitation", 
+                            r20mmETCCDI="count_days_more_than_20mm_precipitation", 
+                            r1mmETCCDI="count_days_more_than_1mm_precipitation",
+                            cddETCCDI="maximum_number_consecutive_dry_days", 
+                            cwdETCCDI="maximum_number_consecutive_wet_days",
+                            altcddETCCDI="maximum_number_consecutive_dry_days", 
+                            altcwdETCCDI="maximum_number_consecutive_wet_days",
+                            r95ptotETCCDI="total_precipitation_exceeding_95th_percentile", 
+                            r99ptotETCCDI="total_precipitation_exceeding_99th_percentile", 
+                            prcptotETCCDI="total_wet_day_precipitation")
   
-  standard.name.lookup <- c(standard.name.lookup, r75ptotETCCDI="total_precipitation_exceeding_75th_percentile", csuETCCDI="consecutive_summer_days", cfdETCCDI="consecutive_frost_days", hd17ETCCDI="heating_degree_days", hiETCCDI="huglin_index", spiETCCDI="standardized_precipitation_index")
+  standard.name.lookup <- c(standard.name.lookup, 
+                            r75ptotETCCDI="total_precipitation_exceeding_75th_percentile", 
+                            csuETCCDI="consecutive_summer_days", 
+                            cfdETCCDI="consecutive_frost_days", 
+                            hd17ETCCDI="heating_degree_days", 
+                            hiETCCDI="huglin_index", 
+                            spi3ETCCDI="standardized_precipitation_index 3-mon", 
+                            spi6ETCCDI="standardized_precipitation_index 6-mon")
   
   all.data$standard.name <- standard.name.lookup[all.data$var.name]
 
@@ -822,8 +852,7 @@ get.quantiles.object <- function(thresholds, idx) {
                          tx90thresh=c("tmax", "outbase", "q90"),
                          tn10thresh=c("tmin", "outbase", "q10"),
                          tn90thresh=c("tmin", "outbase", "q90"))
-  thresh.path.1d <- list(r25thresh=c("prec", "q25"),
-                         r75thresh=c("prec", "q75"),
+  thresh.path.1d <- list(r75thresh=c("prec", "q75"),
                          r95thresh=c("prec", "q95"),
                          r99thresh=c("prec", "q99"))
   result <- list()
@@ -919,9 +948,10 @@ get.lat <- function(open_file_list, variable.name.map) {
 #' }
 #'
 #' @export
-compute.indices.for.stripe <- function(subset, cdx.funcs, ts, base.range, dim.axes, v.f.idx, variable.name.map, src.units, t.f.idx, thresholds.name.map, fclimdex.compatible=TRUE, projection=NULL, f, thresholds.netcdf) {
-  cat('We are now at latitude index', subset[['Y']], '\n')
-  
+compute.indices.for.stripe <- function(subset, cdx.funcs, ts, base.range, dim.axes, v.f.idx, variable.name.map, src.units, t.f.idx, thresholds.name.map, 
+                                       fclimdex.compatible=TRUE, projection=NULL, f, thresholds.netcdf) {
+  cat('We are now at latitude', subset[['Y']], '\n')
+
   f <- if(missing(f)) get("f", .GlobalEnv) else f
   thresholds.netcdf <- if(missing(thresholds.netcdf)) get("thresholds.netcdf", .GlobalEnv) else thresholds.netcdf
   
@@ -937,7 +967,7 @@ compute.indices.for.stripe <- function(subset, cdx.funcs, ts, base.range, dim.ax
 #   latitudes = get.lat(f, variable.name.map[names(v.f.idx)[1]])
 #   cur_sub <- latitudes[subset[['Y']]]
 #   cdx.funcs <- curry_in_subset_for_huglin(cdx.funcs, cur_sub)
-  
+#   
   return(lapply(1:(dim(data.list[[1]])[2]), function(x) {
     dat.list <- sapply(names(data.list), function(name) { data.list[[name]][,x] }, simplify=FALSE)
     ## Fast-path the all-NA case.
@@ -982,7 +1012,8 @@ compute.indices.for.stripe <- function(subset, cdx.funcs, ts, base.range, dim.ax
 #'
 #' @export
 get.thresholds.chunk <- function(subset, cdx.funcs, thresholds.netcdf, t.f.idx, thresholds.name.map) {
-  var.thresh.map <- list(tx10thresh=c("tx10p"), tx90thresh=c("tx90p", "WSDI"), tn10thresh=c("tn10p", "CSDI"), tn90thresh=c("tn90p"), r75thresh=c("r75p"), r95thresh=c("r95p"), r99thresh=c("r99p"))
+  var.thresh.map <- list(tx10thresh=c("tx10p"), tx90thresh=c("tx90p", "WSDI"), tn10thresh=c("tn10p", "CSDI"), 
+                        tn90thresh=c("tn90p"), r75thresh=c("r75p"), r95thresh=c("r95p"), r99thresh=c("r99p"))
   
   cdx.names <- names(cdx.funcs)
   thresh.var.needed <- names(var.thresh.map)[sapply(var.thresh.map, function(x) { any(unlist(lapply(x, function(substr) { any(grepl(substr, cdx.names)) }))) })]
@@ -1401,7 +1432,8 @@ unsquash.dims <- function(dat.dim, subset, f, n) {
 #' }
 #'
 #' @export
-create.thresholds.from.file <- function(input.files, output.file, author.data, variable.name.map=c(tmax="tx", tmin="tn", prec="rr", tavg="tg"), axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990), parallel=4, verbose=FALSE, max.vals.millions=20, cluster.type="SOCK") {
+create.thresholds.from.file <- function(input.files, output.file, author.data, variable.name.map=c(tmax="tx", tmin="tn", prec="rr", tavg="tg"), 
+                                        axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990), parallel=4, verbose=FALSE, max.vals.millions=20, cluster.type="SOCK") {
   if(!(is.logical(parallel) || is.numeric(parallel)))
     stop("'parallel' option must be logical or numeric.")
 
@@ -1583,7 +1615,12 @@ get.thresholds.f.idx <- function(thresholds.files, thresholds.name.map) {
 #' }
 #'
 #' @export
-create.indices.from.files <- function(input.files, out.dir, output.filename.template, author.data, climdex.vars.subset=NULL, climdex.time.resolution=c("all", "annual", "monthly"), variable.name.map=c(tmax="tx", tmin="tn", prec="rr", tavg="tg"), axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990), parallel=4, verbose=FALSE, thresholds.files=NULL, thresholds.name.map=c(tx10thresh="tx10thresh", tn10thresh="tn10thresh", tx90thresh="tx90thresh", tn90thresh="tn90thresh", r75thresh="r75thresh", r95thresh="r95thresh", r99thresh="r99thresh"), max.vals.millions=20, cluster.type="SOCK") {
+create.indices.from.files <- function(input.files, out.dir, output.filename.template, author.data, climdex.vars.subset=NULL, climdex.time.resolution=c("all", "annual", "monthly"), 
+                                      variable.name.map=c(tmax="tx", tmin="tn", prec="rr", tavg="tg"), axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990), 
+                                      parallel=4, verbose=FALSE, thresholds.files=NULL, 
+                                      thresholds.name.map=c(tx10thresh="tx10thresh", tn10thresh="tn10thresh", 
+                                                            tx90thresh="tx90thresh", tn90thresh="tn90thresh", 
+                                                            r75thresh="r75thresh", r95thresh="r95thresh", r99thresh="r99thresh"), max.vals.millions=20, cluster.type="SOCK") {
   if(!(is.logical(parallel) || is.numeric(parallel)))
     stop("'parallel' option must be logical or numeric.")
 
