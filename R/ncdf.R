@@ -97,26 +97,21 @@ put.history.att <- function(f, v, definemode=FALSE) {
 }
 
 put.ETCCDI.atts <- function(f, freq, orig.title, author.data, definemode=FALSE) {
-  if("institution" %in% names(author.data))
-    ncdf4::ncatt_put(f, 0, "Institute", author.data$institution, definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "index_calculation_frequency", freq, definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "institution", "KNMI", definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "webpage", "www.ecad@eu, http://www.ecad.eu/utils/mapserver/eobs_maps_indices.php", definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "contact", "eca@knmi.nl", definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "Indices_references", "http://eca.knmi.nl/documents/WCDMP_72_TD_1500_en_1.pdf", definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "EOBS_references", "http://www.ecad.eu/download/ensembles/Haylock_et_al_2008.pdf", definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "file_created", format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="GMT"), definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "title", paste("climate impact indices computed using E-OBS", author.data$Eobsv, collapse = "-",sep=""), definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "climdex.pcic_version", as.character(packageVersion("climdex.pcic")), definemode=definemode)
+  
   if("institution_id" %in% names(author.data))
     ncdf4::ncatt_put(f, 0, "ETCCDI_institution_id", author.data$institution_id, definemode=definemode)
   if("indices_archive" %in% names(author.data))
     ncdf4::ncatt_put(f, 0, "ETCCDI_indices_archive", author.data$indices_archive, definemode=definemode)
-
-  ncdf4::ncatt_put(f, 0, "ETCCDI_software", "climdex.pcic", definemode=definemode)
-  ncdf4::ncatt_put(f, 0, "ETCCDI_software_version", as.character(packageVersion("climdex.pcic")), definemode=definemode)
-
-  if("contact" %in% names(author.data))
-    ncdf4::ncatt_put(f, 0, "contact", author.data$contact, definemode=definemode)
-  if("references" %in% names(author.data))
-    ncdf4::ncatt_put(f, 0, "references", author.data$references, definemode=definemode)
-  if("references2" %in% names(author.data))
-    ncdf4::ncatt_put(f, 0, "references2", author.data$references, definemode=definemode)
-
-  ncdf4::ncatt_put(f, 0, "frequency", freq, definemode=definemode)
-  ncdf4::ncatt_put(f, 0, "creation_date", format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="GMT"), definemode=definemode)
-  ncdf4::ncatt_put(f, 0, "title", paste("ETCCDI indices computed on", orig.title), definemode=definemode)
+  ## in the future ad github repo
   invisible(0)
 }
 
@@ -199,7 +194,8 @@ get.split.filename.eobs <- function (eobs.file)
 #' @export
 get.climdex.variable.list <- function(source.data.present, time.resolution=c("all", "annual", "monthly"), climdex.vars.subset=NULL) {
   time.res <- match.arg(time.resolution)
-  annual.only <- c("hiETCCDI","gslETCCDI",  "cddETCCDI", "cwdETCCDI",  "altcddETCCDI", "altcwdETCCDI", "csdiETCCDI", "altcsdiETCCDI", "wsdiETCCDI", "altwsdiETCCDI")
+  annual.only <- c("hiETCCDI","gslETCCDI",  "cddETCCDI", "cwdETCCDI",  "altcddETCCDI", "altcwdETCCDI", "csdiETCCDI", 
+                   "altcsdiETCCDI", "wsdiETCCDI", "altwsdiETCCDI")
   monthly.only <- c("spi3ETCCDI","spi6ETCCDI")
   vars.by.src.data.reqd <- list(tmax=c("csuETCCDI", "suETCCDI", "idETCCDI", "txxETCCDI", "txnETCCDI", "tx10pETCCDI", "tx90pETCCDI", "wsdiETCCDI", "altwsdiETCCDI"),
                                 tmin=c("cfdETCCDI", "fdETCCDI", "trETCCDI", "tnxETCCDI", "tnnETCCDI", "tn10pETCCDI", "tn90pETCCDI", "csdiETCCDI", "altcsdiETCCDI"),
@@ -634,7 +630,7 @@ create.ncdf.output.files <- function(cdx.dat, f, v.f.idx, variable.name.map, ts,
     put.history.att(new.file, cdx.dat$var.name[x], definemode=TRUE)
     put.ETCCDI.atts(new.file, c("mon", "yr")[1 + annual], ncdf4::ncatt_get(f.example, 0, "title")$value, author.data, definemode=TRUE)
     if(cdx.dat$base.period.attr[x])
-      ncdf4::ncatt_put(new.file, cdx.dat$var.name[x], "base_period", paste(base.range, collapse="-"), definemode=TRUE)
+      ncdf4::ncatt_put(new.file, cdx.dat$var.name[x], "base_period", paste(author.data$base.range, sep=""), definemode=TRUE)
     ncdf4::nc_enddef(new.file)
 
     ## Copy data from vars.to.copy and put time bounds.
