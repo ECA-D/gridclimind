@@ -89,7 +89,7 @@ parLapplyLBFiltered <- function(cl, x, remote.func, ..., local.filter.func=NULL)
   ## Return data when complete
   return(data.to.return)
 }
-
+## need to remove this one
 put.history.att <- function(f, v, definemode=FALSE) {
   history.string <- paste("Created by climdex.pcic", packageVersion("climdex.pcic"), "on", date())
   ncdf4::ncatt_put(f, v, "history", history.string, definemode=definemode)
@@ -97,14 +97,15 @@ put.history.att <- function(f, v, definemode=FALSE) {
 }
 
 put.ETCCDI.atts <- function(f, freq, orig.title, author.data, definemode=FALSE) {
+  ncdf4::ncatt_put(f, 0, "title", paste("climate impact indices computed using E-OBS", author.data$Eobsv, collapse = "-",sep=""), definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "EOBS_version", author.data$Eobsv, definemode = definemode)
+  ncdf4::ncatt_put(f, 0, "Indices_references", "http://ecad.eu/documents/WCDMP_72_TD_1500_en_1.pdf", definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "EOBS_references", "http://www.ecad.eu/download/ensembles/Haylock_et_al_2008.pdf", definemode=definemode)
   ncdf4::ncatt_put(f, 0, "index_calculation_frequency", freq, definemode=definemode)
   ncdf4::ncatt_put(f, 0, "institution", "KNMI", definemode=definemode)
-  ncdf4::ncatt_put(f, 0, "webpage", "www.ecad@eu, http://www.ecad.eu/utils/mapserver/eobs_maps_indices.php", definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "webpage", "www.ecad.eu, http://www.ecad.eu/utils/mapserver/eobs_maps_indices.php", definemode=definemode)
   ncdf4::ncatt_put(f, 0, "contact", "eca@knmi.nl", definemode=definemode)
-  ncdf4::ncatt_put(f, 0, "Indices_references", "http://eca.knmi.nl/documents/WCDMP_72_TD_1500_en_1.pdf", definemode=definemode)
-  ncdf4::ncatt_put(f, 0, "EOBS_references", "http://www.ecad.eu/download/ensembles/Haylock_et_al_2008.pdf", definemode=definemode)
   ncdf4::ncatt_put(f, 0, "file_created", format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="GMT"), definemode=definemode)
-  ncdf4::ncatt_put(f, 0, "title", paste("climate impact indices computed using E-OBS", author.data$Eobsv, collapse = "-",sep=""), definemode=definemode)
   ncdf4::ncatt_put(f, 0, "climdex.pcic_version", as.character(packageVersion("climdex.pcic")), definemode=definemode)
   
   if("institution_id" %in% names(author.data))
@@ -1467,7 +1468,8 @@ create.thresholds.from.file <- function(input.files, output.file, author.data, v
 
     snow::clusterExport(cluster, "input.files", environment())
     snow::clusterEvalQ(cluster, f <<- lapply(input.files, ncdf4::nc_open, readunlim=FALSE))
-
+    browser()
+    
     ## Compute subsets and fire jobs off; collect and write out chunk-at-a-time
     parLapplyLBFiltered(cluster, subsets, get.quantiles.for.stripe, f.meta$ts, base.range, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, f.meta$src.units, local.filter.func=write.thresholds.data)
 
