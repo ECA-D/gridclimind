@@ -102,7 +102,7 @@ put.ETCCDI.atts <- function(f, freq, orig.title, author.data, definemode=FALSE) 
   ncdf4::ncatt_put(f, 0, "Indices_references", "http://ecad.eu/documents/WCDMP_72_TD_1500_en_1.pdf", definemode=definemode)
   ncdf4::ncatt_put(f, 0, "EOBS_references", "http://www.ecad.eu/download/ensembles/Haylock_et_al_2008.pdf", definemode=definemode)
   ncdf4::ncatt_put(f, 0, "index_calculation_frequency", freq, definemode=definemode)
-  ncdf4::ncatt_put(f, 0, "institution", "KNMI", definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "institute", "KNMI", definemode=definemode)
   ncdf4::ncatt_put(f, 0, "webpage", "www.ecad.eu, http://www.ecad.eu/utils/mapserver/eobs_maps_indices.php", definemode=definemode)
   ncdf4::ncatt_put(f, 0, "contact", "eca@knmi.nl", definemode=definemode)
   ncdf4::ncatt_put(f, 0, "file_created", format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="GMT"), definemode=definemode)
@@ -201,7 +201,8 @@ get.climdex.variable.list <- function(source.data.present, time.resolution=c("al
   vars.by.src.data.reqd <- list(tmax=c("csuETCCDI", "suETCCDI", "idETCCDI", "txxETCCDI", "txnETCCDI", "tx10pETCCDI", "tx90pETCCDI", "wsdiETCCDI", "altwsdiETCCDI"),
                                 tmin=c("cfdETCCDI", "fdETCCDI", "trETCCDI", "tnxETCCDI", "tnnETCCDI", "tn10pETCCDI", "tn90pETCCDI", "csdiETCCDI", "altcsdiETCCDI"),
                                 prec=c("spi3ETCCDI", "spi6ETCCDI", "rx1dayETCCDI", "rx5dayETCCDI", "sdiiETCCDI", "r10mmETCCDI", "r20mmETCCDI", "r1mmETCCDI",
-                                       "cddETCCDI", "cwdETCCDI", "r75ptotETCCDI", "r95ptotETCCDI", "r99ptotETCCDI", "prcptotETCCDI", "altcddETCCDI", "altcwdETCCDI"),
+                                       "cddETCCDI", "cwdETCCDI", "r75pETCCDI", "r95pETCCDI", "r99pETCCDI", "r75ptotETCCDI", "r95ptotETCCDI", "r99ptotETCCDI",
+                                       "prcptotETCCDI", "altcddETCCDI", "altcwdETCCDI"),
                                 tavg=c("hd17ETCCDI", "hiETCCDI", "gslETCCDI", "dtrETCCDI") )
   
   if(any(!(source.data.present %in% c("tmin", "tmax", "tavg", "prec"))))
@@ -275,8 +276,9 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
                   
                   "climdex.cdd", "climdex.cwd")
   #
-  func.names <- c(func.names, "climdex.r75ptot", "climdex.r75ptot", "climdex.csu", "climdex.csu", "climdex.cfd", "climdex.cfd",
-                  "climdex.hd17", "climdex.hd17", "climdex.HI", "climdex.spi3", "climdex.spi6")
+  func.names <- c(func.names, "climdex.r75p", "climdex.r75p", "climdex.r95p", "climdex.r95p", "climdex.r99p", "climdex.r99p", 
+                              "climdex.r75ptot", "climdex.r75ptot", "climdex.csu", "climdex.csu", "climdex.cfd", "climdex.cfd",
+                              "climdex.hd17", "climdex.hd17", "climdex.HI", "climdex.spi3", "climdex.spi6")
   
   
   el <- list()
@@ -304,7 +306,9 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
                            c(af, altcwdd.opts), c(af, altcwdd.opts))
   
   
-  options <- c(options, list(af, mf, af, mf, af, mf, af, mf, af, mf, mf))
+  options <- c(options, list(af, mf, af, mf, af, mf, 
+                             af, mf, af, mf, af, mf, 
+                             af, mf, af, mf, mf))
   
   func <- lapply(1:length(func.names), function(n) do.call(functional::Curry, c(list(getFromNamespace(func.names[n], 'climdex.pcic')), options[[n]])))
   
@@ -324,6 +328,7 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
                    
                    "altcddETCCDI_yr", "altcwdETCCDI_yr", 
                    
+                   "r75pETCCDI_yr", "r75pETCCDI_mon", "r95pETCCDI_yr", "r95pETCCDI_mon", "r99pETCCDI_yr", "r99pETCCDI_mon",
                    "r75ptotETCCDI_yr", "r75ptotETCCDI_mon", "csuETCCDI_yr", "csuETCCDI_mon", "cdfETCCDI_yr", "cdfETCCDI_mon",
                    "hd17ETCCDI_yr", "hd17ETCCDI_mon", "hiETCCDI_yr", "spi3ETCCDI_mon", "spi6ETCCDI_mon")
 
@@ -378,13 +383,13 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                                      "Annual Simple Precipitation Intensity Index", "Annual Count of Days with At Least 10mm of Precipitation",
                                      "Annual Count of Days with At Least 20mm of Precipitation", "Annual Count of Days with At Least 1mm of Precipitation",
                                      "Maximum Number of Consecutive Days with Less Than 1mm of Precipitation", "Maximum Number of Consecutive Days with At Least 1mm of Precipitation",
-                                     "Annual Total Precipitation when Daily Precipitation Exceeds the 95th Percentile of Wet Day Precipitation",
-                                     "Annual Total Precipitation when Daily Precipitation Exceeds the 99th Percentile of Wet Day Precipitation", "Annual Total Precipitation in Wet Days",
+                                     "Annual Precipitation fraction due to very wet days (daily precipitation exceeds 95th percentile)",
+                                     "Annual Precipitation fraction due to extremely wet days (daily precipitation exceeds 99th percentile)", "Annual Total Precipitation in Wet Days",
                                      
                                      "Monthly Simple Precipitation Intensity Index", "Monthly Count of Days with At Least 10mm of Precipitation",
                                      "Monthly Count of Days with At Least 20mm of Precipitation", "Monthly Count of Days with At Least 1mm of Precipitation",
-                                     "Monthly Total Precipitation when Daily Precipitation Exceeds the 95th Percentile of Wet Day Precipitation",
-                                     "Monthly Total Precipitation when Daily Precipitation Exceeds the 99th Percentile of Wet Day Precipitation", "Monthly Total Precipitation in Wet Days",
+                                     "Monthly Precipitation fraction due to very wet days (daily precipitation exceeds 95th percentile)",
+                                     "Monthly Precipitation fraction due to extremely wet days (daily precipitation exceeds 99th percentile)", "Monthly Total Precipitation in Wet Days",
                                      
                                      "Maximum Number of Consecutive Days Per Year with Less Than 1mm of Precipitation", "Maximum Number of Consecutive Days Per Year with At Least 1mm of Precipitation"),
                          
@@ -415,8 +420,8 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                                  "degrees_C", "mm", "mm",
                                  "degrees_C", "mm", "mm",
                                  
-                                 "mm d-1", "days", "days", "days", "days", "days", "mm", "mm", "mm",
-                                 "mm d-1", "days", "days", "days", "mm", "mm", "mm",
+                                 "mm d-1", "days", "days", "days", "days", "days", "%", "%", "mm",
+                                 "mm d-1", "days", "days", "days", "%", "%", "mm",
                                  
                                  "days", "days"),
                          annual=c(T, T, T, T, T,
@@ -471,8 +476,14 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
   ## Adding a new variable, explictily adding it as a new row in stead of introducing it in the large data.frame above. This
   ## makes it less likely that we have errors in lining up the variables. 
   ## TODO: Refactor the code above to add the rows like below, easier to read.
-  all.data = rbind(all.data, r75ptotETCCDI_yr = data.frame(long.name = 'Annual Total Precipitation when Daily Precipitation Exceeds the 75th Percentile of Wet Day Precipitation', var.name = 'r75ptotETCCDI', units = 'mm', annual = TRUE, base.period.attr = FALSE),
-                             r75ptotETCCDI_mon = data.frame(long.name = 'Monthly Total Precipitation when Daily Precipitation Exceeds the 75th Percentile of Wet Day Precipitation', var.name = 'r75ptotETCCDI', units = 'mm', annual = FALSE, base.period.attr = FALSE),
+  all.data = rbind(all.data, r75pETCCDI_yr = data.frame(long.name = 'Annual Total Precipitation when Daily Precipitation Exceeds the 75th Percentile of Wet Day Precipitation', var.name = 'r75pETCCDI', units = 'mm', annual = TRUE, base.period.attr = FALSE),
+                             r75pETCCDI_mon = data.frame(long.name = 'Monthly Total Precipitation when Daily Precipitation Exceeds the 75th Percentile of Wet Day Precipitation', var.name = 'r75pETCCDI', units = 'mm', annual = FALSE, base.period.attr = FALSE),
+                             r95pETCCDI_yr = data.frame(long.name = 'Annual Total Precipitation when Daily Precipitation Exceeds the 95th Percentile of Wet Day Precipitation', var.name = 'r95pETCCDI', units = 'mm', annual = TRUE, base.period.attr = FALSE),
+                             r95pETCCDI_mon = data.frame(long.name = 'Monthly Total Precipitation when Daily Precipitation Exceeds the 95th Percentile of Wet Day Precipitation', var.name = 'r95pETCCDI', units = 'mm', annual = FALSE, base.period.attr = FALSE),
+                             r99pETCCDI_yr = data.frame(long.name = 'Annual Total Precipitation when Daily Precipitation Exceeds the 99th Percentile of Wet Day Precipitation', var.name = 'r99pETCCDI', units = 'mm', annual = TRUE, base.period.attr = FALSE),
+                             r99pETCCDI_mon = data.frame(long.name = 'Monthly Total Precipitation when Daily Precipitation Exceeds the 99th Percentile of Wet Day Precipitation', var.name = 'r99pETCCDI', units = 'mm', annual = FALSE, base.period.attr = FALSE),
+                             r75ptotETCCDI_yr = data.frame(long.name = 'Annual Precipitation fraction due to moderate wet days (daily precipitation exceeds 75th percentile)', var.name = 'r75ptotETCCDI', units = '%', annual = TRUE, base.period.attr = FALSE),
+                             r75ptotETCCDI_mon = data.frame(long.name = 'Monthly Precipitation fraction due to moderate wet days (daily precipitation exceeds 75th percentile', var.name = 'r75ptotETCCDI', units = '%', annual = FALSE, base.period.attr = FALSE),
                              csuETCCDI_yr = data.frame(long.name = 'Annual Number of Consecutive Summer days', var.name = 'csuETCCDI', units = 'days', annual = TRUE, base.period.attr = FALSE),
                              csuETCCDI_mon = data.frame(long.name = 'Monthly Number of Consecutive Summer days', var.name = 'csuETCCDI', units = 'days', annual = FALSE, base.period.attr = FALSE),
                              cfdETCCDI_yr = data.frame(long.name = 'Annual Number of Consecutive Frost days', var.name = 'cfdETCCDI', units = 'days', annual = TRUE, base.period.attr = FALSE),
@@ -512,12 +523,15 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                             cwdETCCDI="maximum_number_consecutive_wet_days",
                             altcddETCCDI="maximum_number_consecutive_dry_days", 
                             altcwdETCCDI="maximum_number_consecutive_wet_days",
-                            r95ptotETCCDI="total_precipitation_exceeding_95th_percentile", 
-                            r99ptotETCCDI="total_precipitation_exceeding_99th_percentile", 
+                            r95ptotETCCDI="precipitation_fraction_exceeding_95th_percentile", 
+                            r99ptotETCCDI="precipitation_fraction_exceeding_99th_percentile", 
                             prcptotETCCDI="total_wet_day_precipitation")
   
   standard.name.lookup <- c(standard.name.lookup, 
-                            r75ptotETCCDI="total_precipitation_exceeding_75th_percentile", 
+                            r75pETCCDI="total_precipitation_exceeding_75th_percentile", 
+                            r95pETCCDI="total_precipitation_exceeding_95th_percentile", 
+                            r99pETCCDI="total_precipitation_exceeding_99th_percentile", 
+                            r75ptotETCCDI="precipitation_fraction_exceeding_75th_percentile", 
                             csuETCCDI="consecutive_summer_days", 
                             cfdETCCDI="consecutive_frost_days", 
                             hd17ETCCDI="heating_degree_days", 
