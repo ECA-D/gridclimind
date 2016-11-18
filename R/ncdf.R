@@ -1,4 +1,5 @@
 #' climdex.pcic.ncdf, a package to calculate Climdex indices from NetCDF files.
+#' test
 #' 
 #' This package implements code to facilitate computation of Climdex indices
 #' from NetCDF input files.
