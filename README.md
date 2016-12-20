@@ -1,4 +1,4 @@
-[![Join the chat at https://gitter.im/eca-d/climate_indices](https://img.shields.io/badge/GITTER-join%20chat-green.svg)](https://gitter.im/eca-d/climate_indices?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/eca-d/climate_indices)
 [![Maintenance](https://img.shields.io/maintenance/yes/2016.svg)]()
 
 # ecad_indices_grid
