@@ -1,5 +1,14 @@
+.hgtags
+.hg
 .git
-tests/test[0-9]/
-tests/correct_output/
+man-roxygen
+comparison
+README.rst
+CONTRIBUTING.rst
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.travis\.yml$
+^appveyor\.yml$
+^README\.Rmd$
+^README-.*\.png$
+^codecov\.yml$

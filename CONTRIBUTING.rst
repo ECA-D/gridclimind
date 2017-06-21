@@ -1,11 +1,11 @@
-Contributing to the climdex.pcic.ncdf R package
+Contributing to the gridclimind R package
 ==========================================
 
 Getting Started
 ---------------
 
 - Create a `Github account`_.
-- Fork the repository on Github at https://github.com/pacificclimate/climdex.pcic.ncdf.
+- Fork the repository on Github at https://github.com/ECA-D/gridclimind
 - Work on the code (see the `next section`_)
 - Send us a `pull request`_.
 
@@ -27,13 +27,13 @@ That's it!
 
 Once you have the required software installed, create a local clone of the repository.
 ::
-    $ git clone https://github.com/[your_user]/climdex.pcic.ncdf.git
+    $ git clone https://github.com/[your_user]/gridclimind.git
 
 Build the docs (which builds the auto-generated NAMESPACE file needed to build). See `below <#how-to-build-the-docs>`_.
 
 Then make sure that everything builds out of the box
 ::
-    $ R CMD build climdex.pcic.ncdf/
+    $ R CMD build gridclimind/
 
 .. _CRAN package checking: http://cran.r-project.org/web/checks/check_flavors.html
 
@@ -42,7 +42,7 @@ How to run the tests
 
 Running the tests can be done with one command:
 ::
-    james@basalt ~/code/git $ R CMD check climdex.pcic.ncdf/
+    james@basalt ~/code/git $ R CMD check gridclimind/
 
 You'll see a bunch of package building spew that has nothing to do with the tests. But towards the end, you see something like this:
 ::
@@ -76,7 +76,7 @@ Then please follow these guidelines for writing your report:
 
 I cannot stress enough how important it is to contrast what you expected to happen, with what actually happened. When executing the code does not produce the *advertised* result, there is a bug in the package. When the code does not produce the result that you *wished* it had, this is *not* a bug. We receive far too many reports in the latter category.
 
-.. _Create a new issue: https://github.com/pacificclimate/climdex.pcic.ncdf/issues/new
+.. _Create a new issue: https://github.com/pacificclimate/gridclimind/issues/new
 
 .. _build-the-docs:
 
@@ -85,7 +85,7 @@ How to build the docs
 
 The package documentation is inline in the code. All of the manual pages are built by using ``roxygen2``. Make sure that you have ``roxygen2`` installed and loaded:
 ::
-   james@basalt ~/code/git/climdex.pcic.ncdf $ R
+   james@basalt ~/code/git/gridclimind $ R
 
    R version 3.0.3 (2014-03-06) -- "Warm Puppy"
    Copyright (C) 2014 The R Foundation for Statistical Computing
@@ -120,7 +120,7 @@ Then call ``roxygenize()`` to build the docs.
    Loading required package: functional
    Loading required package: proj4
    Writing NAMESPACE
-   Writing climdex.pcic.ncdf.Rd
+   Writing gridclimind.Rd
    Writing create.climdex.cmip5.filenames.Rd
    Writing get.climdex.variable.list.Rd
    Writing get.climdex.functions.Rd
@@ -148,7 +148,7 @@ Then call ``roxygenize()`` to build the docs.
 Submitting pull requests
 ------------------------
 
-We would love help from the greater climate community in developing the package and we welcome contributions to climdex.pcic.ncdf package.
+We would love help from the greater climate community in developing the package and we welcome contributions to gridclimind package.
 
 - Please write tests for any functionality that you may add.
 - Please modify tests for any functionality that you change.
@@ -164,8 +164,8 @@ Even if you don't program for a living there are plenty of ways to help. Not onl
 - If the documentation doesn't answer your questions, it probably doesn't answer many people's questions. Help us all out and write something that does.
 - Take a look through the outstanding `"help wanted" issues`_, and see if you know any of the answers.
 - If there are `open bug reports`_, see if you can reproduce the problem and verify that it exists. Having bug reports validated and/or clarified by multiple parties is extremely valuable.
-- Tell us your story. If ``climdex.pcic.ncdf`` has helped your project to better understand climate extremes, we would love to hear about it. Write a blog post and/or send an e-mail to the `package maintainer`_.
+- Tell us your story. If ``gridclimind`` has helped your project to better understand climate extremes, we would love to hear about it. Write a blog post and/or send an e-mail to the `package maintainer`_.
 
-.. _"help wanted" issues: https://github.com/pacificclimate/climdex.pcic.ncdf/labels/help%20wanted
-.. _open bug reports: https://github.com/pacificclimate/climdex.pcic.ncdf/labels/bug
-.. _package maintainer: mailto:hiebert@uvic.ca
+.. _"help wanted" issues: https://github.com/ECA-D/gridclimind/labels/help%20wanted
+.. _open bug reports: https://github.com/ECA-D/gridclimind/labels/bug
+.. _package maintainer: mailto:eca@knmi.nl

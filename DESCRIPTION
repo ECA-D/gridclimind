@@ -1,16 +1,17 @@
-Package: climdex.pcic.ncdf
-Version: 0.5-4
-Date: 2014-11-03
-Title: Functions to compute CLIMDEX indices over a NetCDF grid
-Author: David Bronaugh <bronaugh@uvic.ca> for the Pacific Climate Impacts
-    Consortium (PCIC)
-Maintainer: James Hiebert <hiebert@uvic.ca>
+Package: gridclimind
+Version: 1.0.0
+Date: 2017-04-14
+Title: Functions to compute CLIMIND indices over a NetCDF grid
+Authors@R: as.person(c(
+"Christiana Photiadou <cphotiadou@gmail.com> [aut,cre]",
+"David Bronaugh <bronaugh@uvic.ca> [aut]"
+Maintainer: ECA-D <eca@knmi.nl>
 Depends:
     R (>= 3.0),
     PCICt (>= 0.5-4)
 Imports:
     ncdf4 (>= 1.10),
-    climdex.pcic (>= 1.1-1),
+    climind (>= 1.0.0),
     ncdf4.helpers (>= 0.3-3),
     snow (>= 0.3-13),
     udunits2 (>= 0.6),

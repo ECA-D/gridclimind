@@ -1,4 +1,4 @@
-#' climdex.pcic.ncdf, a package to calculate Climdex indices from NetCDF files.
+#' gridclimind, a package to calculate Climdex indices from NetCDF files.
 #' 
 #' This package implements code to facilitate computation of Climdex indices
 #' from NetCDF input files.
@@ -25,8 +25,8 @@
 #' Many of the other functions exposed by the package are intended to provide for
 #' extensibility, but are unlikely to be routinely used by users of this package.
 #' 
-#' @name climdex.pcic.ncdf
-#' @aliases climdex.pcic.ncdf-package
+#' @name gridclimind
+#' @aliases gridclimind-package
 #' @docType package
 #' @seealso \code{\link{create.indices.from.files}}, \code{\link{create.thresholds.from.file}}
 #' @references \url{http://etccdi.pacificclimate.org/list_27_indices.shtml}
@@ -1190,7 +1190,7 @@ set.up.cluster <- function(parallel, type="SOCK") {
     cat(paste("Creating cluster of", parallel, "nodes of type", type, "\n"))
     cluster <- snow::makeCluster(parallel, type)
 
-    snow::clusterEvalQ(cluster, library(climdex.pcic.ncdf))
+    snow::clusterEvalQ(cluster, library(gridclimind))
     ##snow::clusterEvalQ(cluster, try(getFromNamespace('nc_set_chunk_cache', 'ncdf4')(1024 * 2048, 1009), silent=TRUE))
   }
   cluster
