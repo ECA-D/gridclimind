@@ -1,15 +1,15 @@
 #' gridclimind, a package to calculate Climdex indices from NetCDF files.
-#' 
+#'
 #' This package implements code to facilitate computation of Climdex indices
 #' from NetCDF input files.
-#' 
+#'
 #' The Climdex climate extremes indices have historically been calculated using
 #' Fortran code. This has a number of problems:\itemize{
 #' \item{Difficult to test}
 #' \item{Difficult to modify (for instance, to add NetCDF file I/O)}
 #' \item{Difficult to parallelize}
 #' }
-#' The \code{climdex.pcic} package provides an easy interface to efficient
+#' The \code{climind} package provides an easy interface to efficient
 #' computation of Climdex indices. This package is complementary to it, providing
 #' easy access to functions to compute indices in parallel, using NetCDF files as
 #' input and output. It implements chunked processing of input files to keep memory
@@ -17,32 +17,32 @@
 #' library; and it includes a test suite to verify correctness of the implementation.
 #' Furthermore, the package has a modular design, allowing for easy extension to
 #' allow for adaptation to changing or custom requirements.
-#' 
+#'
 #' Users of this package should pay particular attention to the
 #' \code{\link{create.indices.from.files}} function, which computes Climdex indices
 #' given NetCDF input files; and \code{\link{create.thresholds.from.file}}, which
 #' computes thresholds for use with threshold-based indices given NetCDF input files.
 #' Many of the other functions exposed by the package are intended to provide for
 #' extensibility, but are unlikely to be routinely used by users of this package.
-#' 
+#'
 #' @name gridclimind
 #' @aliases gridclimind-package
 #' @docType package
 #' @seealso \code{\link{create.indices.from.files}}, \code{\link{create.thresholds.from.file}}
 #' @references \url{http://etccdi.pacificclimate.org/list_27_indices.shtml}
-#' 
+#'
 #' Karl, T.R., N. Nicholls, and A. Ghazi, 1999: CLIVAR/GCOS/WMO workshop on
 #' indices and indicators for climate extremes: Workshop summary. Climatic
 #' Change, 42, 3-7.
-#' 
+#'
 #' Peterson, T.C., and Coauthors: Report on the Activities of the Working Group
 #' on Climate Change Detection and Related Rapporteurs 1998-2001. WMO, Rep.
 #' WCDMP-47, WMO-TD 1071, Geneve, Switzerland, 143pp.
-#' 
+#'
 #' Zhang, X., 2005: Avoiding inhomogeneity in percentile-based indices of
 #' temperature extremes. Journal of Climate 18.11 (2005):1641-.
 #' @keywords climate ts
-#' @importClassesFrom climdex.pcic t
+#' @importClassesFrom climind t
 #' @import snow PCICt
 NULL
 
@@ -62,27 +62,27 @@ parLapplyLBFiltered <- function(cl, x, remote.func, ..., local.filter.func=NULL)
   submit.job <- function(cluster.id, task.id) {
     snow::sendCall(cl[[cluster.id]], remote.func, args=c(x[task.id], list(...)), tag=task.id)
   }
-  
+
   ## Fire off jobs, filling in the cur.task table as we go.
   for(i in 1:min(cluster.size, num.tasks))
     submit.job(i, i)
 
   next.task <- min(cluster.size, num.tasks)
-  
+
   ## Stalk and feed jobs
   for(i in 1:num.tasks) {
     d <- snow::recvOneResult(cl)
     next.task <- next.task + 1
-    
+
     ## Feed the finished node another task if we have one.
     if(next.task <= num.tasks)
       submit.job(d$node, next.task)
-    
+
     if(!is.null(local.filter.func))
       data.to.return[d$tag] <- list(local.filter.func(d$value, x[[d$tag]]))
     else
       data.to.return[d$tag] <- list(d$value)
-      
+
     rm(d)
   }
 
@@ -91,7 +91,7 @@ parLapplyLBFiltered <- function(cl, x, remote.func, ..., local.filter.func=NULL)
 }
 ## need to remove this one
 put.history.att <- function(f, v, definemode=FALSE) {
-  history.string <- paste("Created by climdex.pcic", packageVersion("climdex.pcic"), "on", date())
+  history.string <- paste("Created by climind", packageVersion("climind"), "on", date())
   ncdf4::ncatt_put(f, v, "history", history.string, definemode=definemode)
   invisible(0)
 }
@@ -106,8 +106,8 @@ put.ETCCDI.atts <- function(f, freq, orig.title, author.data, definemode=FALSE) 
   ncdf4::ncatt_put(f, 0, "webpage", "www.ecad.eu, http://www.ecad.eu/utils/mapserver/eobs_maps_indices.php", definemode=definemode)
   ncdf4::ncatt_put(f, 0, "contact", "eca@knmi.nl", definemode=definemode)
   ncdf4::ncatt_put(f, 0, "file_created", format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="GMT"), definemode=definemode)
-  ncdf4::ncatt_put(f, 0, "climdex.pcic_version", as.character(packageVersion("climdex.pcic")), definemode=definemode)
-  
+  ncdf4::ncatt_put(f, 0, "climind_version", as.character(packageVersion("climind")), definemode=definemode)
+
   if("institution_id" %in% names(author.data))
     ncdf4::ncatt_put(f, 0, "ETCCDI_institution_id", author.data$institution_id, definemode=definemode)
   if("indices_archive" %in% names(author.data))
@@ -144,7 +144,7 @@ all.the.same <- function(dat) {
 #'# create.climdex.cmip5.filenames <- function(fn.split, vars.list) {
 #   time.res <- c("yr", "mon")[grepl("_mon$", vars.list) + 1]
 #   time.range <- substr(fn.split[c('tstart', 'tend')], 1, 4)
-#   
+#
 #   paste(paste(vars.list, fn.split['model'], fn.split['emissions'], fn.split['run'], sapply(time.res, function(x) { paste(time.range, switch(x, yr=c("", ""), mon=c("01", "12")), sep="", collapse="-") }), sep="_"), ".nc", sep="")
 # }
 # TODO: this has to change to accomodate seas & halfyears
@@ -152,19 +152,19 @@ all.the.same <- function(dat) {
 create.climdex.eobs.filenames <- function(fn.split, vars.list) {
   time.res <- c("yr", "mon")[grepl("_mon$", vars.list) + 1]
   time.range <- substr(fn.split[c('tstart', 'tend')], 1, 4)
-  
+
   paste(paste(vars.list, fn.split['resolution'], fn.split['version'],sapply(time.res, function(x) { paste(time.range, switch(x, yr=c("", ""), mon=c("01", "12")), sep="", collapse="-") }), sep="_"), ".nc", sep="")
 }
 
-get.split.filename.eobs <- function (eobs.file) 
+get.split.filename.eobs <- function (eobs.file)
 {
   split.path <- strsplit(eobs.file, "/")[[1]]
   fn.split <- strsplit(tail(split.path, n = 1), "_")[[1]]
-  names(fn.split) <- c("var", "resolution", 
+  names(fn.split) <- c("var", "resolution",
                        "version", "trange", rep(NA, max(0, length(fn.split) - 6)))
-  fn.split[length(fn.split)] <- strsplit(fn.split[length(fn.split)], 
+  fn.split[length(fn.split)] <- strsplit(fn.split[length(fn.split)],
                                          "\\.")[[1]][1]
-  fn.split[c("tstart", "tend")] <- strsplit(fn.split["trange"], 
+  fn.split[c("tstart", "tend")] <- strsplit(fn.split["trange"],
                                             "-")[[1]]
   fn.split
 }
@@ -172,30 +172,30 @@ get.split.filename.eobs <- function (eobs.file)
 #' Returns a list of Climdex variables given constraints
 #'
 #' Returns a list of Climdex variables given constraints.
-#' 
+#'
 #' This function takes a character vector which specifies what source data is present and a time resolution, and generates a list of names consisting of the variable and the time resolution, separated by an underscore.
-#' 
+#'
 #' @param source.data.present A vector of strings naming the data that's present; at least one of (tmin, tmax, prec, tavg).
 #' @param time.resolution The time resolutions to compute indices at. See \code{\link{create.indices.from.files}}.
 #' @param climdex.vars.subset A character vector of lower-case names of Climdex indices to calculate (eg: tr, fd, rx5day). See \code{\link{create.indices.from.files}}.
 #' @return A character vector containing variable names with time resolutions appended.
-#' 
+#'
 #' @seealso \code{\link{create.indices.from.files}}
 #' @examples
 #' ## Get all variables which require tmin and/or tmax, for all time resolutions.
 #' var.list1 <- get.climdex.variable.list(c("tmax", "tmin"))
-#' 
+#'
 #' ## Get all variables which require prec with an annual time resolution.
 #' var.list2 <- get.climdex.variable.list("prec", time.resolution="annual")
-#' 
+#'
 #' ## Get the intersection of a set list of vars and available data.
 #' sub.vars <- c("su", "id", "tr", "fd", "gsl", "csdi", "wsdi", "r10mm")
 #' var.list3 <- get.climdex.variable.list("tmax", climdex.vars.subset=sub.vars)
-#' 
+#'
 #' @export
 get.climdex.variable.list <- function(source.data.present, time.resolution=c("all", "annual", "monthly"), climdex.vars.subset=NULL) {
   time.res <- match.arg(time.resolution)
-  annual.only <- c("hiETCCDI","gslETCCDI",  "cddETCCDI", "cwdETCCDI",  "altcddETCCDI", "altcwdETCCDI", "csdiETCCDI", 
+  annual.only <- c("hiETCCDI","gslETCCDI",  "cddETCCDI", "cwdETCCDI",  "altcddETCCDI", "altcwdETCCDI", "csdiETCCDI",
                    "altcsdiETCCDI", "wsdiETCCDI", "altwsdiETCCDI")
   monthly.only <- c("spi3ETCCDI","spi6ETCCDI")
   vars.by.src.data.reqd <- list(tmax=c("csuETCCDI", "suETCCDI", "idETCCDI", "txxETCCDI", "txnETCCDI", "tx10pETCCDI", "tx90pETCCDI", "wsdiETCCDI", "altwsdiETCCDI"),
@@ -204,10 +204,10 @@ get.climdex.variable.list <- function(source.data.present, time.resolution=c("al
                                        "cddETCCDI", "cwdETCCDI", "r75pETCCDI", "r95pETCCDI", "r99pETCCDI", "r75ptotETCCDI", "r95ptotETCCDI", "r99ptotETCCDI",
                                        "prcptotETCCDI", "altcddETCCDI", "altcwdETCCDI"),
                                 tavg=c("hd17ETCCDI", "hiETCCDI", "gslETCCDI", "dtrETCCDI") )
-  
+
   if(any(!(source.data.present %in% c("tmin", "tmax", "tavg", "prec"))))
     stop("Invalid variable listed in source.data.present.")
-  
+
   if(all(c("tmax", "tmin") %in% source.data.present) && !("tavg" %in% source.data.present))
     source.data.present <- c(source.data.present, "tavg")
 
@@ -217,7 +217,7 @@ get.climdex.variable.list <- function(source.data.present, time.resolution=c("al
 
   #freq.lists <- list(c("mon", "yr"), c("yr"))
   freq.lists <- list(c("mon", "yr"), c("yr"),c("mon"))
-  
+
   helper_fun <- function(climdex.vars, annual.only, month.only) {
     if (climdex.vars %in% annual.only) {
       return(paste(climdex.vars, 'yr', sep = '_'))
@@ -227,19 +227,19 @@ get.climdex.variable.list <- function(source.data.present, time.resolution=c("al
       return(paste(climdex.vars, c('mon', 'yr'), sep = '_'))
     }
   }
-  
+
 #   dat <- switch(time.res,
 #                 all=unlist(lapply(climdex.vars, function(x) { paste(x, freq.lists[[(x %in% annual.only) + 1]], sep="_") })),
 #                 annual=paste(climdex.vars, "yr", sep="_"),
 #                 monthly=paste(climdex.vars[!(climdex.vars %in% annual.only)], "mon", sep="_"))
-  
+
   dat <- switch(time.res,
                 all=unlist(lapply(climdex.vars, helper_fun, annual.only = annual.only, month.only = month.only)),
                 annual=paste(climdex.vars[!(climdex.vars %in% monthly.only)], "yr", sep="_"),
                 monthly=paste(climdex.vars[!(climdex.vars %in% annual.only)], "mon", sep="_"))
 
   names(dat) <- NULL
-  
+
   return(dat)
 }
 
@@ -262,25 +262,25 @@ get.climdex.variable.list <- function(source.data.present, time.resolution=c("al
 get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
   func.names <- c("climdex.fd", "climdex.su", "climdex.id", "climdex.tr", "climdex.gsl",
                   "climdex.fd", "climdex.su", "climdex.id", "climdex.tr",
-                  
+
                   "climdex.txx", "climdex.tnx", "climdex.txn", "climdex.tnn", "climdex.tn10p", "climdex.tx10p", "climdex.tn90p", "climdex.tx90p",
                   "climdex.txx", "climdex.tnx", "climdex.txn", "climdex.tnn", "climdex.tn10p", "climdex.tx10p", "climdex.tn90p", "climdex.tx90p",
-                  
+
                   "climdex.wsdi", "climdex.csdi", "climdex.wsdi", "climdex.csdi",
-                  
+
                   "climdex.dtr", "climdex.rx1day", "climdex.rx5day",
                   "climdex.dtr", "climdex.rx1day", "climdex.rx5day",
-                  
+
                   "climdex.sdii", "climdex.r10mm", "climdex.r20mm", "climdex.rnnmm", "climdex.cdd", "climdex.cwd", "climdex.r95ptot", "climdex.r99ptot", "climdex.prcptot",
                   "climdex.sdii", "climdex.r10mm", "climdex.r20mm", "climdex.rnnmm", "climdex.r95ptot", "climdex.r99ptot", "climdex.prcptot",
-                  
+
                   "climdex.cdd", "climdex.cwd")
   #
-  func.names <- c(func.names, "climdex.r75p", "climdex.r75p", "climdex.r95p", "climdex.r95p", "climdex.r99p", "climdex.r99p", 
+  func.names <- c(func.names, "climdex.r75p", "climdex.r75p", "climdex.r95p", "climdex.r95p", "climdex.r99p", "climdex.r99p",
                               "climdex.r75ptot", "climdex.r75ptot", "climdex.csu", "climdex.csu", "climdex.cfd", "climdex.cfd",
                               "climdex.hd17", "climdex.hd17", "climdex.HI", "climdex.spi3", "climdex.spi6")
-  
-  
+
+
   el <- list()
   af <- list(freq="annual")
   mf <- list(freq="monthly")
@@ -292,42 +292,42 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
   r1mm.opts <- list(threshold=1)
   options <- list( af, af, af, af, el,
                            mf, mf, mf, mf,
-                           
+
                            mf, mf, mf, mf, mf, mf, mf, mf,
                            af, af, af, af, af, af, af, af,
-                           
+
                            c(af, wcsdi.opts), c(af, wcsdi.opts), c(af, altwcsdi.opts), c(af, altwcsdi.opts),
-                           
+
                            mf, mf, c(mf, rx5day.opts),
                            af, af, c(af, rx5day.opts),
-                           
+
                            af, af, af, c(af, r1mm.opts), c(af,cwdd.opts), c(af,cwdd.opts), af, af, af,
                            mf, mf, mf, c(mf, r1mm.opts), mf, mf, mf,
                            c(af, altcwdd.opts), c(af, altcwdd.opts))
-  
-  
-  options <- c(options, list(af, mf, af, mf, af, mf, 
-                             af, mf, af, mf, af, mf, 
+
+
+  options <- c(options, list(af, mf, af, mf, af, mf,
+                             af, mf, af, mf, af, mf,
                              af, mf, af, mf, mf))
-  
-  func <- lapply(1:length(func.names), function(n) do.call(functional::Curry, c(list(getFromNamespace(func.names[n], 'climdex.pcic')), options[[n]])))
-  
+
+  func <- lapply(1:length(func.names), function(n) do.call(functional::Curry, c(list(getFromNamespace(func.names[n], 'climind')), options[[n]])))
+
   names(func) <- c("fdETCCDI_yr", "suETCCDI_yr", "idETCCDI_yr","trETCCDI_yr", "gslETCCDI_yr",
                    "fdETCCDI_mon", "suETCCDI_mon", "idETCCDI_mon","trETCCDI_mon",
-                   
+
                    "txxETCCDI_mon", "tnxETCCDI_mon", "txnETCCDI_mon", "tnnETCCDI_mon", "tn10pETCCDI_mon", "tx10pETCCDI_mon", "tn90pETCCDI_mon", "tx90pETCCDI_mon",
                    "txxETCCDI_yr",  "tnxETCCDI_yr",  "txnETCCDI_yr",  "tnnETCCDI_yr",  "tn10pETCCDI_yr",  "tx10pETCCDI_yr",  "tn90pETCCDI_yr",  "tx90pETCCDI_yr",
-                   
+
                    "wsdiETCCDI_yr", "csdiETCCDI_yr",  "altwsdiETCCDI_yr", "altcsdiETCCDI_yr",
-                   
+
                    "dtrETCCDI_mon", "rx1dayETCCDI_mon", "rx5dayETCCDI_mon",
                    "dtrETCCDI_yr", "rx1dayETCCDI_yr", "rx5dayETCCDI_yr",
-                   
+
                    "sdiiETCCDI_yr", "r10mmETCCDI_yr", "r20mmETCCDI_yr", "r1mmETCCDI_yr", "cddETCCDI_yr", "cwdETCCDI_yr", "r95ptotETCCDI_yr", "r99ptotETCCDI_yr", "prcptotETCCDI_yr",
                    "sdiiETCCDI_mon", "r10mmETCCDI_mon", "r20mmETCCDI_mon", "r1mmETCCDI_mon", "r95ptotETCCDI_mon", "r99ptotETCCDI_mon", "prcptotETCCDI_mon",
-                   
-                   "altcddETCCDI_yr", "altcwdETCCDI_yr", 
-                   
+
+                   "altcddETCCDI_yr", "altcwdETCCDI_yr",
+
                    "r75pETCCDI_yr", "r75pETCCDI_mon", "r95pETCCDI_yr", "r95pETCCDI_mon", "r99pETCCDI_yr", "r99pETCCDI_mon",
                    "r75ptotETCCDI_yr", "r75ptotETCCDI_mon", "csuETCCDI_yr", "csuETCCDI_mon", "cdfETCCDI_yr", "cdfETCCDI_mon",
                    "hd17ETCCDI_yr", "hd17ETCCDI_mon", "hiETCCDI_yr", "spi3ETCCDI_mon", "spi6ETCCDI_mon")
@@ -336,11 +336,11 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
 }
 
 #' Returns metadata for specified Climdex variables
-#' 
+#'
 #' Returns metadata for specified Climdex variables.
-#' 
+#'
 #' This function returns metadata suitable for use in NetCDF files for the specified variables.
-#' 
+#'
 #' @param vars.list The list of variables, as returned by \code{\link{get.climdex.variable.list}}.
 #' @param template.filename The filename template to be used when generating filenames.
 #' @return A data frame containing the following:
@@ -353,7 +353,7 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
 #' \item{standard.name}{Standard name to use for the variable}
 #' \item{filename}{Filename to be written out}
 #' }
-#' 
+#'
 #' @examples
 #' ## Get metadata (including filenames) for specified variables.
 #' fn <- "pr_day_BCCAQ+ANUSPLIN300+MRI-CGCM3_historical+rcp85_r1i1p1_19500101-21001231.nc"
@@ -364,117 +364,117 @@ get.climdex.functions <- function(vars.list, fclimdex.compatible=TRUE) {
 get.climdex.variable.metadata <- function(vars.list, template.filename) {
   all.data <- data.frame(long.name=c("Annual Number of Frost Days", "Annual Number of Summer Days", "Annual Number of Icing Days", "Annual Number of Tropical Nights", "Growing Season Length",
                                      "Monthly Number of Frost Days", "Monthly Number of Summer Days", "Monthly Number of Icing Days", "Monthly Number of Tropical Nights",
-                                     
+
                                      "Monthly Maximum of Daily Maximum Temperature", "Monthly Maximum of Daily Minimum Temperature",
                                      "Monthly Minimum of Daily Maximum Temperature", "Monthly Minimum of Daily Minimum Temperature",
-                                     
+
                                      "Percentage of Days when Daily Minimum Temperature is Below the 10th Percentile", "Percentage of Days when Daily Maximum Temperature is Below the 10th Percentile",
                                      "Percentage of Days when Daily Minimum Temperature is Above the 90th Percentile", "Percentage of Days when Daily Maximum Temperature is Above the 90th Percentile",
                                      "Annual Maximum of Daily Maximum Temperature", "Annual Maximum of Daily Minimum Temperature",
                                      "Annual Minimum of Daily Maximum Temperature", "Annual Minimum of Daily Minimum Temperature",
                                      "Percentage of Days when Daily Minimum Temperature is Below the 10th Percentile", "Percentage of Days when Daily Maximum Temperature is Below the 10th Percentile",
                                      "Percentage of Days when Daily Minimum Temperature is Above the 90th Percentile", "Percentage of Days when Daily Maximum Temperature is Above the 90th Percentile",
-                                     
+
                                      "Annnual Warm Spell Duration Index", "Annual Cold Spell Duration Index", "Annual Warm Spell Duration Index Spanning Years", "Annual Cold Spell Duration Index Spanning Years",
-                                     
+
                                      "Mean Diurnal Temperature Range", "Monthly Maximum 1-day Precipitation", "Monthly Maximum Consecutive 5-day Precipitation",
                                      "Mean Diurnal Temperature Range", "Annual Maximum 1-day Precipitation", "Annual Maximum Consecutive 5-day Precipitation",
-                                     
+
                                      "Annual Simple Precipitation Intensity Index", "Annual Count of Days with At Least 10mm of Precipitation",
                                      "Annual Count of Days with At Least 20mm of Precipitation", "Annual Count of Days with At Least 1mm of Precipitation",
                                      "Maximum Number of Consecutive Days with Less Than 1mm of Precipitation", "Maximum Number of Consecutive Days with At Least 1mm of Precipitation",
                                      "Annual Precipitation fraction due to very wet days (daily precipitation exceeds 95th percentile)",
                                      "Annual Precipitation fraction due to extremely wet days (daily precipitation exceeds 99th percentile)", "Annual Total Precipitation in Wet Days",
-                                     
+
                                      "Monthly Simple Precipitation Intensity Index", "Monthly Count of Days with At Least 10mm of Precipitation",
                                      "Monthly Count of Days with At Least 20mm of Precipitation", "Monthly Count of Days with At Least 1mm of Precipitation",
                                      "Monthly Precipitation fraction due to very wet days (daily precipitation exceeds 95th percentile)",
                                      "Monthly Precipitation fraction due to extremely wet days (daily precipitation exceeds 99th percentile)", "Monthly Total Precipitation in Wet Days",
-                                     
+
                                      "Maximum Number of Consecutive Days Per Year with Less Than 1mm of Precipitation", "Maximum Number of Consecutive Days Per Year with At Least 1mm of Precipitation"),
-                         
+
                          var.name=c("fdETCCDI", "suETCCDI","idETCCDI", "trETCCDI", "gslETCCDI",
                                     "fdETCCDI", "suETCCDI","idETCCDI", "trETCCDI",
-                                    
+
                                     "txxETCCDI", "tnxETCCDI", "txnETCCDI", "tnnETCCDI", "tn10pETCCDI", "tx10pETCCDI", "tn90pETCCDI", "tx90pETCCDI",
                                     "txxETCCDI", "tnxETCCDI", "txnETCCDI", "tnnETCCDI", "tn10pETCCDI", "tx10pETCCDI", "tn90pETCCDI", "tx90pETCCDI",
-                                    
+
                                     "wsdiETCCDI", "csdiETCCDI", "altwsdiETCCDI", "altcsdiETCCDI",
-                                    
+
                                     "dtrETCCDI", "rx1dayETCCDI", "rx5dayETCCDI",
                                     "dtrETCCDI", "rx1dayETCCDI", "rx5dayETCCDI",
-                                    
+
                                     "sdiiETCCDI", "r10mmETCCDI", "r20mmETCCDI", "r1mmETCCDI", "cddETCCDI", "cwdETCCDI",  "r95ptotETCCDI", "r99ptotETCCDI", "prcptotETCCDI",
                                     "sdiiETCCDI", "r10mmETCCDI", "r20mmETCCDI", "r1mmETCCDI", "r95ptotETCCDI", "r99ptotETCCDI", "prcptotETCCDI",
-                                    
+
                                     "altcddETCCDI", "altcwdETCCDI"),
-                         
+
                          units=c( "days", "days", "days","days", "days",
                                  "days", "days", "days","days",
-                                 
+
                                  "degrees_C", "degrees_C", "degrees_C", "degrees_C", "%", "%", "%", "%",
                                  "degrees_C", "degrees_C", "degrees_C", "degrees_C", "%", "%", "%", "%",
-                                 
+
                                  "days", "days", "days", "days",
-                                 
+
                                  "degrees_C", "mm", "mm",
                                  "degrees_C", "mm", "mm",
-                                 
+
                                  "mm d-1", "days", "days", "days", "days", "days", "%", "%", "mm",
                                  "mm d-1", "days", "days", "days", "%", "%", "mm",
-                                 
+
                                  "days", "days"),
                          annual=c(T, T, T, T, T,
                                   F, F, F, F,
-                                  
+
                                   F, F, F, F, F, F, F, F,
                                   T, T, T, T, T, T, T, T,
-                                  
+
                                   T, T, T, T,
-                                  
+
                                   F, F, F,
                                   T, T, T,
-                                  
+
                                   T, T, T, T, T, T, T, T, T,
                                   F, F, F, F, F, F, F,
-                                  
+
                                   T, T),
-                         
+
                          base.period.attr=c(F, F, F, F, F,
                                             F, F, F, F,
-                                            
+
                                             F, F, F, F, T, T, T, T,
                                             F, F, F, F, T, T, T, T,
-                                            
+
                                             T, T, T, T,
-                                            
+
                                             F, F, F,
                                             F, F, F,
-                                            
+
                                             F, F, F, F, F, F, T, T, F,
                                             F, F, F, F, T, T, F,
-                                            
+
                                             F, F),
-                         
+
                          row.names=c( "fdETCCDI_yr", "suETCCDI_yr", "idETCCDI_yr", "trETCCDI_yr", "gslETCCDI_yr",
                                       "fdETCCDI_mon", "suETCCDI_mon", "idETCCDI_mon", "trETCCDI_mon",
-                                      
+
                                       "txxETCCDI_mon", "tnxETCCDI_mon", "txnETCCDI_mon", "tnnETCCDI_mon", "tn10pETCCDI_mon", "tx10pETCCDI_mon", "tn90pETCCDI_mon", "tx90pETCCDI_mon",
                                       "txxETCCDI_yr", "tnxETCCDI_yr", "txnETCCDI_yr", "tnnETCCDI_yr", "tn10pETCCDI_yr", "tx10pETCCDI_yr", "tn90pETCCDI_yr", "tx90pETCCDI_yr",
-                                      
+
                                       "wsdiETCCDI_yr", "csdiETCCDI_yr", "altwsdiETCCDI_yr", "altcsdiETCCDI_yr",
-                                      
+
                                       "dtrETCCDI_mon", "rx1dayETCCDI_mon", "rx5dayETCCDI_mon",
                                       "dtrETCCDI_yr", "rx1dayETCCDI_yr", "rx5dayETCCDI_yr",
-                                      
+
                                       "sdiiETCCDI_yr", "r10mmETCCDI_yr", "r20mmETCCDI_yr", "r1mmETCCDI_yr", "cddETCCDI_yr", "cwdETCCDI_yr", "r95ptotETCCDI_yr", "r99ptotETCCDI_yr", "prcptotETCCDI_yr",
                                       "sdiiETCCDI_mon", "r10mmETCCDI_mon", "r20mmETCCDI_mon", "r1mmETCCDI_mon", "r95ptotETCCDI_mon", "r99ptotETCCDI_mon", "prcptotETCCDI_mon",
-                                      
+
                                       "altcddETCCDI_yr", "altcwdETCCDI_yr"),
                          stringsAsFactors=FALSE)
-  
+
   ## Adding a new variable, explictily adding it as a new row in stead of introducing it in the large data.frame above. This
-  ## makes it less likely that we have errors in lining up the variables. 
+  ## makes it less likely that we have errors in lining up the variables.
   ## TODO: Refactor the code above to add the rows like below, easier to read.
   all.data = rbind(all.data, r75pETCCDI_yr = data.frame(long.name = 'Annual Total Precipitation when Daily Precipitation Exceeds the 75th Percentile of Wet Day Precipitation', var.name = 'r75pETCCDI', units = 'mm', annual = TRUE, base.period.attr = FALSE),
                              r75pETCCDI_mon = data.frame(long.name = 'Monthly Total Precipitation when Daily Precipitation Exceeds the 75th Percentile of Wet Day Precipitation', var.name = 'r75pETCCDI', units = 'mm', annual = FALSE, base.period.attr = FALSE),
@@ -495,50 +495,50 @@ get.climdex.variable.metadata <- function(vars.list, template.filename) {
                              spi6ETCCDI_mon = data.frame(long.name = 'Standardized Precipitation Index 6-mon', var.name = 'spi6ETCCDI', units = '', annual = FALSE, base.period.attr = FALSE))
 
 
-  standard.name.lookup <- c(fdETCCDI="number_frost_days", 
-                            suETCCDI="number_summer_days", 
-                            idETCCDI="number_icing_days", 
-                            trETCCDI="number_tropical_nights", 
+  standard.name.lookup <- c(fdETCCDI="number_frost_days",
+                            suETCCDI="number_summer_days",
+                            idETCCDI="number_icing_days",
+                            trETCCDI="number_tropical_nights",
                             gslETCCDI="growing_season_length",
-                            txxETCCDI="maximum_daily_maximum_temperature", 
-                            tnxETCCDI="maximum_daily_minimum_temperature", 
-                            txnETCCDI="minimum_daily_maximum_temperature", 
+                            txxETCCDI="maximum_daily_maximum_temperature",
+                            tnxETCCDI="maximum_daily_minimum_temperature",
+                            txnETCCDI="minimum_daily_maximum_temperature",
                             tnnETCCDI="minimum_daily_minimum_temperature",
-                            tn10pETCCDI="percent_days_when_daily_minimum_temperature_below_10p", 
+                            tn10pETCCDI="percent_days_when_daily_minimum_temperature_below_10p",
                             tx10pETCCDI="percent_days_when_daily_maximum_temperature_below_10p",
-                            tn90pETCCDI="percent_days_when_daily_minimum_temperature_above_90p", 
+                            tn90pETCCDI="percent_days_when_daily_minimum_temperature_above_90p",
                             tx90pETCCDI="percent_days_when_daily_maximum_temperature_above_90p",
-                            wsdiETCCDI="warm_spell_duration_index", 
-                            csdiETCCDI="cold_spell_duration_index", 
-                            altwsdiETCCDI="warm_spell_duration_index", 
+                            wsdiETCCDI="warm_spell_duration_index",
+                            csdiETCCDI="cold_spell_duration_index",
+                            altwsdiETCCDI="warm_spell_duration_index",
                             altcsdiETCCDI="cold_spell_duration_index",
                             dtrETCCDI="diurnal_temperature_range",
-                            rx1dayETCCDI="maximum_1day_precipitation", 
-                            rx5dayETCCDI="maximum_5day_precipitation", 
+                            rx1dayETCCDI="maximum_1day_precipitation",
+                            rx5dayETCCDI="maximum_5day_precipitation",
                             sdiiETCCDI="simple_precipitation_intensity_index",
-                            r10mmETCCDI="count_days_more_than_10mm_precipitation", 
-                            r20mmETCCDI="count_days_more_than_20mm_precipitation", 
+                            r10mmETCCDI="count_days_more_than_10mm_precipitation",
+                            r20mmETCCDI="count_days_more_than_20mm_precipitation",
                             r1mmETCCDI="count_days_more_than_1mm_precipitation",
-                            cddETCCDI="maximum_number_consecutive_dry_days", 
+                            cddETCCDI="maximum_number_consecutive_dry_days",
                             cwdETCCDI="maximum_number_consecutive_wet_days",
-                            altcddETCCDI="maximum_number_consecutive_dry_days", 
+                            altcddETCCDI="maximum_number_consecutive_dry_days",
                             altcwdETCCDI="maximum_number_consecutive_wet_days",
-                            r95ptotETCCDI="precipitation_fraction_exceeding_95th_percentile", 
-                            r99ptotETCCDI="precipitation_fraction_exceeding_99th_percentile", 
+                            r95ptotETCCDI="precipitation_fraction_exceeding_95th_percentile",
+                            r99ptotETCCDI="precipitation_fraction_exceeding_99th_percentile",
                             prcptotETCCDI="total_wet_day_precipitation")
-  
-  standard.name.lookup <- c(standard.name.lookup, 
-                            r75pETCCDI="total_precipitation_exceeding_75th_percentile", 
-                            r95pETCCDI="total_precipitation_exceeding_95th_percentile", 
-                            r99pETCCDI="total_precipitation_exceeding_99th_percentile", 
-                            r75ptotETCCDI="precipitation_fraction_exceeding_75th_percentile", 
-                            csuETCCDI="consecutive_summer_days", 
-                            cfdETCCDI="consecutive_frost_days", 
-                            hd17ETCCDI="heating_degree_days", 
-                            hiETCCDI="huglin_index", 
-                            spi3ETCCDI="standardized_precipitation_index 3-mon", 
+
+  standard.name.lookup <- c(standard.name.lookup,
+                            r75pETCCDI="total_precipitation_exceeding_75th_percentile",
+                            r95pETCCDI="total_precipitation_exceeding_95th_percentile",
+                            r99pETCCDI="total_precipitation_exceeding_99th_percentile",
+                            r75ptotETCCDI="precipitation_fraction_exceeding_75th_percentile",
+                            csuETCCDI="consecutive_summer_days",
+                            cfdETCCDI="consecutive_frost_days",
+                            hd17ETCCDI="heating_degree_days",
+                            hiETCCDI="huglin_index",
+                            spi3ETCCDI="standardized_precipitation_index 3-mon",
                             spi6ETCCDI="standardized_precipitation_index 6-mon")
-  
+
   all.data$standard.name <- standard.name.lookup[all.data$var.name]
 
   all.data$filename <- create.climdex.eobs.filenames(get.split.filename.eobs(template.filename), rownames(all.data))
@@ -599,7 +599,7 @@ create.ncdf.output.files <- function(cdx.dat, f, v.f.idx, variable.name.map, ts,
   time.dim.name <- ncdf4.helpers::nc.get.dim.for.axis(f.example, v.example, "T")$name
   old.time.bnds.att <- ncdf4::ncatt_get(f.example, time.dim.name, "bounds")
   time.bnds.name <- if(old.time.bnds.att$hasatt) old.time.bnds.att$value else paste(time.dim.name, "bnds", sep="_")
-  
+
   ## Create new time dimensions
   time.origin.PCICt <- PCICt::as.PCICt.default(time.origin, cal=attr(ts, "cal"))
   time.units <- paste("days since", time.origin)
@@ -609,13 +609,13 @@ create.ncdf.output.files <- function(cdx.dat, f, v.f.idx, variable.name.map, ts,
   bnds <- if(length(input.bounds) > 0) f.example$var[[input.bounds[1]]]$dim[[1]] else ncdf4::ncdim_def("bnds", "", 1:2, create_dimvar=FALSE)
   time.dat <- list(annual=get.output.time.data(ts, time.origin.PCICt, time.units, time.dim.name, time.bnds.name, bnds, res="year"),
                    monthly=get.output.time.data(ts, time.origin.PCICt, time.units, time.dim.name, time.bnds.name, bnds, res="month"))
-  
+
   grid.mapping.att <- ncdf4::ncatt_get(f.example, v.example, "grid_mapping")
   vars.to.copy <- c(input.bounds[input.bounds != time.bnds.name], names(ncdf4.helpers::nc.get.coordinate.axes(f.example, v.example)), if(grid.mapping.att$hasatt) grid.mapping.att$value)
   vars.to.clone.atts.for <- c(vars.to.copy, ncdf4.helpers::nc.get.dim.names(f.example, v.example))
   vars.ncvars <- sapply(vars.to.copy, function(x) { f.example$var[[x]] }, simplify=FALSE)
   vars.data <- lapply(vars.ncvars, function(ncvar) { if(length(ncvar$dim) == 0) NULL else ncdf4::ncvar_get(f.example, ncvar) })
-  
+
   return(lapply(1:length(cdx.dat$var.name), function(x) {
     annual <- cdx.dat$annual[x]
     time.for.file <- time.dat[[c("monthly", "annual")[1 + annual]]]
@@ -632,7 +632,7 @@ create.ncdf.output.files <- function(cdx.dat, f, v.f.idx, variable.name.map, ts,
       names(att.rename.inst) <- paste(inst.id$value, names(att.rename.inst), sep="_")
       att.rename <- c(att.rename, att.rename.inst)
     }
-    
+
     ## Copy attributes with renaming and exclusions.
     ncdf4.helpers::nc.copy.atts(f.example, 0, new.file, 0, definemode=TRUE, rename.mapping=att.rename)
     ncdf4.helpers::nc.copy.atts(f.example, v.example, new.file, cdx.dat$var.name[x], definemode=TRUE, exception.list=c("units", "long_name", "standard_name", "base_period", "missing_value", "_FillValue", "add_", "valid_min", "valid_max", "valid_range", "scale_factor", "add_offset", "signedness", "history"))
@@ -653,7 +653,7 @@ create.ncdf.output.files <- function(cdx.dat, f, v.f.idx, variable.name.map, ts,
     for(v in vars.to.copy)
       if(!is.null(vars.data[[v]]))
          ncdf4::ncvar_put(new.file, v, vars.data[[v]])
-    
+
     new.file
   }))
 }
@@ -682,9 +682,9 @@ get.ts <- function(f) {
 
 ## Compute all indices for a single grid box
 #' Compute Climdex indices using provided data.
-#' 
+#'
 #' Compute Climdex indices using provided data.
-#' 
+#'
 #' Given the provided data and functions, compute the Climdex indices defined by the functions.
 #'
 #' @param in.dat The input data to compute indices on.
@@ -695,8 +695,8 @@ get.ts <- function(f) {
 #' @return A list of data for each index.
 #'
 #' @examples
-#' library(climdex.pcic)
-#' 
+#' library(climind)
+#'
 #' ## Prepare input data
 #' in.dat <- list(tmax=ec.1018935.tmax$MAX_TEMP)
 #' cdx.funcs <- get.climdex.functions(get.climdex.variable.list(names(in.dat)))
@@ -706,19 +706,19 @@ get.ts <- function(f) {
 #'
 #' ## Compute indices
 #' res <- compute.climdex.indices(in.dat, cdx.funcs, ts, c(1981, 1990), FALSE)
-#' 
+#'
 #' @export
 compute.climdex.indices <- function(in.dat, cdx.funcs, ts, base.range, fclimdex.compatible) {
-  
-  ci <- climdex.pcic::climdexInput.raw(
-                        tmax = in.dat$tmax, tmin = in.dat$tmin, prec = in.dat$prec,  tavg=in.dat$tavg, 
+
+  ci <- climind::climdexInput.raw(
+                        tmax = in.dat$tmax, tmin = in.dat$tmin, prec = in.dat$prec,  tavg=in.dat$tavg,
                         tmax.dates = if(is.null(in.dat$tmax)) NULL else ts,
                         tmin.dates = if(is.null(in.dat$tmin)) NULL else ts,
                         prec.dates = if(is.null(in.dat$prec)) NULL else ts,
                         tavg.dates = if(is.null(in.dat$tavg)) NULL else ts,
                         base.range=base.range, northern.hemisphere=in.dat$northern.hemisphere,
                         quantiles=in.dat$quantiles)
-  
+
   ## NOTE: Names must be stripped here because it increases memory usage on the head by a factor of 8-9x (!)
   return(lapply(cdx.funcs, function(f) { d <- f(ci=ci); names(d) <- NULL; d }))
 }
@@ -781,7 +781,7 @@ get.data <- function(f, v, subset, src.units, dim.axes) {
   # udunits2::ud.convert(ncdf4.helpers::nc.get.var.subset.by.axes(f, v, subset), src.units, dest.units)
   #else
   dat <- ncdf4.helpers::nc.get.var.subset.by.axes(f, v, subset)
-  
+
   reduce.dims <- which(dim.axes %in% c("X", "Y", "Z"))
   return(t(flatten.dims(dat, reduce.dims=reduce.dims)))
 }
@@ -789,7 +789,7 @@ get.data <- function(f, v, subset, src.units, dim.axes) {
 
 ## Produce slab of northern.hemisphere booleans of the same shape as the data.
 #' Determine what portions of a subset are within the northern hemisphere.
-#' 
+#'
 #' Determine what portions of a subset are within the northern hemisphere.
 #'
 #' Given a subset, a file, a variable, and a projection, determine what positions are within the northern hemisphere, returning the result as an array of booleans.
@@ -840,7 +840,7 @@ get.northern.hemisphere.booleans <- function(subset, f, v, projection) {
 #' thresholds.name.map <- c(tx10thresh="tx10thresh", tn10thresh="tn10thresh", tx90thresh="tx90thresh",
 #'                          tn90thresh="tn90thresh", r95thresh="r95thresh", r99thresh="r99thresh")
 #' thresh.files <- "thresholds.nc"
-#' 
+#'
 #' ## Open files, etc.
 #' cdx.funcs <- get.climdex.functions(get.climdex.variable.list("tmax"))
 #' thresholds.netcdf <- lapply(thresh.files, nc_open)
@@ -858,7 +858,7 @@ get.northern.hemisphere.booleans <- function(subset, f, v, projection) {
 get.quantiles.object <- function(thresholds, idx) {
   if(is.null(thresholds))
     return(NULL)
-  
+
   thresh.path.2d <- list(tx10thresh=c("tmax", "outbase", "q10"),
                          tx90thresh=c("tmax", "outbase", "q90"),
                          tn10thresh=c("tmin", "outbase", "q10"),
@@ -868,14 +868,14 @@ get.quantiles.object <- function(thresholds, idx) {
                          r99thresh=c("prec", "q99"))
   result <- list()
 
-  
+
   recursive.append <- function(x, l, data) {
     if(length(x) == 0) return(data)
     if(is.null(l)) l <- list()
     return(c(l[!(names(l) %in% x[1])], structure(list(recursive.append(tail(x, n=-1), l[[x[1]]], data)), .Names=x[1])))
   }
-  
-  
+
+
   for(threshold.var in names(thresh.path.2d)[names(thresh.path.2d) %in% names(thresholds)])
     result <- recursive.append(thresh.path.2d[[threshold.var]], result, thresholds[[threshold.var]][,idx])
 
@@ -890,7 +890,7 @@ get.quantiles.object <- function(thresholds, idx) {
 #' A curry function used only for the Huglin Index
 #' This function curries the cdx.funcs so that the current subset (cur_sub) is retrieved with the cdx function
 #' It is placed inside compute.indices.for.stripe
-#' 
+#'
 curry_in_subset_for_huglin <- function(cdx.funcs, cur_sub){
   cdx.names = names(cdx.funcs)
   cdx.funcs <- lapply(cdx.names, function(function_name) {
@@ -919,7 +919,7 @@ get.lat <- function(open_file_list, variable.name.map) {
 #' Compute Climdex indices for a subset / stripe
 #'
 #' Given a subset, a set of Climdex functions (as created by \code{\link{get.climdex.functions}}), and ancillary data, load and convert data, create a climdexInput object for each point, run all of the functions in \code{cdx.funcs} on that data, and return the result.
-#' 
+#'
 #' @param subset The subset to use.
 #' @param cdx.funcs The functions to be applied to the data, as created by \code{\link{get.climdex.functions}}.
 #' @param ts The associated time data, as created by \code{nc.get.time.series}.
@@ -935,16 +935,16 @@ get.lat <- function(open_file_list, variable.name.map) {
 #' @param projection A proj4 string representing the projection the data is in.
 #' @param f A list of objects of type \code{ncdf4}, consisting of the open input files. If missing, will be pulled from the global namespace.
 #' @param thresholds.netcdf A list of objects of type \code{ncdf4}, consisting of the open threshold files. If missing, will be pulled from the global namespace.
-#' 
+#'
 #' @note This function relies on an object named 'f' and containing the opened NetCDF files being part of the global namespace.
-#' 
+#'
 #' @examples
 #' \donttest{
 #' ## Define mappings and filenames.
 #' author.data <- list(institution="Looney Bin", institution_id="LBC")
 #' input.files <- c("pr_NAM44_CanRCM4_ERAINT_r1i1p1_1989-2009.nc")
 #' variable.name.map <- c(tmax="tasmax", tmin="tasmin", prec="pr")
-#' 
+#'
 #' ## Open files, etc.
 #' cdx.funcs <- get.climdex.functions(get.climdex.variable.list("tmax"))
 #' f <- lapply(input.files, ncdf4::nc_open)
@@ -959,26 +959,26 @@ get.lat <- function(open_file_list, variable.name.map) {
 #' }
 #'
 #' @export
-compute.indices.for.stripe <- function(subset, cdx.funcs, ts, base.range, dim.axes, v.f.idx, variable.name.map, src.units, t.f.idx, thresholds.name.map, 
+compute.indices.for.stripe <- function(subset, cdx.funcs, ts, base.range, dim.axes, v.f.idx, variable.name.map, src.units, t.f.idx, thresholds.name.map,
                                        fclimdex.compatible=TRUE, projection=NULL, f, thresholds.netcdf) {
   cat('We are now at latitude', subset[['Y']], '\n')
 
   f <- if(missing(f)) get("f", .GlobalEnv) else f
   thresholds.netcdf <- if(missing(thresholds.netcdf)) get("thresholds.netcdf", .GlobalEnv) else thresholds.netcdf
-  
+
   ## Dimension order: Time, Space for each Var in list
   data.list <- sapply(names(v.f.idx), function(x) { gc(); get.data(f[[v.f.idx[x]]], variable.name.map[x], subset, src.units[x], dim.axes) }, simplify=FALSE)
   gc()
 
   northern.hemisphere <- get.northern.hemisphere.booleans(subset, f[[v.f.idx[1]]], variable.name.map[names(v.f.idx)[1]], projection)
-  
+
   thresholds <- if(is.null(thresholds.netcdf)) NULL else get.thresholds.chunk(subset, cdx.funcs, thresholds.netcdf, t.f.idx, thresholds.name.map)
-  
+
 #   #Retrieve current latitude using subset for Huglin Index
 #   latitudes = get.lat(f, variable.name.map[names(v.f.idx)[1]])
 #   cur_sub <- latitudes[subset[['Y']]]
 #   cdx.funcs <- curry_in_subset_for_huglin(cdx.funcs, cur_sub)
-#   
+#
   return(lapply(1:(dim(data.list[[1]])[2]), function(x) {
     dat.list <- sapply(names(data.list), function(name) { data.list[[name]][,x] }, simplify=FALSE)
     ## Fast-path the all-NA case.
@@ -997,20 +997,20 @@ compute.indices.for.stripe <- function(subset, cdx.funcs, ts, base.range, dim.ax
 #' Retrieve thresholds for a subset
 #'
 #' Given a subset, a set of Climdex functions (as created by \code{\link{get.climdex.functions}}), and ancillary data, load the thresholds required for the functions being called and return them.
-#' 
+#'
 #' @param subset The subset to use.
 #' @param cdx.funcs The functions to be applied to the data, as created by \code{\link{get.climdex.functions}}.
 #' @param thresholds.netcdf One or more NetCDF files containing thresholds.
 #' @param t.f.idx A mapping from threshold variables to threshold files, as created by \code{\link{get.var.file.idx}}.
 #' @param thresholds.name.map A mapping from standardized names (tx10thresh, tn90thresh, etc) to NetCDF variable names.
-#' 
+#'
 #' @examples
 #' \donttest{
 #' ## Define mappings and filenames.
 #' thresholds.name.map <- c(tx10thresh="tx10thresh", tn10thresh="tn10thresh", tx90thresh="tx90thresh",
 #'                          tn90thresh="tn90thresh", r95thresh="r95thresh", r99thresh="r99thresh")
 #' thresh.files <- "thresholds.nc"
-#' 
+#'
 #' ## Open files, etc.
 #' cdx.funcs <- get.climdex.functions(get.climdex.variable.list("tmax"))
 #' thresholds.netcdf <- lapply(thresh.files, nc_open)
@@ -1023,23 +1023,23 @@ compute.indices.for.stripe <- function(subset, cdx.funcs, ts, base.range, dim.ax
 #'
 #' @export
 get.thresholds.chunk <- function(subset, cdx.funcs, thresholds.netcdf, t.f.idx, thresholds.name.map) {
-  var.thresh.map <- list(tx10thresh=c("tx10p"), tx90thresh=c("tx90p", "WSDI"), tn10thresh=c("tn10p", "CSDI"), 
+  var.thresh.map <- list(tx10thresh=c("tx10p"), tx90thresh=c("tx90p", "WSDI"), tn10thresh=c("tn10p", "CSDI"),
                         tn90thresh=c("tn90p"), r75thresh=c("r75p"), r95thresh=c("r95p"), r99thresh=c("r99p"))
-  
+
   cdx.names <- names(cdx.funcs)
   thresh.var.needed <- names(var.thresh.map)[sapply(var.thresh.map, function(x) { any(unlist(lapply(x, function(substr) { any(grepl(substr, cdx.names)) }))) })]
   stopifnot(all(thresh.var.needed %in% names(t.f.idx)))
-  return(sapply(thresh.var.needed, function(threshold.var) { 
+  return(sapply(thresh.var.needed, function(threshold.var) {
     dim.axes <- ncdf4.helpers::nc.get.dim.axes(thresholds.netcdf[[t.f.idx[threshold.var]]], thresholds.name.map[threshold.var]);
     return(get.data(thresholds.netcdf[[t.f.idx[threshold.var]]], thresholds.name.map[threshold.var], subset, dim.axes=dim.axes))
   }, simplify=FALSE))
 }
-                            
+
 ## Write out results for variables computed
 #' Write out computed climdex results
-#' 
+#'
 #' Write out computed climdex results
-#' 
+#'
 #' Given a set of Climdex results, a subset, a set of files, and dimension sizes, write out the data to the appropriate files.
 #'
 #' @param climdex.results The results to write out.
@@ -1054,7 +1054,7 @@ get.thresholds.chunk <- function(subset, cdx.funcs, thresholds.netcdf, t.f.idx, 
 #' author.data <- list(institution="Looney Bin", institution_id="LBC")
 #' input.files <- c("pr_NAM44_CanRCM4_ERAINT_r1i1p1_1989-2009.nc")
 #' variable.name.map <- c(tmax="tasmax", tmin="tasmin", prec="pr")
-#' 
+#'
 #' ## Open files, etc.
 #' cdx.funcs <- get.climdex.functions("tmax")
 #' f <- lapply(input.files, ncdf4::nc_open)
@@ -1071,7 +1071,7 @@ get.thresholds.chunk <- function(subset, cdx.funcs, thresholds.netcdf, t.f.idx, 
 #' cdx <- compute.indices.for.stripe(list(Y=1), cdx.funcs, f.meta$ts, c(1991, 2000), f.meta$dim.axes,
 #'                            f.meta$v.f.idx, variable.name.map, f.meta$src.units, f.meta$dest.units,
 #'                            t.f.idx, NULL, f=f, thresholds.netcdf=NULL)
-#' 
+#'
 #' ## Write out indices
 #' write.climdex.results(cdx, list(Y=1), cdx.ncfile, f.meta$dim.size, cdx.meta$varname)
 #' }
@@ -1108,7 +1108,7 @@ write.climdex.results <- function(climdex.results, chunk.subset, cdx.ncfile, dim
 #' Compute Climdex thresholds for a subset / stripe
 #'
 #' Given a subset and ancillary data, load and convert data, get the out-of-base quantiles for the data for each point, and return the result.
-#' 
+#'
 #' @param subset The subset to use.
 #' @param ts The associated time data, as created by \code{nc.get.time.series}.
 #' @param base.range The base range; a vector of two numeric years.
@@ -1154,27 +1154,27 @@ get.quantiles.for.stripe <- function(subset, ts, base.range, dim.axes, v.f.idx, 
   if(!is.null(data.list$tmax)) {
     if(!is.null(data.list$tmin)) {
       if(!is.null(data.list$prec)) {
-        return(lapply(r, function(x) climdex.pcic::get.outofbase.quantiles(data.list$tmax[,x], data.list$tmin[,x], data.list$prec[,x], ts, ts, ts, base.range)))
+        return(lapply(r, function(x) climind::get.outofbase.quantiles(data.list$tmax[,x], data.list$tmin[,x], data.list$prec[,x], ts, ts, ts, base.range)))
       } else {
-        return(lapply(r, function(x) climdex.pcic::get.outofbase.quantiles(data.list$tmax[,x], data.list$tmin[,x], NULL, ts, ts, NULL, base.range)))
+        return(lapply(r, function(x) climind::get.outofbase.quantiles(data.list$tmax[,x], data.list$tmin[,x], NULL, ts, ts, NULL, base.range)))
       }
     } else {
       if(!is.null(data.list$prec)) {
-        return(lapply(r, function(x) climdex.pcic::get.outofbase.quantiles(data.list$tmax[,x], NULL, data.list$prec[,x], ts, NULL, ts, base.range)))
+        return(lapply(r, function(x) climind::get.outofbase.quantiles(data.list$tmax[,x], NULL, data.list$prec[,x], ts, NULL, ts, base.range)))
       } else {
-        return(lapply(r, function(x) climdex.pcic::get.outofbase.quantiles(data.list$tmax[,x], NULL, NULL, ts, NULL, NULL, base.range)))
+        return(lapply(r, function(x) climind::get.outofbase.quantiles(data.list$tmax[,x], NULL, NULL, ts, NULL, NULL, base.range)))
       }
     }
   } else {
     if(!is.null(data.list$tmin)) {
       if(!is.null(data.list$prec)) {
-        return(lapply(r, function(x) climdex.pcic::get.outofbase.quantiles(NULL, data.list$tmin[,x], data.list$prec[,x], NULL, ts, ts, base.range)))
+        return(lapply(r, function(x) climind::get.outofbase.quantiles(NULL, data.list$tmin[,x], data.list$prec[,x], NULL, ts, ts, base.range)))
       } else {
-        return(lapply(r, function(x) climdex.pcic::get.outofbase.quantiles(NULL, data.list$tmin[,x], NULL, NULL, ts, NULL, base.range)))
+        return(lapply(r, function(x) climind::get.outofbase.quantiles(NULL, data.list$tmin[,x], NULL, NULL, ts, NULL, base.range)))
       }
     } else {
       if(!is.null(data.list$prec)) {
-        return(lapply(r, function(x) climdex.pcic::get.outofbase.quantiles(NULL, NULL, data.list$prec[,x], NULL, NULL, ts, base.range)))
+        return(lapply(r, function(x) climind::get.outofbase.quantiles(NULL, NULL, data.list$prec[,x], NULL, NULL, ts, base.range)))
       } else {
         stop("Go home and take your shitty input with you.")
       }
@@ -1258,7 +1258,7 @@ create.thresholds.file <- function(thresholds.file, f, ts, v.f.idx, variable.nam
   input.bounds <- input.bounds[input.bounds != time.bnds.name]
   input.dim.names <- ncdf4.helpers::nc.get.dim.names(exemplar.file, exemplar.var.name)
   input.varname.list <- c(input.bounds, input.dim.names)
-  
+
   bnds.dim <- ncdf4::ncdim_def("bnds", "", 1:2, create_dimvar=FALSE)
   if(length(input.bounds) > 0)
     bnds.dim <- exemplar.file$var[[input.bounds[1]]]$dim[[1]]
@@ -1305,7 +1305,7 @@ create.thresholds.file <- function(thresholds.file, f, ts, v.f.idx, variable.nam
     ncdf4::ncatt_put(thresholds.netcdf, v, "base_period", paste(base.range, collapse="-"), definemode=TRUE)
   })
   ncdf4::nc_enddef(thresholds.netcdf)
-  
+
   ## Put bounds data.
   for(v in all.bounds) {
     ncdf4::ncvar_put(thresholds.netcdf, v, input.bounds.data[[v]])
@@ -1341,7 +1341,7 @@ get.var.file.idx <- function(variable.name.map, v.list) {
 }
 
 #' Retrieve metadata about NetCDF-format files.
-#' 
+#'
 #' Retrieve metadata about NetCDF-format files.
 #'
 #' Given a list of NetCDF files and a mapping from standard variable names (tmax, tmin, prec) to NetCDF variable names, retrieve a set of standardized metadata.
@@ -1377,7 +1377,7 @@ create.file.metadata <- function(f, variable.name.map) {
   stopifnot(!is.null(projection))
   if(projection == "")
     projection <- NULL
-  
+
   return(list(ts=get.ts(f), dim.size=get.dim.size(f, v.f.idx, variable.name.map), dim.axes=get.dim.axes(f, v.f.idx, variable.name.map),
               src.units=sapply(names(v.f.idx), function(i) { f[[v.f.idx[i]]]$var[[variable.name.map[i]]]$units }),
               dest.units=dest.units, v.f.idx=v.f.idx, projection=projection))
@@ -1414,9 +1414,9 @@ unsquash.dims <- function(dat.dim, subset, f, n) {
 
 ## Run Climdex to generate indices for computing Climdex on future data
 #' Create Climdex thresholds used for computing threshold-based indices
-#' 
+#'
 #' Create Climdex thresholds used for computing threshold-based indices
-#' 
+#'
 #' For many applications, one may want to compute thresholds on one data set, then apply them to another. This is usually the case when comparing GCM (Global Climate Model) results for future time periods to either historical reanalysis data or historical / pre-industrial control runs from models. The purpose of this function is to compute these thresholds on the data supplied, saving them to the file specified. Then these thresholds can be used with \code{\link{create.indices.from.files}} to compute indices using the thresholds computed using this code.
 #'
 #' @param input.files A list of filenames of NetCDF files to be used as input. A NetCDF file may contain one or more variables.
@@ -1443,7 +1443,7 @@ unsquash.dims <- function(dat.dim, subset, f, n) {
 #' }
 #'
 #' @export
-create.thresholds.from.file <- function(input.files, output.file, author.data, variable.name.map=c(tmax="tx", tmin="tn", prec="rr", tavg="tg"), 
+create.thresholds.from.file <- function(input.files, output.file, author.data, variable.name.map=c(tmax="tx", tmin="tn", prec="rr", tavg="tg"),
                                         axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990), parallel=4, verbose=FALSE, max.vals.millions=20, cluster.type="SOCK") {
   if(!(is.logical(parallel) || is.numeric(parallel)))
     stop("'parallel' option must be logical or numeric.")
@@ -1456,7 +1456,7 @@ create.thresholds.from.file <- function(input.files, output.file, author.data, v
 
   ## Define what the threshold indices will look like...
   threshold.dat <- get.thresholds.metadata(names(f.meta$v.f.idx))
-  
+
   ## Create the output file
   thresholds.netcdf <- create.thresholds.file(output.file, f, f.meta$ts, f.meta$v.f.idx, variable.name.map, base.range, f.meta$dim.size, f.meta$dim.axes, threshold.dat, author.data)
 
@@ -1466,7 +1466,7 @@ create.thresholds.from.file <- function(input.files, output.file, author.data, v
   write.thresholds.data <- function(out.list, out.sub) {
     lapply(names(threshold.dat), function(n) {
       d <- threshold.dat[[n]]
-      if(d$has.time) 
+      if(d$has.time)
         dat <- t(sapply(out.list, function(y) { return(y[[d$q.path]]) }))
       else
         dat <- sapply(out.list, function(y) { return(y[[d$q.path[1]]][d$q.path[2]]) })
@@ -1482,8 +1482,7 @@ create.thresholds.from.file <- function(input.files, output.file, author.data, v
 
     snow::clusterExport(cluster, "input.files", environment())
     snow::clusterEvalQ(cluster, f <<- lapply(input.files, ncdf4::nc_open, readunlim=FALSE))
-    browser()
-    
+
     ## Compute subsets and fire jobs off; collect and write out chunk-at-a-time
     parLapplyLBFiltered(cluster, subsets, get.quantiles.for.stripe, f.meta$ts, base.range, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, f.meta$src.units, local.filter.func=write.thresholds.data)
 
@@ -1495,7 +1494,7 @@ create.thresholds.from.file <- function(input.files, output.file, author.data, v
 
     lapply(f, ncdf4::nc_close)
   }
-  
+
   ## Close all the files
   ncdf4::nc_close(thresholds.netcdf)
 
@@ -1544,7 +1543,7 @@ thresholds.open <- function(thresholds.files) {
 thresholds.close <- function(thresholds.nc) {
   if(!is.null(thresholds.nc)) lapply(thresholds.nc, ncdf4::nc_close)
   invisible(0)
-}                                           
+}
 
 
 get.time.origin <- function(f, dim.axes) {
@@ -1567,12 +1566,12 @@ get.thresholds.f.idx <- function(thresholds.files, thresholds.name.map) {
 
 ## Run Climdex and populate the output files
 #' Create Climdex indices from NetCDF input files.
-#' 
+#'
 #' Create Climdex indices from NetCDF input files.
-#' 
+#'
 #' This function computes Climdex indices from NetCDF input files, writing out one file per variable named like the \code{template.filename}, which must follow the CMIP5 file naming conventions (this is a deficiency which will be corrected in later versions).
 #'
-#' The indices to be calculated can be specified; if not, they will be determined by data availability. Thresholds can be supplied (via \code{thresholds.files}) or, if there is data within the base period, calculated and used as part of the process. Note that in-base thresholds are separate from out-of-base thresholds; this is covered in more detail in the help for the \code{climdex.pcic} package.
+#' The indices to be calculated can be specified; if not, they will be determined by data availability. Thresholds can be supplied (via \code{thresholds.files}) or, if there is data within the base period, calculated and used as part of the process. Note that in-base thresholds are separate from out-of-base thresholds; this is covered in more detail in the help for the \code{climind} package.
 #'
 #' @param input.files A list of filenames of NetCDF files to be used as input. A NetCDF file may contain one or more variables.
 #' @param out.dir The directory to put the output files in.
@@ -1616,7 +1615,7 @@ get.thresholds.f.idx <- function(thresholds.files, thresholds.name.map) {
 #' author.data <- list(institution="Looney Bin", institution_id="LBC")
 #' create.indices.from.files(input.files, "out_dir/", input.files[1], author.data,
 #'                           base.range=c(1991, 2000), parallel=FALSE)
-#' 
+#'
 #' ## Prepare input data and calculate indices for two files
 #' ## in parallel given thresholds.
 #' input.files <- c("pr_NAM44_CanRCM4_ERAINT_r1i1p1_1989-2009.nc",
@@ -1627,25 +1626,25 @@ get.thresholds.f.idx <- function(thresholds.files, thresholds.name.map) {
 #' }
 #'
 #' @export
-create.indices.from.files <- function(input.files, out.dir, output.filename.template, author.data, climdex.vars.subset=NULL, climdex.time.resolution=c("all", "annual", "monthly"), 
-                                      variable.name.map=c(tmax="tx", tmin="tn", prec="rr", tavg="tg"), axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990), 
-                                      parallel=4, verbose=FALSE, thresholds.files=NULL, 
-                                      thresholds.name.map=c(tx10thresh="tx10thresh", tn10thresh="tn10thresh", 
-                                                            tx90thresh="tx90thresh", tn90thresh="tn90thresh", 
+create.indices.from.files <- function(input.files, out.dir, output.filename.template, author.data, climdex.vars.subset=NULL, climdex.time.resolution=c("all", "annual", "monthly"),
+                                      variable.name.map=c(tmax="tx", tmin="tn", prec="rr", tavg="tg"), axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990),
+                                      parallel=4, verbose=FALSE, thresholds.files=NULL,
+                                      thresholds.name.map=c(tx10thresh="tx10thresh", tn10thresh="tn10thresh",
+                                                            tx90thresh="tx90thresh", tn90thresh="tn90thresh",
                                                             r75thresh="r75thresh", r95thresh="r95thresh", r99thresh="r99thresh"), max.vals.millions=20, cluster.type="SOCK") {
   if(!(is.logical(parallel) || is.numeric(parallel)))
     stop("'parallel' option must be logical or numeric.")
 
   if(length(input.files) == 0)
     stop("Require at least one input file.")
-  
+
   ## Open files, determine mapping between files and variables.
   f <- lapply(input.files, ncdf4::nc_open)
   f.meta <- create.file.metadata(f, variable.name.map)
 
   ## Get thresholds variable-file mapping
   t.f.idx <- get.thresholds.f.idx(thresholds.files, thresholds.name.map)
-  
+
   ## Get variable list, subset if necessary
   climdex.time.resolution <- match.arg(climdex.time.resolution)
   climdex.var.list <- get.climdex.variable.list(names(f.meta$v.f.idx), climdex.time.resolution, climdex.vars.subset)
@@ -1653,7 +1652,7 @@ create.indices.from.files <- function(input.files, out.dir, output.filename.temp
   cdx.meta <- get.climdex.variable.metadata(climdex.var.list, output.filename.template)
   cdx.ncfile <- create.ncdf.output.files(cdx.meta, f, f.meta$v.f.idx, variable.name.map, f.meta$ts, get.time.origin(f, f.meta$dim.axes), base.range, out.dir, author.data)
   cdx.funcs <- get.climdex.functions(climdex.var.list)
-  
+
   ## Compute indices, either single process or multi-process using 'parallel'
   subsets <- ncdf4.helpers::get.cluster.worker.subsets(max.vals.millions * 1000000, f.meta$dim.size, f.meta$dim.axes, axis.to.split.on)
   if(is.numeric(parallel)) {
@@ -1676,7 +1675,7 @@ create.indices.from.files <- function(input.files, out.dir, output.filename.temp
     ## Setup...
     thresholds.netcdf <- thresholds.open(thresholds.files)
     ##try(getFromNamespace('nc_set_chunk_cache', 'ncdf4')(1024 * 2048, 1009), silent=TRUE)
-    
+
     ## Meat...
     lapply(subsets, function(x) { write.climdex.results(compute.indices.for.stripe(x, cdx.funcs, f.meta$ts, base.range, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, f.meta$src.units, t.f.idx, thresholds.name.map, fclimdex.compatible, f.meta$projection, f, thresholds.netcdf), x, cdx.ncfile, f.meta$dim.size, cdx.meta$var.name) })
 
@@ -1684,7 +1683,7 @@ create.indices.from.files <- function(input.files, out.dir, output.filename.temp
     thresholds.close(thresholds.netcdf)
     lapply(f, ncdf4::nc_close)
   }
-  
+
   ## Close all the output files
   lapply(cdx.ncfile, ncdf4::nc_close)
 
