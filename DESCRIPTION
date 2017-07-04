@@ -3,9 +3,9 @@ Version: 1.0.0
 Date: 2017-04-14
 Title: Functions to compute CLIMIND indices over a NetCDF grid
 Authors@R: as.person(c(
-"Christiana Photiadou <cphotiadou@gmail.com> [aut,cre]",
-"David Bronaugh <bronaugh@uvic.ca> [aut]"
-Maintainer: ECA-D <eca@knmi.nl>
+  "Christiana Photiadou <cphotiadou@gmail.com> [aut,cre]",
+  "David Bronaugh <bronaugh@uvic.ca> [aut]"))
+Maintainer: ECAD <eca@knmi.nl>
 Depends:
     R (>= 3.0),
     PCICt (>= 0.5-4)
