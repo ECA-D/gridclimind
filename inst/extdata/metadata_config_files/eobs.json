@@ -1,0 +1,409 @@
+{
+  "generic.metadata": {
+    "time.resolution.long.name.prefix": {
+      "annual": "Annual",
+      "monthly": "Monthly"
+    }
+  },
+  "index.metadata": {
+    "fd": {
+      "long.name": "Number of Frost Days",
+      "units": "days",
+      "base.period.attr": false,
+      "standard.name": "number_frost_days",
+      "calculation.function.name": "climdex.fd",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "tmin"
+    },
+    "su": {
+      "long.name": "Number of Summer Days",
+      "units": "days",
+      "base.period.attr": false,
+      "standard.name": "number_summer_days",
+      "calculation.function.name": "climdex.su",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "tmax"
+    },
+    "id": {
+      "long.name": "Number of Icing Days",
+      "units": "days",
+      "base.period.attr": false,
+      "standard.name": "number_icing_days",
+      "calculation.function.name": "climdex.id",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "tmax"
+    },
+    "tr": {
+      "long.name": "Number of Tropical Nights",
+      "units": "days",
+      "base.period.attr": false,
+      "standard.name": "number_tropical_nights",
+      "calculation.function.name": "climdex.tr",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "tmin"
+    },
+    "gsl": {
+      "long.name": "Growing Season Length",
+      "units": "days",
+      "base.period.attr": false,
+      "standard.name": "growing_season_length",
+      "calculation.function.name": "climdex.gsl",
+      "supported.time.resolutions": "annual",
+      "required.variables": "tavg"
+    },
+    "txx": {
+      "long.name": "Maximum of Daily Maximum Temperature",
+      "units": "degrees_C",
+      "base.period.attr": false,
+      "standard.name": "maximum_daily_maximum_temperature",
+      "calculation.function.name": "climdex.txx",
+      "supported.time.resolutions": ["monthly", "annual"],
+      "required.variables": "tmax"
+    },
+    "tnx": {
+      "long.name": "Maximum of Daily Minimum Temperature",
+      "units": "degrees_C",
+      "base.period.attr": false,
+      "standard.name": "maximum_daily_minimum_temperature",
+      "calculation.function.name": "climdex.tnx",
+      "supported.time.resolutions": ["monthly", "annual"],
+      "required.variables": "tmin"
+    },
+    "txn": {
+      "long.name": "Minimum of Daily Maximum Temperature",
+      "units": "degrees_C",
+      "base.period.attr": false,
+      "standard.name": "minimum_daily_maximum_temperature",
+      "calculation.function.name": "climdex.txn",
+      "supported.time.resolutions": ["monthly", "annual"],
+      "required.variables": "tmax"
+    },
+    "tnn": {
+      "long.name": "Minimum of Daily Minimum Temperature",
+      "units": "degrees_C",
+      "base.period.attr": false,
+      "standard.name": "minimum_daily_minimum_temperature",
+      "calculation.function.name": "climdex.tnn",
+      "supported.time.resolutions": ["monthly", "annual"],
+      "required.variables": "tmin"
+    },
+    "tn10p": {
+      "long.name": "Percentage of Days when Daily Minimum Temperature is Below the 10th Percentile",
+      "units": "%",
+      "base.period.attr": true,
+      "standard.name": "percent_days_when_daily_minimum_temperature_below_10p",
+      "calculation.function.name": "climdex.tn10p",
+      "supported.time.resolutions": ["monthly", "annual"],
+      "required.variables": "tmin"
+    },
+    "tx10p": {
+      "long.name": "Percentage of Days when Daily Maximum Temperature is Below the 10th Percentile",
+      "units": "%",
+      "base.period.attr": true,
+      "standard.name": "percent_days_when_daily_maximum_temperature_below_10p",
+      "calculation.function.name": "climdex.tx10p",
+      "supported.time.resolutions": ["monthly", "annual"],
+      "required.variables": "tmax"
+    },
+    "tn90p": {
+      "long.name": "Percentage of Days when Daily Minimum Temperature is Above the 90th Percentile",
+      "units": "%",
+      "base.period.attr": true,
+      "standard.name": "percent_days_when_daily_minimum_temperature_above_90p",
+      "calculation.function.name": "climdex.tn90p",
+      "supported.time.resolutions": ["monthly", "annual"],
+      "required.variables": "tmin"
+    },
+    "tx90p": {
+      "long.name": "Percentage of Days when Daily Maximum Temperature is Above the 90th Percentile",
+      "units": "%",
+      "base.period.attr": true,
+      "standard.name": "percent_days_when_daily_maximum_temperature_above_90p",
+      "calculation.function.name": "climdex.tx90p",
+      "supported.time.resolutions": ["monthly", "annual"],
+      "required.variables": "tmax"
+    },
+    "wsdi": {
+      "long.name": "Annnual Warm Spell Duration Index",
+      "units": "days",
+      "base.period.attr": true,
+      "standard.name": "warm_spell_duration_index",
+      "calculation.function.name": "climdex.wsdi",
+      "additional_arguments": {
+        "spells.can.span.years": false
+      },
+      "supported.time.resolutions": "annual",
+      "required.variables": "tmax"
+    },
+    "csdi": {
+      "long.name": "Cold Spell Duration Index",
+      "units": "days",
+      "base.period.attr": true,
+      "standard.name": "cold_spell_duration_index",
+      "calculation.function.name": "climdex.csdi",
+      "additional_arguments": {
+        "spells.can.span.years": false
+      },
+      "supported.time.resolutions": "annual",
+      "required.variables": "tmin"
+    },
+    "altwsdi": {
+      "long.name": "Warm Spell Duration Index Spanning Years",
+      "units": "days",
+      "base.period.attr": true,
+      "standard.name": "warm_spell_duration_index",
+      "calculation.function.name": "climdex.wsdi",
+      "additional_arguments": {
+        "spells.can.span.years": true
+      },
+      "supported.time.resolutions": "annual",
+      "required.variables": "tmax"
+    },
+    "altcsdi": {
+      "long.name": "Cold Spell Duration Index Spanning Years",
+      "units": "days",
+      "base.period.attr": true,
+      "standard.name": "cold_spell_duration_index",
+      "calculation.function.name": "climdex.csdi",
+      "additional_arguments": {
+        "spells.can.span.years": true
+      },
+      "supported.time.resolutions": "annual",
+      "required.variables": "tmin"
+    },
+    "dtr": {
+      "long.name": "Mean Diurnal Temperature Range",
+      "units": "degrees_C",
+      "base.period.attr": false,
+      "standard.name": "diurnal_temperature_range",
+      "calculation.function.name": "climdex.dtr",
+      "supported.time.resolutions": ["monthly", "annual"],
+      "required.variables": "tavg"
+    },
+    "rx1day": {
+      "long.name": "Maximum 1-day Precipitation",
+      "units": "mm",
+      "base.period.attr": false,
+      "standard.name": "maximum_1day_precipitation",
+      "calculation.function.name": "climdex.rx1day",
+      "supported.time.resolutions": ["monthly", "annual"],
+      "required.variables": "prec"
+    },
+    "rx5day": {
+      "long.name": "Maximum Consecutive 5-day Precipitation",
+      "units": "mm",
+      "base.period.attr": false,
+      "standard.name": "maximum_5day_precipitation",
+      "calculation.function.name": "climdex.rx5day",
+      "additional_arguments": {
+        "center.mean.on.last.day": true
+      },
+      "supported.time.resolutions": ["monthly", "annual"],
+      "required.variables": "prec"
+    },
+    "sdii": {
+      "long.name": "Simple Precipitation Intensity Index",
+      "units": "mm d-1",
+      "base.period.attr": false,
+      "standard.name": "simple_precipitation_intensity_index",
+      "calculation.function.name": "climdex.sdii",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "prec"
+    },
+    "r10mm": {
+      "long.name": "Count of Days with At Least 10mm of Precipitation",
+      "units": "days",
+      "base.period.attr": false,
+      "standard.name": "count_days_more_than_10mm_precipitation",
+      "calculation.function.name": "climdex.r10mm",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "prec"
+    },
+    "r20mm": {
+      "long.name": "Count of Days with At Least 20mm of Precipitation",
+      "units": "days",
+      "base.period.attr": false,
+      "standard.name": "count_days_more_than_20mm_precipitation",
+      "calculation.function.name": "climdex.r20mm",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "prec"
+    },
+    "r1mm": {
+      "long.name": "Count of Days with At Least 1mm of Precipitation",
+      "units": "days",
+      "base.period.attr": false,
+      "standard.name": "count_days_more_than_1mm_precipitation",
+      "calculation.function.name": "climdex.rnnmm",
+      "additional_arguments": {
+        "threshold": 1
+      },
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "prec"
+    },
+    "cdd": {
+      "long.name": "Maximum Number of Consecutive Days with Less Than 1mm of Precipitation",
+      "units": "days",
+      "base.period.attr": false,
+      "standard.name": "maximum_number_consecutive_dry_days",
+      "calculation.function.name": "climdex.cdd",
+      "additional_arguments": {
+        "spells.can.span.years": true
+      },
+      "supported.time.resolutions": "annual",
+      "required.variables": "prec"
+    },
+    "cwd": {
+      "long.name": "Maximum Number of Consecutive Days with At Least 1mm of Precipitation",
+      "units": "days",
+      "base.period.attr": false,
+      "standard.name": "maximum_number_consecutive_wet_days",
+      "calculation.function.name": "climdex.cwd",
+      "additional_arguments": {
+        "spells.can.span.years": true
+      },
+      "supported.time.resolutions": "annual",
+      "required.variables": "prec"
+    },
+    "r95ptot": {
+      "long.name": "Precipitation fraction due to very wet days (daily precipitation exceeds 95th percentile)",
+      "units": "%",
+      "base.period.attr": true,
+      "standard.name": "precipitation_fraction_exceeding_95th_percentile",
+      "calculation.function.name": "climdex.r95ptot",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "prec"
+    },
+    "r99ptot": {
+      "long.name": "Precipitation fraction due to extremely wet days (daily precipitation exceeds 99th percentile)",
+      "units": "%",
+      "base.period.attr": true,
+      "standard.name": "precipitation_fraction_exceeding_99th_percentile",
+      "calculation.function.name": "climdex.r99ptot",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "prec"
+    },
+    "prcptot": {
+      "long.name": "Total Precipitation in Wet Days",
+      "units": "mm",
+      "base.period.attr": false,
+      "standard.name": "total_wet_day_precipitation",
+      "calculation.function.name": "climdex.prcptot",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "prec"
+    },
+    "altcdd": {
+      "long.name": "Maximum Number of Consecutive Days Per Year with Less Than 1mm of Precipitation",
+      "units": "days",
+      "base.period.attr": false,
+      "standard.name": "maximum_number_consecutive_dry_days",
+      "calculation.function.name": "climdex.cdd",
+      "additional_arguments": {
+        "spells.can.span.years": false
+      },
+      "supported.time.resolutions": "annual",
+      "required.variables": "prec"
+    },
+    "altcwd": {
+      "long.name": "Maximum Number of Consecutive Days Per Year with At Least 1mm of Precipitation",
+      "units": "days",
+      "base.period.attr": false,
+      "standard.name": "maximum_number_consecutive_wet_days",
+      "calculation.function.name": "climdex.cwd",
+      "additional_arguments": {
+        "spells.can.span.years": false
+      },
+      "supported.time.resolutions": "annual",
+      "required.variables": "prec"
+    },
+    "r75p": {
+      "long.name": "Total Precipitation when Daily Precipitation Exceeds the 75th Percentile of Wet Day Precipitation",
+      "units": "mm",
+      "base.period.attr": false,
+      "standard.name": "total_precipitation_exceeding_75th_percentile",
+      "calculation.function.name": "climdex.r75p",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "prec"
+    },
+    "r95p": {
+      "long.name": "Total Precipitation when Daily Precipitation Exceeds the 95th Percentile of Wet Day Precipitation",
+      "units": "mm",
+      "base.period.attr": false,
+      "standard.name": "total_precipitation_exceeding_95th_percentile",
+      "calculation.function.name": "climdex.r95p",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "prec"
+    },
+    "r99p": {
+      "long.name": "Total Precipitation when Daily Precipitation Exceeds the 99th Percentile of Wet Day Precipitation",
+      "units": "mm",
+      "base.period.attr": false,
+      "standard.name": "total_precipitation_exceeding_99th_percentile",
+      "calculation.function.name": "climdex.r99p",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "prec"
+    },
+    "r75ptot": {
+      "long.name": "Precipitation fraction due to moderate wet days (daily precipitation exceeds 75th percentile)",
+      "units": "%",
+      "base.period.attr": false,
+      "standard.name": "precipitation_fraction_exceeding_75th_percentile",
+      "calculation.function.name": "climdex.r75ptot",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "prec"
+    },
+    "csu": {
+      "long.name": "Number of Consecutive Summer days",
+      "units": "days",
+      "base.period.attr": false,
+      "standard.name": "consecutive_summer_days",
+      "calculation.function.name": "climdex.csu",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "tmax"
+    },
+    "cfd": {
+      "long.name": "Number of Consecutive Frost days",
+      "units": "days",
+      "base.period.attr": false,
+      "standard.name": "consecutive_frost_days",
+      "calculation.function.name": "climdex.cfd",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "tmin"
+    },
+    "hd17": {
+      "long.name": "Heating Degree days",
+      "units": "degrees_C",
+      "base.period.attr": false,
+      "standard.name": "heating_degree_days",
+      "calculation.function.name": "climdex.hd17",
+      "supported.time.resolutions": ["annual", "monthly"],
+      "required.variables": "tavg"
+    },
+    "hi": {
+      "long.name": "Huglin Index",
+      "units": "degrees_C",
+      "base.period.attr": false,
+      "standard.name": "huglin_index",
+      "calculation.function.name": "climdex.HI",
+      "supported.time.resolutions": "annual",
+      "required.variables": "tavg"
+    },
+    "spi3": {
+      "long.name": "Standardized Precipitation Index 3-mon",
+      "units": "",
+      "base.period.attr": false,
+      "standard.name": "standardized_precipitation_index 3-mon",
+      "calculation.function.name": "climdex.spi3",
+      "supported.time.resolutions": "monthly",
+      "required.variables": "prec"
+    },
+    "spi6": {
+      "long.name": "Standardized Precipitation Index 6-mon",
+      "units": "",
+      "base.period.attr": false,
+      "standard.name": "standardized_precipitation_index 6-mon",
+      "calculation.function.name": "climdex.spi6",
+      "supported.time.resolutions": "monthly",
+      "required.variables": "prec"
+    }
+  }
+}
