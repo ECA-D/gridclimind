@@ -3,6 +3,26 @@
     "time.resolution.long.name.prefix": {
       "annual": "Annual",
       "monthly": "Monthly"
+    },
+    "time.resolution.postfix": {
+      "annual": "yr",
+      "monthly": "mon"
+    },
+    "index.category": "ETCCDI",
+    "variable.name.map": {
+      "tmax": "tx",
+      "tmin": "tn",
+      "prec": "rr",
+      "tavg": "tg"
+    },
+    "threshold.name.map": {
+      "tx10thresh": "tx10thresh",
+      "tn10thresh": "tn10thresh",
+      "tx90thresh": "tx90thresh",
+      "tn90thresh": "tn90thresh",
+      "r75thresh": "r75thresh",
+      "r95thresh": "r95thresh",
+      "r99thresh": "r99thresh"
     }
   },
   "index.metadata": {
