@@ -27,9 +27,14 @@ ncdf_files_equal_to_ref = sapply(rainfall_reference_files, function(p) {
   res = ncdf_files_equal(path.expand(file.path(output_data_path, p)),
                          path.expand(file.path(reference_file_path, p)))
 })
+ncdf_metadata_equal_to_ref = sapply(rainfall_reference_files, function(p) {
+  res = ncdf_files_metadata_equal(path.expand(file.path(output_data_path, p)),
+                                  path.expand(file.path(reference_file_path, p)))
+})
 
 # Perform all the checks
 test_that('Rainfall index files where correctly generated', {
   expect_true(all(file_present_in_output), info = sprintf('Missing files %s.', paste(rainfall_reference_files[!file_present_in_output], collapse = ', ')))
   expect_true(all(ncdf_files_equal_to_ref), info = sprintf('Files differ from reference %s.', paste(rainfall_reference_files[!ncdf_files_equal_to_ref], collapse = ', ')))
+  expect_true(all(ncdf_metadata_equal_to_ref), info = sprintf('Metadata differs from reference %s.', paste(rainfall_reference_files[!ncdf_metadata_equal_to_ref], collapse = ', ')))
 })

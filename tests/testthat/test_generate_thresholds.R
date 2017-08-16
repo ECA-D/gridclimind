@@ -16,4 +16,5 @@ dummy = capture.output(create.thresholds.from.file(input.files = file.path(input
 test_that('the threshold files have been generated correctly', {
   expect_true(file.exists(output_file), info = 'can the output file be found')
   expect_true(ncdf_files_equal(output_file, file.path(reference_file_path, 'TH_test.nc')))
+  expect_true(ncdf_files_metadata_equal(output_file, file.path(reference_file_path, 'TH_test.nc')))
 })
