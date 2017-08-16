@@ -72,6 +72,9 @@ create.indices.from.files <- function(input.files, out.dir, output.filename.temp
   if(length(input.files) == 0)
     stop("Require at least one input file.")
 
+  ## Load a json config file that contains the majority of the configurable options, e.g. long name, etc
+  metadata.config = read_json_metadata_config_file()
+
   ## Open files, determine mapping between files and variables.
   f <- lapply(input.files, ncdf4::nc_open)
   f.meta <- create.file.metadata(f, variable.name.map)
@@ -83,7 +86,7 @@ create.indices.from.files <- function(input.files, out.dir, output.filename.temp
   climdex.time.resolution <- match.arg(climdex.time.resolution)
   climdex.var.list <- get.climdex.variable.list(names(f.meta$v.f.idx), climdex.time.resolution, climdex.vars.subset)
 
-  cdx.meta <- get.climdex.variable.metadata(climdex.var.list, output.filename.template)
+  cdx.meta <- get.climdex.variable.metadata(climdex.var.list, output.filename.template, metadata.config)
   cdx.ncfile <- create.ncdf.output.files(cdx.meta, f, f.meta$v.f.idx, variable.name.map, f.meta$ts, get.time.origin(f, f.meta$dim.axes), base.range, out.dir, author.data)
   cdx.funcs <- get.climdex.functions(climdex.var.list)
 

@@ -7,7 +7,7 @@ author.data = list(Eobsv ="14.0", base.range="1981-2010")
 delete_all_content_in_temp_path()
 
 # Generate rainfall indices
-dummy = capture.output(create.indices.from.files(input.files = file.path(input_data_path, 'rr_0.25deg_reg_1950-2016.nc'),
+dummy = suppressMessages(capture.output(create.indices.from.files(input.files = file.path(input_data_path, 'rr_0.25deg_reg_1950-2016.nc'),
                                                  thresholds.files = file.path(input_data_path, 'EOBS_TH_rr_v14.nc'),
                                                  out.dir = output_data_path,
                                                  author.data = author.data,
@@ -15,7 +15,7 @@ dummy = capture.output(create.indices.from.files(input.files = file.path(input_d
                                                                          'r75ptot', 'r95ptot', 'r99ptot'),
                                                  output.filename.template = 'rr_0.25deg_reg_1950-2016.nc',
                                                  base.range=c(2017, 2021),
-                                                 parallel=FALSE))
+                                                 parallel=FALSE)))
 
 # Check that the files have been generated
 rainfall_reference_files = list.files(reference_file_path, pattern = '^r')

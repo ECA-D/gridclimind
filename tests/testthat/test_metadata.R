@@ -1,5 +1,7 @@
 context('Do the metadata functions generate the correct metadata')
 
+metadata.config = gridclimind:::read_json_metadata_config_file()
+
 # Variables
 input_data_path = system.file('extdata/example_ncfiles', package = 'gridclimind')
 variable.name.map = c(tmax="tx", tmin="tn", prec="rr", tavg="tg")
@@ -19,7 +21,7 @@ threshold_files = list.files(input_data_path, pattern = '*_TH_*', full.names = T
 f.meta = create.file.metadata(open_nc_files, variable.name.map)
 t.f.idx = get.thresholds.f.idx(threshold_files, threshold.name.map)
 climdex.var.list = get.climdex.variable.list(names(f.meta$v.f.idx), climdex.time.resolution, climdex.vars.subset)
-cdx.meta = get.climdex.variable.metadata(climdex.var.list, output.filename.template)
+cdx.meta = get.climdex.variable.metadata(climdex.var.list, output.filename.template, metadata.config)
 cdx.funcs = get.climdex.functions(climdex.var.list)
 metadata = list(f.meta = f.meta, t.f.idx = t.f.idx, climdex.var.list = climdex.var.list, cdx.meta = cdx.meta, cdx.funcs = cdx.funcs)
 
@@ -37,7 +39,7 @@ climdex.time.resolution = 'monthly'
 f.meta = create.file.metadata(open_nc_files, variable.name.map)
 t.f.idx = get.thresholds.f.idx(threshold_files, threshold.name.map)
 climdex.var.list = get.climdex.variable.list(names(f.meta$v.f.idx), climdex.time.resolution, climdex.vars.subset)
-cdx.meta = get.climdex.variable.metadata(climdex.var.list, output.filename.template)
+cdx.meta = get.climdex.variable.metadata(climdex.var.list, output.filename.template, metadata.config)
 cdx.funcs = get.climdex.functions(climdex.var.list)
 metadata.monthly = list(f.meta = f.meta, t.f.idx = t.f.idx, climdex.var.list = climdex.var.list, cdx.meta = cdx.meta, cdx.funcs = cdx.funcs)
 
@@ -57,7 +59,7 @@ climdex.vars.subset = 'r75p'   # Just use all you can compute
 f.meta = create.file.metadata(open_nc_files, variable.name.map)
 t.f.idx = get.thresholds.f.idx(threshold_files, threshold.name.map)
 climdex.var.list = get.climdex.variable.list(names(f.meta$v.f.idx), climdex.time.resolution, climdex.vars.subset)
-cdx.meta = get.climdex.variable.metadata(climdex.var.list, output.filename.template)
+cdx.meta = get.climdex.variable.metadata(climdex.var.list, output.filename.template, metadata.config)
 cdx.funcs = get.climdex.functions(climdex.var.list)
 metadata.r75p = list(f.meta = f.meta, t.f.idx = t.f.idx, climdex.var.list = climdex.var.list, cdx.meta = cdx.meta, cdx.funcs = cdx.funcs)
 

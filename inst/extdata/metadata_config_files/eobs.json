@@ -33,6 +33,7 @@
       "standard.name": "number_frost_days",
       "calculation.function.name": "climdex.fd",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "tmin"
     },
     "su": {
@@ -42,6 +43,7 @@
       "standard.name": "number_summer_days",
       "calculation.function.name": "climdex.su",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "tmax"
     },
     "id": {
@@ -51,6 +53,7 @@
       "standard.name": "number_icing_days",
       "calculation.function.name": "climdex.id",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "tmax"
     },
     "tr": {
@@ -60,6 +63,7 @@
       "standard.name": "number_tropical_nights",
       "calculation.function.name": "climdex.tr",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "tmin"
     },
     "gsl": {
@@ -69,6 +73,7 @@
       "standard.name": "growing_season_length",
       "calculation.function.name": "climdex.gsl",
       "supported.time.resolutions": "annual",
+      "include.time.prefix.in.long.name": false,
       "required.variables": "tavg"
     },
     "txx": {
@@ -78,6 +83,7 @@
       "standard.name": "maximum_daily_maximum_temperature",
       "calculation.function.name": "climdex.txx",
       "supported.time.resolutions": ["monthly", "annual"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "tmax"
     },
     "tnx": {
@@ -87,6 +93,7 @@
       "standard.name": "maximum_daily_minimum_temperature",
       "calculation.function.name": "climdex.tnx",
       "supported.time.resolutions": ["monthly", "annual"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "tmin"
     },
     "txn": {
@@ -96,6 +103,7 @@
       "standard.name": "minimum_daily_maximum_temperature",
       "calculation.function.name": "climdex.txn",
       "supported.time.resolutions": ["monthly", "annual"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "tmax"
     },
     "tnn": {
@@ -105,6 +113,7 @@
       "standard.name": "minimum_daily_minimum_temperature",
       "calculation.function.name": "climdex.tnn",
       "supported.time.resolutions": ["monthly", "annual"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "tmin"
     },
     "tn10p": {
@@ -114,6 +123,7 @@
       "standard.name": "percent_days_when_daily_minimum_temperature_below_10p",
       "calculation.function.name": "climdex.tn10p",
       "supported.time.resolutions": ["monthly", "annual"],
+      "include.time.prefix.in.long.name": false,
       "required.variables": "tmin"
     },
     "tx10p": {
@@ -123,6 +133,7 @@
       "standard.name": "percent_days_when_daily_maximum_temperature_below_10p",
       "calculation.function.name": "climdex.tx10p",
       "supported.time.resolutions": ["monthly", "annual"],
+      "include.time.prefix.in.long.name": false,
       "required.variables": "tmax"
     },
     "tn90p": {
@@ -132,6 +143,7 @@
       "standard.name": "percent_days_when_daily_minimum_temperature_above_90p",
       "calculation.function.name": "climdex.tn90p",
       "supported.time.resolutions": ["monthly", "annual"],
+      "include.time.prefix.in.long.name": false,
       "required.variables": "tmin"
     },
     "tx90p": {
@@ -141,6 +153,7 @@
       "standard.name": "percent_days_when_daily_maximum_temperature_above_90p",
       "calculation.function.name": "climdex.tx90p",
       "supported.time.resolutions": ["monthly", "annual"],
+      "include.time.prefix.in.long.name": false,
       "required.variables": "tmax"
     },
     "wsdi": {
@@ -153,6 +166,7 @@
         "spells.can.span.years": false
       },
       "supported.time.resolutions": "annual",
+      "include.time.prefix.in.long.name": false,
       "required.variables": "tmax"
     },
     "csdi": {
@@ -165,6 +179,7 @@
         "spells.can.span.years": false
       },
       "supported.time.resolutions": "annual",
+      "include.time.prefix.in.long.name": true,
       "required.variables": "tmin"
     },
     "altwsdi": {
@@ -177,6 +192,7 @@
         "spells.can.span.years": true
       },
       "supported.time.resolutions": "annual",
+      "include.time.prefix.in.long.name": true,
       "required.variables": "tmax"
     },
     "altcsdi": {
@@ -189,6 +205,7 @@
         "spells.can.span.years": true
       },
       "supported.time.resolutions": "annual",
+      "include.time.prefix.in.long.name": true,
       "required.variables": "tmin"
     },
     "dtr": {
@@ -198,6 +215,7 @@
       "standard.name": "diurnal_temperature_range",
       "calculation.function.name": "climdex.dtr",
       "supported.time.resolutions": ["monthly", "annual"],
+      "include.time.prefix.in.long.name": false,
       "required.variables": "tavg"
     },
     "rx1day": {
@@ -207,6 +225,7 @@
       "standard.name": "maximum_1day_precipitation",
       "calculation.function.name": "climdex.rx1day",
       "supported.time.resolutions": ["monthly", "annual"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "prec"
     },
     "rx5day": {
@@ -219,6 +238,7 @@
         "center.mean.on.last.day": true
       },
       "supported.time.resolutions": ["monthly", "annual"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "prec"
     },
     "sdii": {
@@ -228,6 +248,7 @@
       "standard.name": "simple_precipitation_intensity_index",
       "calculation.function.name": "climdex.sdii",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "prec"
     },
     "r10mm": {
@@ -237,6 +258,7 @@
       "standard.name": "count_days_more_than_10mm_precipitation",
       "calculation.function.name": "climdex.r10mm",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "prec"
     },
     "r20mm": {
@@ -246,6 +268,7 @@
       "standard.name": "count_days_more_than_20mm_precipitation",
       "calculation.function.name": "climdex.r20mm",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "prec"
     },
     "r1mm": {
@@ -258,6 +281,7 @@
         "threshold": 1
       },
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "prec"
     },
     "cdd": {
@@ -270,6 +294,7 @@
         "spells.can.span.years": true
       },
       "supported.time.resolutions": "annual",
+      "include.time.prefix.in.long.name": false,
       "required.variables": "prec"
     },
     "cwd": {
@@ -282,6 +307,7 @@
         "spells.can.span.years": true
       },
       "supported.time.resolutions": "annual",
+      "include.time.prefix.in.long.name": false,
       "required.variables": "prec"
     },
     "r95ptot": {
@@ -291,6 +317,7 @@
       "standard.name": "precipitation_fraction_exceeding_95th_percentile",
       "calculation.function.name": "climdex.r95ptot",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "prec"
     },
     "r99ptot": {
@@ -300,6 +327,7 @@
       "standard.name": "precipitation_fraction_exceeding_99th_percentile",
       "calculation.function.name": "climdex.r99ptot",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "prec"
     },
     "prcptot": {
@@ -309,6 +337,7 @@
       "standard.name": "total_wet_day_precipitation",
       "calculation.function.name": "climdex.prcptot",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "prec"
     },
     "altcdd": {
@@ -321,6 +350,7 @@
         "spells.can.span.years": false
       },
       "supported.time.resolutions": "annual",
+      "include.time.prefix.in.long.name": false,
       "required.variables": "prec"
     },
     "altcwd": {
@@ -333,6 +363,7 @@
         "spells.can.span.years": false
       },
       "supported.time.resolutions": "annual",
+      "include.time.prefix.in.long.name": false,
       "required.variables": "prec"
     },
     "r75p": {
@@ -342,6 +373,7 @@
       "standard.name": "total_precipitation_exceeding_75th_percentile",
       "calculation.function.name": "climdex.r75p",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "prec"
     },
     "r95p": {
@@ -351,6 +383,7 @@
       "standard.name": "total_precipitation_exceeding_95th_percentile",
       "calculation.function.name": "climdex.r95p",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "prec"
     },
     "r99p": {
@@ -360,6 +393,7 @@
       "standard.name": "total_precipitation_exceeding_99th_percentile",
       "calculation.function.name": "climdex.r99p",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "prec"
     },
     "r75ptot": {
@@ -369,6 +403,7 @@
       "standard.name": "precipitation_fraction_exceeding_75th_percentile",
       "calculation.function.name": "climdex.r75ptot",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "prec"
     },
     "csu": {
@@ -378,6 +413,7 @@
       "standard.name": "consecutive_summer_days",
       "calculation.function.name": "climdex.csu",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "tmax"
     },
     "cfd": {
@@ -387,6 +423,7 @@
       "standard.name": "consecutive_frost_days",
       "calculation.function.name": "climdex.cfd",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "tmin"
     },
     "hd17": {
@@ -396,6 +433,7 @@
       "standard.name": "heating_degree_days",
       "calculation.function.name": "climdex.hd17",
       "supported.time.resolutions": ["annual", "monthly"],
+      "include.time.prefix.in.long.name": true,
       "required.variables": "tavg"
     },
     "hi": {
@@ -405,6 +443,7 @@
       "standard.name": "huglin_index",
       "calculation.function.name": "climdex.HI",
       "supported.time.resolutions": "annual",
+      "include.time.prefix.in.long.name": false,
       "required.variables": "tavg"
     },
     "spi3": {
@@ -414,6 +453,7 @@
       "standard.name": "standardized_precipitation_index 3-mon",
       "calculation.function.name": "climdex.spi3",
       "supported.time.resolutions": "monthly",
+      "include.time.prefix.in.long.name": false,
       "required.variables": "prec"
     },
     "spi6": {
@@ -423,6 +463,7 @@
       "standard.name": "standardized_precipitation_index 6-mon",
       "calculation.function.name": "climdex.spi6",
       "supported.time.resolutions": "monthly",
+      "include.time.prefix.in.long.name": false,
       "required.variables": "prec"
     }
   }
