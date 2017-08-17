@@ -50,6 +50,22 @@ get.src.data.required.from.json = function(json_metadata) {
   return(required_data_per_index)
 }
 
+get.functions.from.json = function(json_metadata) {
+  index_data = json_metadata$index.metadata
+  all_functions = lapply(names(json_metadata$index.metadata), function(index.id) {
+    index_data = json_metadata$index.metadata[[index.id]]
+    actual_function = getFromNamespace(index_data$calculation.function.name, 'climind')
+    curried_functions = sapply(index_data$supported.time.resolutions, function(time.res) {
+      args = list(actual_function, freq = time.res)
+      if (!is.null(index_data$additional_arguments)) args = c(args, index_data$additional_arguments)
+      do.call(functional:::Curry, args)
+    })
+    names(curried_functions) = paste(index.id, json_metadata$generic.metadata$index.category, '_', json_metadata$generic.metadata$time.resolution.postfix[index_data$supported.time.resolutions], sep = '')
+    return(curried_functions)
+  })
+  return(unlist(all_functions))
+}
+
 read_json_metadata_config_file = function(json_path) {
   require(jsonlite)
   if (missing(json_path)) {
@@ -64,7 +80,8 @@ read_json_metadata_config_file = function(json_path) {
   return(list(
     get.variable.metadata = function() get.variable.metadata.from.json(json_metadata),
     get.variable.list = function(index.ids, time.resolution) get.variable.list.from.json(index.ids, time.resolution, json_metadata),
-    get.src.data.required = function() get.src.data.required.from.json(json_metadata)
+    get.src.data.required = function() get.src.data.required.from.json(json_metadata),
+    get.functions = function() get.functions.from.json(json_metadata)
   ))
 }
 # xi = read_json_metadata_config_file(system.file('extdata/metadata_config_files/eobs.json', package = 'gridclimind'))

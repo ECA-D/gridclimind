@@ -88,7 +88,7 @@ create.indices.from.files <- function(input.files, out.dir, output.filename.temp
 
   cdx.meta <- get.climdex.variable.metadata(climdex.var.list, output.filename.template, metadata.config)
   cdx.ncfile <- create.ncdf.output.files(cdx.meta, f, f.meta$v.f.idx, variable.name.map, f.meta$ts, get.time.origin(f, f.meta$dim.axes), base.range, out.dir, author.data)
-  cdx.funcs <- get.climdex.functions(climdex.var.list)
+  cdx.funcs <- get.climdex.functions(climdex.var.list, metadata.config)
 
   ## Compute indices, either single process or multi-process using 'parallel'
   subsets <- ncdf4.helpers::get.cluster.worker.subsets(max.vals.millions * 1000000, f.meta$dim.size, f.meta$dim.axes, axis.to.split.on)
