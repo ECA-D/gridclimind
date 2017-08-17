@@ -1,6 +1,4 @@
 # This json configuration code is meant to replace all the hardcoded metadata
-
-
 get.variable.metadata.from.json = function(json_metadata) {
   variable.metadata.rows = lapply(names(json_metadata$index.metadata), function(index_id) {
     index_data = json_metadata$index.metadata[[index_id]]
@@ -22,11 +20,34 @@ get.variable.metadata.from.json = function(json_metadata) {
   })
   return(do.call('rbind', variable.metadata.rows))
 }
-get.index.variable = function(index_id, variable_id, json_metadata) {
-  index_metadata = json_metadata$index.metadata
-  if (!index_id %in% names(index_metadata)) stop(sprintf('Unkown index %s', index_id))
-  if (!variable_id %in% names(index_metadata[[index_id]])) stop(sprintf('Unknown variable %s for index %s', variable_id, index_id))
-  index_metadata[[index_id]][[variable_id]]
+
+get.variable.list.from.json = function(index.ids, time.resolution, json_metadata) {
+  relevant_index_data = json_metadata$index.metadata[index.ids]
+  dat = sapply(names(relevant_index_data), function(index.id) {
+    index_data = relevant_index_data[[index.id]]
+    relevant_postfixes = json_metadata$generic.metadata$time.resolution.postfix[index_data$supported.time.resolutions]
+    if (time.resolution != 'all') {
+      relevant_postfixes = relevant_postfixes[time.resolution]
+      if (is.null(relevant_postfixes[[1]])) return(NULL)   # For this particular index, the asked time.resolution is not supported
+    }
+    return(paste(index.id, json_metadata$generic.metadata$index.category, '_', relevant_postfixes, sep = ''))
+  })
+  dat = dat[!sapply(dat, is.null)]   # Remove any empty indices, i.e. no matching supported time.resolution
+  names(dat) = NULL
+  result = unlist(dat)
+  if (is.null(result)) stop('No matching variables where found')
+  return(result)
+}
+
+get.src.data.required.from.json = function(json_metadata) {
+  source_data_per_index = lapply(json_metadata$index.metadata, '[[', 'required.variables')
+  if (any(sapply(source_data_per_index, length) > 1)) stop('Cannot yet deal with indices that require more than one source variable')
+  possible_source_data = unique(unlist(source_data_per_index))
+  required_data_per_index = lapply(possible_source_data, function(src) {
+    names(source_data_per_index)[source_data_per_index == src]
+  })
+  names(required_data_per_index) = possible_source_data
+  return(required_data_per_index)
 }
 
 read_json_metadata_config_file = function(json_path) {
@@ -42,7 +63,8 @@ read_json_metadata_config_file = function(json_path) {
   json_metadata = fromJSON(json_path)
   return(list(
     get.variable.metadata = function() get.variable.metadata.from.json(json_metadata),
-    get.index.variable = function(index_id, variable_id) get.index.variable(index_id, variable_id, json_metadata)
+    get.variable.list = function(index.ids, time.resolution) get.variable.list.from.json(index.ids, time.resolution, json_metadata),
+    get.src.data.required = function() get.src.data.required.from.json(json_metadata)
   ))
 }
 # xi = read_json_metadata_config_file(system.file('extdata/metadata_config_files/eobs.json', package = 'gridclimind'))

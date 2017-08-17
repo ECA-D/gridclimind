@@ -84,7 +84,7 @@ create.indices.from.files <- function(input.files, out.dir, output.filename.temp
 
   ## Get variable list, subset if necessary
   climdex.time.resolution <- match.arg(climdex.time.resolution)
-  climdex.var.list <- get.climdex.variable.list(names(f.meta$v.f.idx), climdex.time.resolution, climdex.vars.subset)
+  climdex.var.list <- get.climdex.variable.list(names(f.meta$v.f.idx), metadata.config, climdex.time.resolution, climdex.vars.subset)
 
   cdx.meta <- get.climdex.variable.metadata(climdex.var.list, output.filename.template, metadata.config)
   cdx.ncfile <- create.ncdf.output.files(cdx.meta, f, f.meta$v.f.idx, variable.name.map, f.meta$ts, get.time.origin(f, f.meta$dim.axes), base.range, out.dir, author.data)

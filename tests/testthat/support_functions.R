@@ -26,7 +26,7 @@ ncdf_files_metadata_equal = function(file1, file2) {
 
 delete_all_content_in_temp_path = function() {
   if (!any(startsWith(output_data_path, c('/var', '/tmp')))) stop(sprintf('The output_data_path as a suspicious start, please check: %s', output_data_path))
-  output_files_present = list.files(output_data_path, full.names = TRUE) %>% as.list()
+  output_files_present = as.list(list.files(output_data_path, full.names = TRUE))
   if (length(output_files_present) > 0) do.call(unlink, c(list(output_files_present), list(recursive = TRUE)))
   return(invisible(NULL))
 }
