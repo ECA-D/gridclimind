@@ -15,6 +15,6 @@
 #'
 #' @export
 get.climdex.functions <- function(vars.list, metadata.config, fclimdex.compatible=TRUE) {
-  func = metadata.config$get.functions()
+  func = metadata.config$get.functions(additional.arguments = list(rx5day = list(center.mean.on.last.day = fclimdex.compatible)))
   return(func[vars.list])
 }

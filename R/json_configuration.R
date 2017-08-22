@@ -50,7 +50,7 @@ get.src.data.required.from.json = function(json_metadata) {
   return(required_data_per_index)
 }
 
-get.functions.from.json = function(json_metadata) {
+get.functions.from.json = function(json_metadata, additional.arguments) {
   index_data = json_metadata$index.metadata
   all_functions = lapply(names(json_metadata$index.metadata), function(index.id) {
     index_data = json_metadata$index.metadata[[index.id]]
@@ -58,6 +58,7 @@ get.functions.from.json = function(json_metadata) {
     curried_functions = sapply(index_data$supported.time.resolutions, function(time.res) {
       args = list(actual_function, freq = time.res)
       if (!is.null(index_data$additional_arguments)) args = c(args, index_data$additional_arguments)
+      if (index.id %in% names(additional.arguments)) args = modifyList(args, additional.arguments[[index.id]]) # Add or replace any of the manually passed arguments
       do.call(functional:::Curry, args)
     })
     names(curried_functions) = paste(index.id, json_metadata$generic.metadata$index.category, '_', json_metadata$generic.metadata$time.resolution.postfix[index_data$supported.time.resolutions], sep = '')
@@ -98,7 +99,7 @@ read_json_metadata_config_file = function(json_path) {
     get.variable.metadata = function() get.variable.metadata.from.json(json_metadata),
     get.variable.list = function(index.ids, time.resolution) get.variable.list.from.json(index.ids, time.resolution, json_metadata),
     get.src.data.required = function() get.src.data.required.from.json(json_metadata),
-    get.functions = function() get.functions.from.json(json_metadata),
+    get.functions = function(additional.arguments) get.functions.from.json(json_metadata, additional.arguments),
     get.thresholds.metadata = function() get.thresholds.metadata.from.json(json_metadata),
     get.variable.name.map = function() get.variable.name.map.from.json(json_metadata),
     get.thresholds.name.map = function() get.thresholds.name.map.from.json(json_metadata)
