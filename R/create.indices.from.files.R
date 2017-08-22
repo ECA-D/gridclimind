@@ -19,22 +19,12 @@
 #' }
 #' @param climdex.vars.subset A character vector of lower-case names of Climdex indices to calculate (eg: tr, fd, rx5day). See the list of 27 indices in the References section.
 #' @param climdex.time.resolution The time resolution to compute indices at; one of "all" (both monthly and annual), "annual" (only annual), or "monthly" (only monthly).
-#' @param variable.name.map A character vector mapping from standardized names (tmax, tmin, prec) to NetCDF variable names.
 #' @param axis.to.split.on The axis to split up the data on for parallel / incremental processing.
 #' @param fclimdex.compatible Whether the thresholds should be created to match fclimdex thresholds; affects padding at the ends of the base period.
 #' @param base.range Vector of two numeric years specifying the start and end years.
 #' @param parallel The number of parallel processing threads, or FALSE if no parallel processing is desired.
 #' @param verbose Whether to be chatty.
 #' @param thresholds.files A character vector of files containing thresholds to be used.
-#' @param thresholds.name.map A mapping from threshold names to NetCDF variable names. The following names will be used: \describe{
-#' \item{tx10thresh}{10th percentile for a 5-day running window of baseline daily maximum temperature.}
-#' \item{tn10thresh}{10th percentile for a 5-day running window of baseline daily minimum temperature.}
-#' \item{tx90thresh}{90th percentile for a 5-day running window of baseline daily maximum temperature.}
-#' \item{tn90thresh}{90th percentile for a 5-day running window of baseline daily minimum temperature.}
-#' \item{r75thresh}{75th percentile of daily precipitation in wet days (>=1 mm of rain).}
-#' \item{r95thresh}{95th percentile of daily precipitation in wet days (>=1 mm of rain).}
-#' \item{r99thresh}{99th percentile of daily precipitation in wet days (>=1 mm of rain).}
-#' }
 #' @param max.vals.millions The number of data values to process at one time (length of time dim * number of values * number of variables).
 #' @param cluster.type The cluster type, as used by the \code{snow} library.
 #'
@@ -61,11 +51,8 @@
 #'
 #' @export
 create.indices.from.files <- function(input.files, out.dir, output.filename.template, author.data, climdex.vars.subset=NULL, climdex.time.resolution=c("all", "annual", "monthly"),
-                                      variable.name.map=c(tmax="tx", tmin="tn", prec="rr", tavg="tg"), axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990),
-                                      parallel=4, verbose=FALSE, thresholds.files=NULL,
-                                      thresholds.name.map=c(tx10thresh="tx10thresh", tn10thresh="tn10thresh",
-                                                            tx90thresh="tx90thresh", tn90thresh="tn90thresh",
-                                                            r75thresh="r75thresh", r95thresh="r95thresh", r99thresh="r99thresh"), max.vals.millions=20, cluster.type="SOCK") {
+                                      axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990),
+                                      parallel=4, verbose=FALSE, thresholds.files=NULL, max.vals.millions=20, cluster.type="SOCK") {
   if(!(is.logical(parallel) || is.numeric(parallel)))
     stop("'parallel' option must be logical or numeric.")
 
@@ -74,6 +61,8 @@ create.indices.from.files <- function(input.files, out.dir, output.filename.temp
 
   ## Load a json config file that contains the majority of the configurable options, e.g. long name, etc
   metadata.config = read_json_metadata_config_file()
+  variable.name.map = metadata.config$get.variable.name.map()
+  thresholds.name.map = metadata.config$get.thresholds.name.map()
 
   ## Open files, determine mapping between files and variables.
   f <- lapply(input.files, ncdf4::nc_open)
