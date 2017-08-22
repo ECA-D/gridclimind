@@ -15,14 +15,56 @@
       "prec": "rr",
       "tavg": "tg"
     },
-    "threshold.name.map": {
-      "tx10thresh": "tx10thresh",
-      "tn10thresh": "tn10thresh",
-      "tx90thresh": "tx90thresh",
-      "tn90thresh": "tn90thresh",
-      "r75thresh": "r75thresh",
-      "r95thresh": "r95thresh",
-      "r99thresh": "r99thresh"
+    "threshold.metadata": {
+      "tx10thresh": {
+        "name": "tx10thresh",
+        "units": "degrees_C",
+        "longname": "10th_percentile_running_baseline_tasmax",
+        "has.time": true,
+        "q.path": ["tmax", "outbase", "q10"]
+      },
+      "tx90thresh": {
+        "name": "tx90thresh",
+        "units": "degrees_C",
+        "longname": "90th_percentile_running_baseline_tasmax",
+        "has.time": true,
+        "q.path": ["tmax", "outbase", "q90"]
+      },
+      "tn10thresh": {
+        "name": "tn10thresh",
+        "units": "degrees_C",
+        "longname": "10th_percentile_running_baseline_tasmin",
+        "has.time": true,
+        "q.path": ["tmin", "outbase", "q10"]
+      },
+      "tn90thresh": {
+        "name": "tn90thresh",
+        "units": "degrees_C",
+        "longname": "90th_percentile_running_baseline_tasmin",
+        "has.time": true,
+        "q.path": ["tmin", "outbase", "q90"]
+      },
+      "r75thresh": {
+        "name": "r75thresh",
+        "units": "mm",
+        "longname": "75th_percentile_baseline_wet_day_pr",
+        "has.time": false,
+        "q.path": ["prec", "q75"]
+      },
+      "r95thresh": {
+        "name": "r95thresh",
+        "units": "mm",
+        "longname": "95th_percentile_baseline_wet_day_pr",
+        "has.time": false,
+        "q.path": ["prec", "q95"]
+      },
+      "r99thresh": {
+        "name": "r99thresh",
+        "units": "mm",
+        "longname": "99th_percentile_baseline_wet_day_pr",
+        "has.time": false,
+        "q.path": ["prec", "q99"]
+      }
     }
   },
   "index.metadata": {

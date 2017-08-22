@@ -66,6 +66,10 @@ get.functions.from.json = function(json_metadata) {
   return(unlist(all_functions))
 }
 
+get.thresholds.metadata.from.json = function(json_metadata) {
+  return(json_metadata$generic.metadata$threshold.metadata)
+}
+
 read_json_metadata_config_file = function(json_path) {
   require(jsonlite)
   if (missing(json_path)) {
@@ -81,7 +85,8 @@ read_json_metadata_config_file = function(json_path) {
     get.variable.metadata = function() get.variable.metadata.from.json(json_metadata),
     get.variable.list = function(index.ids, time.resolution) get.variable.list.from.json(index.ids, time.resolution, json_metadata),
     get.src.data.required = function() get.src.data.required.from.json(json_metadata),
-    get.functions = function() get.functions.from.json(json_metadata)
+    get.functions = function() get.functions.from.json(json_metadata),
+    get.thresholds.metadata = function() get.thresholds.metadata.from.json(json_metadata)
   ))
 }
 # xi = read_json_metadata_config_file(system.file('extdata/metadata_config_files/eobs.json', package = 'gridclimind'))
