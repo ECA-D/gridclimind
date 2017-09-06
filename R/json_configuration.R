@@ -84,6 +84,15 @@ get.thresholds.name.map.from.json = function(json_metadata) {
   return(thresholds.name.map)
 }
 
+# This function reads the json file matching the global setting 'metadata.id', and expects a matching file to exist
+# in 'extdata/metadata_config_files/'. To add more json files, simply copy one of the existing files and edit the
+# information. To change metadata settings, simply edit the appropriate json file and rebuild the package. People using
+# that new package will use the new metadata settings.
+#
+# The json files contain two types of metadata:
+#
+# - Generic metadata, e.g. how the variables tmin and tmax are called in the input NCDF files.
+# - Index related metadata, for example how to name the variables in the output NCDF files.
 read_json_metadata_config_file = function(json_path) {
   require(jsonlite)
   if (missing(json_path)) {
@@ -92,7 +101,7 @@ read_json_metadata_config_file = function(json_path) {
     } else {
       metadata.id = 'eobs'
     }
-    json_path = system.file(sprintf('extdata/metadata_config_files/%s.json', metadata.id), package = 'gridclimind')
+    json_path = system.file(sprintf('extdata/metadata_config_files/%s.json', tolower(metadata.id)), package = 'gridclimind')
   }
   json_metadata = fromJSON(json_path)
   return(list(
@@ -105,5 +114,3 @@ read_json_metadata_config_file = function(json_path) {
     get.thresholds.name.map = function() get.thresholds.name.map.from.json(json_metadata)
   ))
 }
-# xi = read_json_metadata_config_file(system.file('extdata/metadata_config_files/eobs.json', package = 'gridclimind'))
-# xi$get.variable.metadata()

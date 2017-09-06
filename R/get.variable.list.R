@@ -5,6 +5,7 @@
 #' This function takes a character vector which specifies what source data is present and a time resolution, and generates a list of names consisting of the variable and the time resolution, separated by an underscore.
 #'
 #' @param source.data.present A vector of strings naming the data that's present; at least one of (tmin, tmax, prec, tavg).
+#' @param metadata.config config object read using \code{read_json_metadata_config_file}. This contains all the metadata such as the output long names of the indices in the output NCDF files.
 #' @param time.resolution The time resolutions to compute indices at. See \code{\link{create.indices.from.files}}.
 #' @param climdex.vars.subset A character vector of lower-case names of Climdex indices to calculate (eg: tr, fd, rx5day). See \code{\link{create.indices.from.files}}.
 #' @return A character vector containing variable names with time resolutions appended.

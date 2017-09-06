@@ -6,6 +6,7 @@
 #'
 #' @param vars.list The list of variables, as returned by \code{\link{get.climdex.variable.list}}.
 #' @param template.filename The filename template to be used when generating filenames.
+#' @param metadata.config config object read using \code{read_json_metadata_config_file}. This contains all the metadata such as the output long names of the indices in the output NCDF files.
 #' @return A data frame containing the following:
 #' \itemize{
 #' \item{long.name}{Long names for the variable}

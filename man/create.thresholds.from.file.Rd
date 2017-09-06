@@ -38,6 +38,13 @@ Create Climdex thresholds used for computing threshold-based indices
 }
 \details{
 For many applications, one may want to compute thresholds on one data set, then apply them to another. This is usually the case when comparing GCM (Global Climate Model) results for future time periods to either historical reanalysis data or historical / pre-industrial control runs from models. The purpose of this function is to compute these thresholds on the data supplied, saving them to the file specified. Then these thresholds can be used with \code{\link{create.indices.from.files}} to compute indices using the thresholds computed using this code.
+
+The metadata is stored in JSON files that are included with the pacakge. Right now, the metadata relevant to EOBS is used by default. To switch to another set of metadata, use the \code{metadata.id}
+global option:
+
+\code{options(metadata.id = 'eobs')}
+
+Note that currently only EOBS metadata is available (\code{metadata.id = 'eobs'}).
 }
 \note{
 NetCDF input files may contain one or more variables, named as per \code{variable.name.map}. The code will search the files for the named variables.

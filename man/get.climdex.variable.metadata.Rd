@@ -10,6 +10,8 @@ get.climdex.variable.metadata(vars.list, template.filename, metadata.config)
 \item{vars.list}{The list of variables, as returned by \code{\link{get.climdex.variable.list}}.}
 
 \item{template.filename}{The filename template to be used when generating filenames.}
+
+\item{metadata.config}{config object read using \code{read_json_metadata_config_file}. This contains all the metadata such as the output long names of the indices in the output NCDF files.}
 }
 \value{
 A data frame containing the following:

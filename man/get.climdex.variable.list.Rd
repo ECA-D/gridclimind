@@ -11,6 +11,8 @@ get.climdex.variable.list(source.data.present, metadata.config,
 \arguments{
 \item{source.data.present}{A vector of strings naming the data that's present; at least one of (tmin, tmax, prec, tavg).}
 
+\item{metadata.config}{config object read using \code{read_json_metadata_config_file}. This contains all the metadata such as the output long names of the indices in the output NCDF files.}
+
 \item{time.resolution}{The time resolutions to compute indices at. See \code{\link{create.indices.from.files}}.}
 
 \item{climdex.vars.subset}{A character vector of lower-case names of Climdex indices to calculate (eg: tr, fd, rx5day). See \code{\link{create.indices.from.files}}.}
