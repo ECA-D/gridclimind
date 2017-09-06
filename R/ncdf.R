@@ -16,7 +16,10 @@
 #' usage reasonable; it implements parallel computation using the \code{snow}
 #' library; and it includes a test suite to verify correctness of the implementation.
 #' Furthermore, the package has a modular design, allowing for easy extension to
-#' allow for adaptation to changing or custom requirements.
+#' allow for adaptation to changing or custom requirements. For example, the metadata
+#' is stored in json files that are included with the package. This allows the core
+#' of the code to separate from the metadata details, for example allowing one to switch
+#' on-the-fly.
 #'
 #' Users of this package should pay particular attention to the
 #' \code{\link{create.indices.from.files}} function, which computes Climdex indices
@@ -42,6 +45,5 @@
 #' Zhang, X., 2005: Avoiding inhomogeneity in percentile-based indices of
 #' temperature extremes. Journal of Climate 18.11 (2005):1641-.
 #' @keywords climate ts
-#' @importClassesFrom climind t
 #' @import snow PCICt
 NULL

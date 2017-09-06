@@ -5,6 +5,13 @@
 #'
 #' For many applications, one may want to compute thresholds on one data set, then apply them to another. This is usually the case when comparing GCM (Global Climate Model) results for future time periods to either historical reanalysis data or historical / pre-industrial control runs from models. The purpose of this function is to compute these thresholds on the data supplied, saving them to the file specified. Then these thresholds can be used with \code{\link{create.indices.from.files}} to compute indices using the thresholds computed using this code.
 #'
+#' The metadata is stored in JSON files that are included with the pacakge. Right now, the metadata relevant to EOBS is used by default. To switch to another set of metadata, use the \code{metadata.id}
+#' global option:
+#'
+#'     \code{options(metadata.id = 'eobs')}
+#'
+#' Note that currently only EOBS metadata is available (\code{metadata.id = 'eobs'}).
+#'
 #' @param input.files A list of filenames of NetCDF files to be used as input. A NetCDF file may contain one or more variables.
 #' @param output.file The name of the file to be created.
 #' @param author.data A vector containing named elements describing the author; see \code{\link{create.indices.from.files}}.
@@ -37,11 +44,14 @@ create.thresholds.from.file <- function(input.files, output.file, author.data, v
   if(length(input.files) == 0)
     stop("Require at least one input file.")
 
+  ## Load a json config file that contains the majority of the configurable options, e.g. long name, etc
+  metadata.config = read_json_metadata_config_file()
+
   f <- lapply(input.files, ncdf4::nc_open)
   f.meta <- create.file.metadata(f, variable.name.map)
 
   ## Define what the threshold indices will look like...
-  threshold.dat <- get.thresholds.metadata(names(f.meta$v.f.idx))
+  threshold.dat <- get.thresholds.metadata(names(f.meta$v.f.idx), metadata.config)
 
   ## Create the output file
   thresholds.netcdf <- create.thresholds.file(output.file, f, f.meta$ts, f.meta$v.f.idx, variable.name.map, base.range, f.meta$dim.size, f.meta$dim.axes, threshold.dat, author.data)
@@ -144,14 +154,8 @@ thresholds.close <- function(thresholds.nc) {
 #' thresholds.meta <- get.thresholds.metadata("prec")
 #'
 #' @export
-get.thresholds.metadata <- function(var.names) {
-  threshold.dat <- list(tx10thresh=list(units="degrees_C", longname="10th_percentile_running_baseline_tasmax", has.time=TRUE, q.path=c("tmax", "outbase", "q10")),
-                        tx90thresh=list(units="degrees_C", longname="90th_percentile_running_baseline_tasmax", has.time=TRUE, q.path=c("tmax", "outbase", "q90")),
-                        tn10thresh=list(units="degrees_C", longname="10th_percentile_running_baseline_tasmin", has.time=TRUE, q.path=c("tmin", "outbase", "q10")),
-                        tn90thresh=list(units="degrees_C", longname="90th_percentile_running_baseline_tasmin", has.time=TRUE, q.path=c("tmin", "outbase", "q90")),
-                        r75thresh=list(units="mm", longname="75th_percentile_baseline_wet_day_pr", has.time=FALSE, q.path=c("prec", "q75")),
-                        r95thresh=list(units="mm", longname="95th_percentile_baseline_wet_day_pr", has.time=FALSE, q.path=c("prec", "q95")),
-                        r99thresh=list(units="mm", longname="99th_percentile_baseline_wet_day_pr", has.time=FALSE, q.path=c("prec", "q99")))
+get.thresholds.metadata <- function(var.names, metadata.config) {
+  threshold.dat = metadata.config$get.thresholds.metadata()
   return(threshold.dat[sapply(threshold.dat, function(x) { x$q.path[1] %in% var.names })])
 }
 

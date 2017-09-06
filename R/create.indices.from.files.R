@@ -7,6 +7,13 @@
 #'
 #' The indices to be calculated can be specified; if not, they will be determined by data availability. Thresholds can be supplied (via \code{thresholds.files}) or, if there is data within the base period, calculated and used as part of the process. Note that in-base thresholds are separate from out-of-base thresholds; this is covered in more detail in the help for the \code{climind} package.
 #'
+#' The metadata is stored in JSON files that are included with the pacakge. Right now, the metadata relevant to EOBS is used by default. To switch to another set of metadata, use the \code{metadata.id}
+#' global option:
+#'
+#'     \code{options(metadata.id = 'eobs')}
+#'
+#' Note that currently only EOBS metadata is available (\code{metadata.id = 'eobs'}).
+#'
 #' @param input.files A list of filenames of NetCDF files to be used as input. A NetCDF file may contain one or more variables.
 #' @param out.dir The directory to put the output files in.
 #' @param output.filename.template The output filename to be used as a template, which must follow the CMIP5 file naming conventions.
@@ -19,26 +26,16 @@
 #' }
 #' @param climdex.vars.subset A character vector of lower-case names of Climdex indices to calculate (eg: tr, fd, rx5day). See the list of 27 indices in the References section.
 #' @param climdex.time.resolution The time resolution to compute indices at; one of "all" (both monthly and annual), "annual" (only annual), or "monthly" (only monthly).
-#' @param variable.name.map A character vector mapping from standardized names (tmax, tmin, prec) to NetCDF variable names.
 #' @param axis.to.split.on The axis to split up the data on for parallel / incremental processing.
 #' @param fclimdex.compatible Whether the thresholds should be created to match fclimdex thresholds; affects padding at the ends of the base period.
 #' @param base.range Vector of two numeric years specifying the start and end years.
 #' @param parallel The number of parallel processing threads, or FALSE if no parallel processing is desired.
 #' @param verbose Whether to be chatty.
 #' @param thresholds.files A character vector of files containing thresholds to be used.
-#' @param thresholds.name.map A mapping from threshold names to NetCDF variable names. The following names will be used: \describe{
-#' \item{tx10thresh}{10th percentile for a 5-day running window of baseline daily maximum temperature.}
-#' \item{tn10thresh}{10th percentile for a 5-day running window of baseline daily minimum temperature.}
-#' \item{tx90thresh}{90th percentile for a 5-day running window of baseline daily maximum temperature.}
-#' \item{tn90thresh}{90th percentile for a 5-day running window of baseline daily minimum temperature.}
-#' \item{r75thresh}{75th percentile of daily precipitation in wet days (>=1 mm of rain).}
-#' \item{r95thresh}{95th percentile of daily precipitation in wet days (>=1 mm of rain).}
-#' \item{r99thresh}{99th percentile of daily precipitation in wet days (>=1 mm of rain).}
-#' }
 #' @param max.vals.millions The number of data values to process at one time (length of time dim * number of values * number of variables).
 #' @param cluster.type The cluster type, as used by the \code{snow} library.
 #'
-#' @note NetCDF input files may contain one or more variables, named as per \code{variable.name.map}. The code will search the files for the named variables. The same is true of thresholds files; one file may be supplied, or multiple files may be supplied, via the \code{thresholds.files} argument; and the name mapping may be supplied via the \code{thresholds.name.map} argument.
+#' @note NetCDF input files may contain one or more variables, named as per \code{variable.name.map} in the json config file. The code will search the files for the named variables. The same is true of thresholds files; one file may be supplied, or multiple files may be supplied, via the \code{thresholds.files} argument; and the name mapping may be supplied via the \code{thresholds.name.map} argument.
 #'
 #' @references \url{http://etccdi.pacificclimate.org/list_27_indices.shtml}
 #' @examples
@@ -61,16 +58,18 @@
 #'
 #' @export
 create.indices.from.files <- function(input.files, out.dir, output.filename.template, author.data, climdex.vars.subset=NULL, climdex.time.resolution=c("all", "annual", "monthly"),
-                                      variable.name.map=c(tmax="tx", tmin="tn", prec="rr", tavg="tg"), axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990),
-                                      parallel=4, verbose=FALSE, thresholds.files=NULL,
-                                      thresholds.name.map=c(tx10thresh="tx10thresh", tn10thresh="tn10thresh",
-                                                            tx90thresh="tx90thresh", tn90thresh="tn90thresh",
-                                                            r75thresh="r75thresh", r95thresh="r95thresh", r99thresh="r99thresh"), max.vals.millions=20, cluster.type="SOCK") {
+                                      axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990),
+                                      parallel=4, verbose=FALSE, thresholds.files=NULL, max.vals.millions=20, cluster.type="SOCK") {
   if(!(is.logical(parallel) || is.numeric(parallel)))
     stop("'parallel' option must be logical or numeric.")
 
   if(length(input.files) == 0)
     stop("Require at least one input file.")
+
+  ## Load a json config file that contains the majority of the configurable options, e.g. long name, etc
+  metadata.config = read_json_metadata_config_file()
+  variable.name.map = metadata.config$get.variable.name.map()
+  thresholds.name.map = metadata.config$get.thresholds.name.map()
 
   ## Open files, determine mapping between files and variables.
   f <- lapply(input.files, ncdf4::nc_open)
@@ -81,11 +80,11 @@ create.indices.from.files <- function(input.files, out.dir, output.filename.temp
 
   ## Get variable list, subset if necessary
   climdex.time.resolution <- match.arg(climdex.time.resolution)
-  climdex.var.list <- get.climdex.variable.list(names(f.meta$v.f.idx), climdex.time.resolution, climdex.vars.subset)
+  climdex.var.list <- get.climdex.variable.list(names(f.meta$v.f.idx), metadata.config, climdex.time.resolution, climdex.vars.subset)
 
-  cdx.meta <- get.climdex.variable.metadata(climdex.var.list, output.filename.template)
+  cdx.meta <- get.climdex.variable.metadata(climdex.var.list, output.filename.template, metadata.config)
   cdx.ncfile <- create.ncdf.output.files(cdx.meta, f, f.meta$v.f.idx, variable.name.map, f.meta$ts, get.time.origin(f, f.meta$dim.axes), base.range, out.dir, author.data)
-  cdx.funcs <- get.climdex.functions(climdex.var.list)
+  cdx.funcs <- get.climdex.functions(climdex.var.list, metadata.config)
 
   ## Compute indices, either single process or multi-process using 'parallel'
   subsets <- ncdf4.helpers::get.cluster.worker.subsets(max.vals.millions * 1000000, f.meta$dim.size, f.meta$dim.axes, axis.to.split.on)
