@@ -5,7 +5,7 @@
 \title{Returns a list of Climdex variables given constraints}
 \usage{
 get.climdex.variable.list(source.data.present, metadata.config,
-  time.resolution = c("all", "annual", "monthly"),
+  time.resolution = c("all", "annual", "monthly", "seasonal", "halfyear"),
   climdex.vars.subset = NULL)
 }
 \arguments{

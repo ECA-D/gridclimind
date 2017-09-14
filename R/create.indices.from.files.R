@@ -57,7 +57,7 @@
 #' }
 #'
 #' @export
-create.indices.from.files <- function(input.files, out.dir, output.filename.template, author.data, climdex.vars.subset=NULL, climdex.time.resolution=c("all", "annual", "monthly"),
+create.indices.from.files <- function(input.files, out.dir, output.filename.template, author.data, climdex.vars.subset=NULL, climdex.time.resolution=c("all", "annual", "monthly", "seasonal", "halfyear"),
                                       axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990),
                                       parallel=4, verbose=FALSE, thresholds.files=NULL, max.vals.millions=20, cluster.type="SOCK") {
   if(!(is.logical(parallel) || is.numeric(parallel)))
@@ -83,7 +83,7 @@ create.indices.from.files <- function(input.files, out.dir, output.filename.temp
   climdex.var.list <- get.climdex.variable.list(names(f.meta$v.f.idx), metadata.config, climdex.time.resolution, climdex.vars.subset)
 
   cdx.meta <- get.climdex.variable.metadata(climdex.var.list, output.filename.template, metadata.config)
-  cdx.ncfile <- create.ncdf.output.files(cdx.meta, f, f.meta$v.f.idx, variable.name.map, f.meta$ts, get.time.origin(f, f.meta$dim.axes), base.range, out.dir, author.data)
+  cdx.ncfile <- create.ncdf.output.files(cdx.meta, f, f.meta$v.f.idx, variable.name.map, f.meta$ts, get.time.origin(f, f.meta$dim.axes), base.range, out.dir, author.data, metadata.config)
   cdx.funcs <- get.climdex.functions(climdex.var.list, metadata.config)
 
   ## Compute indices, either single process or multi-process using 'parallel'

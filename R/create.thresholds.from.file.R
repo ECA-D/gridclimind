@@ -159,6 +159,7 @@ get.thresholds.metadata <- function(var.names, metadata.config) {
   return(threshold.dat[sapply(threshold.dat, function(x) { x$q.path[1] %in% var.names })])
 }
 
+#' @export
 get.thresholds.f.idx <- function(thresholds.files, thresholds.name.map) {
   if(is.null(thresholds.files)) {
     return(NULL)
