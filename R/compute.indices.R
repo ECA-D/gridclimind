@@ -9,7 +9,6 @@
 #' @param cdx.funcs The functions to be applied to the data, as created by \code{\link{get.climdex.functions}}.
 #' @param ts The associated time data, as created by \code{nc.get.time.series}.
 #' @param base.range The base range; a vector of two numeric years.
-#' @param fclimdex.compatible Whether to make the results identical to those of fclimdex; this affects how the data in the base period is padded.
 #' @return A list of data for each index.
 #'
 #' @examples
@@ -26,7 +25,7 @@
 #' res <- compute.climdex.indices(in.dat, cdx.funcs, ts, c(1981, 1990), FALSE)
 #'
 #' @export
-compute.climdex.indices <- function(in.dat, cdx.funcs, ts, base.range, fclimdex.compatible) {
+compute.climdex.indices <- function(in.dat, cdx.funcs, ts, base.range) {
 
   ci <- climind::climdexInput.raw(
     tmax = in.dat$tmax, tmin = in.dat$tmin, prec = in.dat$prec,  tavg=in.dat$tavg,

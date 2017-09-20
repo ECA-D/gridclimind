@@ -15,7 +15,6 @@
 #' @param dest.units The destination units to convert to.
 #' @param t.f.idx A mapping from threshold variables to threshold files, as created by \code{\link{get.var.file.idx}}.
 #' @param thresholds.name.map A mapping from standardized names (tx10thresh, tn90thresh, etc) to NetCDF variable names.
-#' @param fclimdex.compatible Whether to make the results identical to those of fclimdex; this affects how the data in the base period is padded.
 #' @param projection A proj4 string representing the projection the data is in.
 #' @param f A list of objects of type \code{ncdf4}, consisting of the open input files. If missing, will be pulled from the global namespace.
 #' @param thresholds.netcdf A list of objects of type \code{ncdf4}, consisting of the open threshold files. If missing, will be pulled from the global namespace.
@@ -44,7 +43,7 @@
 #'
 #' @export
 compute.indices.for.stripe <- function(subset, cdx.funcs, ts, base.range, dim.axes, v.f.idx, variable.name.map, src.units, t.f.idx, thresholds.name.map,
-                                       fclimdex.compatible=TRUE, projection=NULL, f, thresholds.netcdf) {
+                                       projection=NULL, f, thresholds.netcdf) {
   cat('We are now at latitude', subset[['Y']], '\n')
 
   f <- if(missing(f)) get("f", .GlobalEnv) else f
@@ -65,7 +64,7 @@ compute.indices.for.stripe <- function(subset, cdx.funcs, ts, base.range, dim.ax
       return(structure(as.list(rep(NA, length(cdx.funcs))), .Names=names(cdx.funcs)))
     } else {
       indices.input <- c(dat.list, northern.hemisphere=northern.hemisphere[x], list(quantiles=get.quantiles.object(thresholds, x)))
-      return(compute.climdex.indices(indices.input, cdx.funcs, ts, base.range, fclimdex.compatible))
+      return(compute.climdex.indices(indices.input, cdx.funcs, ts, base.range))
     }
   }))
 }

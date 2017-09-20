@@ -17,7 +17,6 @@
 #' @param author.data A vector containing named elements describing the author; see \code{\link{create.indices.from.files}}.
 #' @param variable.name.map A character vector mapping from standardized names (tmax, tmin, prec) to NetCDF variable names.
 #' @param axis.to.split.on The axis to split up the data on for parallel / incremental processing.
-#' @param fclimdex.compatible Whether the thresholds should be created to match fclimdex thresholds; affects padding at the ends of the base period.
 #' @param base.range Vector of two numeric years specifying the start and end years.
 #' @param parallel The number of parallel processing threads, or FALSE if no parallel processing is desired.
 #' @param verbose Whether to be chatty.
@@ -37,7 +36,7 @@
 #'
 #' @export
 create.thresholds.from.file <- function(input.files, output.file, author.data, variable.name.map=c(tmax="tx", tmin="tn", prec="rr", tavg="tg"),
-                                        axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990), parallel=4, verbose=FALSE, max.vals.millions=20, cluster.type="SOCK") {
+                                        axis.to.split.on="Y", base.range=c(1961, 1990), parallel=4, verbose=FALSE, max.vals.millions=20, cluster.type="SOCK") {
   if(!(is.logical(parallel) || is.numeric(parallel)))
     stop("'parallel' option must be logical or numeric.")
 
