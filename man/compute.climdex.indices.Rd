@@ -4,7 +4,7 @@
 \alias{compute.climdex.indices}
 \title{Compute Climdex indices using provided data.}
 \usage{
-compute.climdex.indices(in.dat, cdx.funcs, ts, base.range, fclimdex.compatible)
+compute.climdex.indices(in.dat, cdx.funcs, ts, base.range)
 }
 \arguments{
 \item{in.dat}{The input data to compute indices on.}
@@ -14,8 +14,6 @@ compute.climdex.indices(in.dat, cdx.funcs, ts, base.range, fclimdex.compatible)
 \item{ts}{The associated time data, as created by \code{nc.get.time.series}.}
 
 \item{base.range}{The base range; a vector of two numeric years.}
-
-\item{fclimdex.compatible}{Whether to make the results identical to those of fclimdex; this affects how the data in the base period is padded.}
 }
 \value{
 A list of data for each index.

@@ -6,9 +6,8 @@
 \usage{
 create.thresholds.from.file(input.files, output.file, author.data,
   variable.name.map = c(tmax = "tx", tmin = "tn", prec = "rr", tavg = "tg"),
-  axis.to.split.on = "Y", fclimdex.compatible = TRUE, base.range = c(1961,
-  1990), parallel = 4, verbose = FALSE, max.vals.millions = 20,
-  cluster.type = "SOCK")
+  axis.to.split.on = "Y", base.range = c(1961, 1990), parallel = 4,
+  verbose = FALSE, max.vals.millions = 20, cluster.type = "SOCK")
 }
 \arguments{
 \item{input.files}{A list of filenames of NetCDF files to be used as input. A NetCDF file may contain one or more variables.}
@@ -20,8 +19,6 @@ create.thresholds.from.file(input.files, output.file, author.data,
 \item{variable.name.map}{A character vector mapping from standardized names (tmax, tmin, prec) to NetCDF variable names.}
 
 \item{axis.to.split.on}{The axis to split up the data on for parallel / incremental processing.}
-
-\item{fclimdex.compatible}{Whether the thresholds should be created to match fclimdex thresholds; affects padding at the ends of the base period.}
 
 \item{base.range}{Vector of two numeric years specifying the start and end years.}
 
