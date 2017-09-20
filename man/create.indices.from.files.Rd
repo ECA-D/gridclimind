@@ -6,10 +6,10 @@
 \usage{
 create.indices.from.files(input.files, out.dir, output.filename.template,
   author.data, climdex.vars.subset = NULL,
-  climdex.time.resolution = c("all", "annual", "monthly"),
-  axis.to.split.on = "Y", fclimdex.compatible = TRUE, base.range = c(1961,
-  1990), parallel = 4, verbose = FALSE, thresholds.files = NULL,
-  max.vals.millions = 20, cluster.type = "SOCK")
+  climdex.time.resolution = c("all", "annual", "monthly", "seasonal",
+  "halfyear"), axis.to.split.on = "Y", fclimdex.compatible = TRUE,
+  base.range = c(1961, 1990), parallel = 4, verbose = FALSE,
+  thresholds.files = NULL, max.vals.millions = 20, cluster.type = "SOCK")
 }
 \arguments{
 \item{input.files}{A list of filenames of NetCDF files to be used as input. A NetCDF file may contain one or more variables.}

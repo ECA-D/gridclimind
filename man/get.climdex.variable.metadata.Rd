@@ -19,7 +19,7 @@ A data frame containing the following:
 \item{long.name}{Long names for the variable}
 \item{var.name}{Variable name for use in the file}
 \item{units}{Units for the variable}
-\item{annual}{Whether the variable is annual}
+\item{time.res}{The time resolution of the variable.}
 \item{base.period.attr}{Whether to include a base period attribute}
 \item{standard.name}{Standard name to use for the variable}
 \item{filename}{Filename to be written out}

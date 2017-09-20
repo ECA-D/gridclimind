@@ -6,7 +6,7 @@
 \usage{
 compute.indices.for.stripe(subset, cdx.funcs, ts, base.range, dim.axes, v.f.idx,
   variable.name.map, src.units, t.f.idx, thresholds.name.map,
-  fclimdex.compatible = TRUE, projection = NULL, f, thresholds.netcdf)
+  projection = NULL, f, thresholds.netcdf)
 }
 \arguments{
 \item{subset}{The subset to use.}
@@ -28,8 +28,6 @@ compute.indices.for.stripe(subset, cdx.funcs, ts, base.range, dim.axes, v.f.idx,
 \item{t.f.idx}{A mapping from threshold variables to threshold files, as created by \code{\link{get.var.file.idx}}.}
 
 \item{thresholds.name.map}{A mapping from standardized names (tx10thresh, tn90thresh, etc) to NetCDF variable names.}
-
-\item{fclimdex.compatible}{Whether to make the results identical to those of fclimdex; this affects how the data in the base period is padded.}
 
 \item{projection}{A proj4 string representing the projection the data is in.}
 

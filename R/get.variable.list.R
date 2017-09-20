@@ -23,7 +23,7 @@
 #' var.list3 <- get.climdex.variable.list("tmax", climdex.vars.subset=sub.vars)
 #'
 #' @export
-get.climdex.variable.list <- function(source.data.present, metadata.config, time.resolution=c("all", "annual", "monthly"), climdex.vars.subset=NULL) {
+get.climdex.variable.list <- function(source.data.present, metadata.config, time.resolution=c("all", "annual", "monthly", "seasonal", "halfyear"), climdex.vars.subset=NULL) {
   time.res <- match.arg(time.resolution)
   vars.by.src.data.reqd = metadata.config$get.src.data.required()
 

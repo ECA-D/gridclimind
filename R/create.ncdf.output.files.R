@@ -35,7 +35,9 @@
 #' }
 #'
 #' @export
-create.ncdf.output.files <- function(cdx.dat, f, v.f.idx, variable.name.map, ts, time.origin, base.range, out.dir, author.data) {
+create.ncdf.output.files <- function(cdx.dat, f, v.f.idx, variable.name.map, ts, time.origin, base.range, out.dir, author.data, metadata.config) {
+  file_postfixes = metadata.config$get.time.resolution.postfix()
+
   f.example <- f[[v.f.idx[1]]]
   v.example <- variable.name.map[names(v.f.idx)[1]]
   time.dim.name <- ncdf4.helpers::nc.get.dim.for.axis(f.example, v.example, "T")$name
@@ -49,8 +51,10 @@ create.ncdf.output.files <- function(cdx.dat, f, v.f.idx, variable.name.map, ts,
   input.bounds <- ncdf4.helpers::nc.get.dim.bounds.var.list(f.example, v.example)
   ## FIXME: I'm not sure how solid the assumption about the location of bnds here is.
   bnds <- if(length(input.bounds) > 0) f.example$var[[input.bounds[1]]]$dim[[1]] else ncdf4::ncdim_def("bnds", "", 1:2, create_dimvar=FALSE)
-  time.dat <- list(annual=get.output.time.data(ts, time.origin.PCICt, time.units, time.dim.name, time.bnds.name, bnds, res="year"),
-                   monthly=get.output.time.data(ts, time.origin.PCICt, time.units, time.dim.name, time.bnds.name, bnds, res="month"))
+  time.dat <- list(annual    = get.output.time.data(ts, time.origin.PCICt, time.units, time.dim.name, time.bnds.name, bnds, res="year"),
+                   monthly   = get.output.time.data(ts, time.origin.PCICt, time.units, time.dim.name, time.bnds.name, bnds, res="month"),
+                   seasonal  = get.output.time.data(ts, time.origin.PCICt, time.units, time.dim.name, time.bnds.name, bnds, res="season"),
+                   halfyear  = get.output.time.data(ts, time.origin.PCICt, time.units, time.dim.name, time.bnds.name, bnds, res="halfyear"))
 
   grid.mapping.att <- ncdf4::ncatt_get(f.example, v.example, "grid_mapping")
   vars.to.copy <- c(input.bounds[input.bounds != time.bnds.name], names(ncdf4.helpers::nc.get.coordinate.axes(f.example, v.example)), if(grid.mapping.att$hasatt) grid.mapping.att$value)
@@ -59,8 +63,7 @@ create.ncdf.output.files <- function(cdx.dat, f, v.f.idx, variable.name.map, ts,
   vars.data <- lapply(vars.ncvars, function(ncvar) { if(length(ncvar$dim) == 0) NULL else ncdf4::ncvar_get(f.example, ncvar) })
 
   return(lapply(1:length(cdx.dat$var.name), function(x) {
-    annual <- cdx.dat$annual[x]
-    time.for.file <- time.dat[[c("monthly", "annual")[1 + annual]]]
+    time.for.file <- time.dat[[cdx.dat$time.res[x]]]
 
     ## Establish variables, create file
     nc.var.list <- c(vars.ncvars, list(time.for.file$time.bnds.var, ncdf4::ncvar_def(name=cdx.dat$var.name[x], units=cdx.dat$units[x], dim=c(f.example$var[[v.example]]$dim[1:2], list(time.for.file$time.dim)), missval=1e20, longname=cdx.dat$long.name[x])))
@@ -85,7 +88,7 @@ create.ncdf.output.files <- function(cdx.dat, f, v.f.idx, variable.name.map, ts,
 
     ## Put additional attributes.
     put.history.att(new.file, cdx.dat$var.name[x], definemode=TRUE)
-    put.ETCCDI.atts(new.file, c("mon", "yr")[1 + annual], ncdf4::ncatt_get(f.example, 0, "title")$value, author.data, definemode=TRUE)
+    put.ETCCDI.atts(new.file, file_postfixes[[cdx.dat$time.res[x]]], ncdf4::ncatt_get(f.example, 0, "title")$value, author.data, definemode=TRUE)
     if(cdx.dat$base.period.attr[x])
       ncdf4::ncatt_put(new.file, cdx.dat$var.name[x], "base_period", paste(author.data$base.range, sep=""), definemode=TRUE)
     ncdf4::nc_enddef(new.file)

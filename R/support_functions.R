@@ -136,9 +136,31 @@ get.split.filename.eobs <- function (eobs.file)
   fn.split
 }
 
-get.output.time.data <- function(ts, time.origin.PCICt, time.units, time.dim.name, time.bnds.name, bnds.dim, res=c("year", "month"), origin="1970-01-01") {
+custom.nc.make.time.bounds <- function (ts, unit = c("year", "month", "season", "halfyear")) {
+  # Based on ncdf4.helpers::nc.make.time.bounds, extended to include season and halfyear
+
+  unit <- match.arg(unit)
+  multiplier <- switch(unit, year = 1, month = 12, season = 4, halfyear = 2)
+  r <- range(ts)
+  r.years <- as.numeric(format(r, "%Y"))
+  start.date = switch(unit,
+                      year = PCICt::as.PCICt.default(paste(r.years[1], "-01-01", sep = ""), attr(ts, "cal")),
+                      month = PCICt::as.PCICt.default(paste(r.years[1], "-01-01", sep = ""), attr(ts, "cal")),
+                      season = start.date <- PCICt::as.PCICt.default(paste(r.years[1] - 1, "-12-01", sep = ""), attr(ts, "cal")),    # First season starts 1st of dec of the previous year
+                      halfyear = start.date <- PCICt::as.PCICt.default(paste(r.years[1] - 1, "-10-01", sep = ""), attr(ts, "cal")))  # First halfyear starts 1st of okt previous year
+  num.years <- r.years[2] - r.years[1] + 1
+  seq_unit <- switch(unit, year = '1 year', month = '1 month', season = '3 month', halfyear = '6 month')
+  extra_times_at_end = switch(unit, year = 1, month = 1, season = 2, halfyear = 2)
+  padded.dates <- seq(start.date, by = seq_unit, length.out = (num.years * multiplier) + extra_times_at_end)
+  padded.length <- length(padded.dates)
+  bounds <- c(padded.dates[1:(padded.length - 1)], padded.dates[2:padded.length] - 86400)
+  dim(bounds) <- c(padded.length - 1, 2)
+  t(bounds)
+}
+
+get.output.time.data <- function(ts, time.origin.PCICt, time.units, time.dim.name, time.bnds.name, bnds.dim, res=c("year", "month", "season", "halfyear"), origin="1970-01-01") {
   res <- match.arg(res)
-  time.bounds <- ncdf4.helpers::nc.make.time.bounds(ts, res)
+  time.bounds <- custom.nc.make.time.bounds(ts, res)
   time.series <- PCICt::as.PCICt.numeric((unclass(time.bounds[1,]) + unclass(time.bounds[2,])) / 2, cal=attr(time.bounds, "cal"), origin=origin)
   time.bounds.days <- as.numeric(julian(time.bounds, origin=time.origin.PCICt))
   time.days <- as.numeric(julian(time.series, origin=time.origin.PCICt))

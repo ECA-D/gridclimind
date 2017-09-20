@@ -57,8 +57,9 @@ write.climdex.results <- function(climdex.results, chunk.subset, cdx.ncfile, dim
       stop(dat)
 
     ## Special case of an entire slab missing values... repeat such that we have full data.
-    if(prod(dim(dat)) != prod(c(xy.dims, t.dim.len)))
+    if(prod(dim(dat)) != prod(c(xy.dims, t.dim.len))) {
       dat <- rep(dat, t.dim.len)
+    }
 
     dim(dat) <- c(xy.dims, t.dim.len)
     ncdf4.helpers::nc.put.var.subset.by.axes(cdx.ncfile[[v]], cdx.varname[v], dat, chunk.subset)

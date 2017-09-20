@@ -12,7 +12,7 @@ get.variable.metadata.from.json = function(json_metadata) {
     data.frame(long.name = long.name,
                var.name = paste(index_id, json_metadata$generic.metadata$index.category, sep = ''),
                units = index_data$units,
-               annual = index_data$supported.time.resolutions == 'annual',
+               time.res = index_data$supported.time.resolutions,
                base.period.attr = index_data$base.period.attr,
                row.names = paste(index_id, json_metadata$generic.metadata$index.category, '_', index.time.postfix[index_data$supported.time.resolutions], sep = ''),
                standard.name = index_data$standard.name,
@@ -84,6 +84,10 @@ get.thresholds.name.map.from.json = function(json_metadata) {
   return(thresholds.name.map)
 }
 
+get.time.resolution.postfix.from.json = function(json_metadata) {
+  return(json_metadata$generic.metadata$time.resolution.postfix)
+}
+
 # This function reads the json file matching the global setting 'metadata.id', and expects a matching file to exist
 # in 'extdata/metadata_config_files/'. To add more json files, simply copy one of the existing files and edit the
 # information. To change metadata settings, simply edit the appropriate json file and rebuild the package. People using
@@ -111,6 +115,7 @@ read_json_metadata_config_file = function(json_path) {
     get.functions = function(additional.arguments) get.functions.from.json(json_metadata, additional.arguments),
     get.thresholds.metadata = function() get.thresholds.metadata.from.json(json_metadata),
     get.variable.name.map = function() get.variable.name.map.from.json(json_metadata),
-    get.thresholds.name.map = function() get.thresholds.name.map.from.json(json_metadata)
+    get.thresholds.name.map = function() get.thresholds.name.map.from.json(json_metadata),
+    get.time.resolution.postfix = function() get.time.resolution.postfix.from.json(json_metadata)
   ))
 }
