@@ -39,15 +39,11 @@ get.variable.list.from.json = function(index.ids, time.resolution, json_metadata
   return(result)
 }
 
-get.src.data.required.from.json = function(json_metadata) {
-  source_data_per_index = lapply(json_metadata$index.metadata, '[[', 'required.variables')
-  if (any(sapply(source_data_per_index, length) > 1)) stop('Cannot yet deal with indices that require more than one source variable')
-  possible_source_data = unique(unlist(source_data_per_index))
-  required_data_per_index = lapply(possible_source_data, function(src) {
-    names(source_data_per_index)[source_data_per_index == src]
-  })
-  names(required_data_per_index) = possible_source_data
-  return(required_data_per_index)
+get.indices.for.which.data.is.present.from.json = function(source.data.present, json_metadata) {
+  index_data = json_metadata$index.metadata
+  required.variables = lapply(index_data, '[[', 'required.variables')
+  all_data_present_for_index = sapply(required.variables, function(x) all(x %in% source.data.present))
+  return(names(index_data)[all_data_present_for_index])
 }
 
 get.functions.from.json = function(json_metadata, additional.arguments) {
@@ -111,7 +107,7 @@ read_json_metadata_config_file = function(json_path) {
   return(list(
     get.variable.metadata = function() get.variable.metadata.from.json(json_metadata),
     get.variable.list = function(index.ids, time.resolution) get.variable.list.from.json(index.ids, time.resolution, json_metadata),
-    get.src.data.required = function() get.src.data.required.from.json(json_metadata),
+    get.indices.for.which.data.is.present = function(source.data.present) get.indices.for.which.data.is.present.from.json(source.data.present, json_metadata),
     get.functions = function(additional.arguments) get.functions.from.json(json_metadata, additional.arguments),
     get.thresholds.metadata = function() get.thresholds.metadata.from.json(json_metadata),
     get.variable.name.map = function() get.variable.name.map.from.json(json_metadata),

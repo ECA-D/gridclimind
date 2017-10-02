@@ -25,15 +25,9 @@
 #' @export
 get.climdex.variable.list <- function(source.data.present, metadata.config, time.resolution=c("all", "annual", "monthly", "seasonal", "halfyear"), climdex.vars.subset=NULL) {
   time.res <- match.arg(time.resolution)
-  vars.by.src.data.reqd = metadata.config$get.src.data.required()
+  if(all(c("tmax", "tmin") %in% source.data.present) && !("tavg" %in% source.data.present)) source.data.present <- c(source.data.present, "tavg")
 
-  if(any(!(source.data.present %in% c("tmin", "tmax", "tavg", "prec"))))
-    stop("Invalid variable listed in source.data.present.")
-
-  if(all(c("tmax", "tmin") %in% source.data.present) && !("tavg" %in% source.data.present))
-    source.data.present <- c(source.data.present, "tavg")
-
-  climdex.vars <- unlist(vars.by.src.data.reqd[source.data.present])
+  climdex.vars = metadata.config$get.indices.for.which.data.is.present(source.data.present)
   if(!is.null(climdex.vars.subset)) climdex.vars <- climdex.vars[climdex.vars %in% climdex.vars.subset]
 
   dat = metadata.config$get.variable.list(climdex.vars, time.resolution)
