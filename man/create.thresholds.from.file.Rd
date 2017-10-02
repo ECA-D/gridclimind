@@ -5,7 +5,6 @@
 \title{Create Climdex thresholds used for computing threshold-based indices}
 \usage{
 create.thresholds.from.file(input.files, output.file, author.data,
-  variable.name.map = c(tmax = "tx", tmin = "tn", prec = "rr", tavg = "tg"),
   axis.to.split.on = "Y", base.range = c(1961, 1990), parallel = 4,
   verbose = FALSE, max.vals.millions = 20, cluster.type = "SOCK")
 }
@@ -15,8 +14,6 @@ create.thresholds.from.file(input.files, output.file, author.data,
 \item{output.file}{The name of the file to be created.}
 
 \item{author.data}{A vector containing named elements describing the author; see \code{\link{create.indices.from.files}}.}
-
-\item{variable.name.map}{A character vector mapping from standardized names (tmax, tmin, prec) to NetCDF variable names.}
 
 \item{axis.to.split.on}{The axis to split up the data on for parallel / incremental processing.}
 
@@ -44,7 +41,7 @@ global option:
 Note that currently only EOBS metadata is available (\code{metadata.id = 'eobs'}).
 }
 \note{
-NetCDF input files may contain one or more variables, named as per \code{variable.name.map}. The code will search the files for the named variables.
+NetCDF input files may contain one or more variables, named as per \code{variable.name.map} (read from config json file). The code will search the files for the named variables.
 }
 \examples{
 \dontrun{

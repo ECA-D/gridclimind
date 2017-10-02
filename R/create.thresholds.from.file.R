@@ -15,7 +15,6 @@
 #' @param input.files A list of filenames of NetCDF files to be used as input. A NetCDF file may contain one or more variables.
 #' @param output.file The name of the file to be created.
 #' @param author.data A vector containing named elements describing the author; see \code{\link{create.indices.from.files}}.
-#' @param variable.name.map A character vector mapping from standardized names (tmax, tmin, prec) to NetCDF variable names.
 #' @param axis.to.split.on The axis to split up the data on for parallel / incremental processing.
 #' @param base.range Vector of two numeric years specifying the start and end years.
 #' @param parallel The number of parallel processing threads, or FALSE if no parallel processing is desired.
@@ -23,7 +22,7 @@
 #' @param max.vals.millions The number of data values to process at one time (length of time dim * number of values * number of variables).
 #' @param cluster.type The cluster type, as used by the \code{snow} library.
 #'
-#' @note NetCDF input files may contain one or more variables, named as per \code{variable.name.map}. The code will search the files for the named variables.
+#' @note NetCDF input files may contain one or more variables, named as per \code{variable.name.map} (read from config json file). The code will search the files for the named variables.
 #'
 #' @examples
 #' \dontrun{
@@ -35,7 +34,7 @@
 #' }
 #'
 #' @export
-create.thresholds.from.file <- function(input.files, output.file, author.data, variable.name.map=c(tmax="tx", tmin="tn", prec="rr", tavg="tg"),
+create.thresholds.from.file <- function(input.files, output.file, author.data,
                                         axis.to.split.on="Y", base.range=c(1961, 1990), parallel=4, verbose=FALSE, max.vals.millions=20, cluster.type="SOCK") {
   if(!(is.logical(parallel) || is.numeric(parallel)))
     stop("'parallel' option must be logical or numeric.")
@@ -45,6 +44,7 @@ create.thresholds.from.file <- function(input.files, output.file, author.data, v
 
   ## Load a json config file that contains the majority of the configurable options, e.g. long name, etc
   metadata.config = read_json_metadata_config_file()
+  variable.name.map = metadata.config$get.variable.name.map()
 
   f <- lapply(input.files, ncdf4::nc_open)
   f.meta <- create.file.metadata(f, variable.name.map)
