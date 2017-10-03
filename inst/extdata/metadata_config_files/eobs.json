@@ -590,6 +590,54 @@
       "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
       "include.time.prefix.in.long.name": true,
       "required.variables": ["prec", "tavg"]
+    },
+    "cw": {
+      "long.name": "Cold-wet days",
+      "units": "",
+      "base.period.attr": false,
+      "standard.name": "cold_wet_days",
+      "calculation.function.name": "climdex.cw",
+      "additional_arguments": {
+        "precip.thresh": "q75",
+        "precip.op": ">",
+        "temp.thresh": "q25",
+        "temp.op": "<"
+      },
+      "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
+      "include.time.prefix.in.long.name": true,
+      "required.variables": ["prec", "tavg"]
+    },
+    "wd": {
+      "long.name": "Warm-dry days",
+      "units": "",
+      "base.period.attr": false,
+      "standard.name": "warm_dry_days",
+      "calculation.function.name": "climdex.wd",
+      "additional_arguments": {
+        "precip.thresh": "q25",
+        "precip.op": "<",
+        "temp.thresh": "q75",
+        "temp.op": ">"
+      },
+      "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
+      "include.time.prefix.in.long.name": true,
+      "required.variables": ["prec", "tavg"]
+    },
+    "ww": {
+      "long.name": "Warm-wet days",
+      "units": "",
+      "base.period.attr": false,
+      "standard.name": "warm_wet_days",
+      "calculation.function.name": "climdex.wd",
+      "additional_arguments": {
+        "precip.thresh": "q75",
+        "precip.op": ">",
+        "temp.thresh": "q75",
+        "temp.op": ">"
+      },
+      "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
+      "include.time.prefix.in.long.name": true,
+      "required.variables": ["prec", "tavg"]
     }
   }
 }
