@@ -4,10 +4,8 @@ metadata.config = gridclimind:::read_json_metadata_config_file()
 
 # Variables
 input_data_path = system.file('extdata/example_ncfiles', package = 'gridclimind')
-variable.name.map = c(tmax="tx", tmin="tn", prec="rr", tavg="tg")
-threshold.name.map = c(tx10thresh="tx10thresh", tn10thresh="tn10thresh",
-  tx90thresh="tx90thresh", tn90thresh="tn90thresh",
-  r75thresh="r75thresh", r95thresh="r95thresh", r99thresh="r99thresh")
+variable.name.map = metadata.config$get.variable.name.map()
+threshold.name.map = metadata.config$get.thresholds.name.map()
 climdex.time.resolution = 'all'
 climdex.vars.subset = NULL   # Just use all you can compute
 output.filename.template = 'rr_0.25deg_reg_1950-2016.nc'

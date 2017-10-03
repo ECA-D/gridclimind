@@ -4,7 +4,7 @@
 \alias{get.quantiles.object}
 \title{Extract a single quantiles object from a set of thresholds.}
 \usage{
-get.quantiles.object(thresholds, idx)
+get.quantiles.object(thresholds, idx, metadata.config)
 }
 \arguments{
 \item{thresholds}{The thresholds, as extracted by \code{\link{get.thresholds.chunk}}.}

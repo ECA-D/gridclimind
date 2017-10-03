@@ -38,3 +38,14 @@ test_that('Rainfall index files where correctly generated', {
   expect_true(all(ncdf_files_equal_to_ref), info = sprintf('Files differ from reference %s.', paste(rainfall_reference_files[!ncdf_files_equal_to_ref], collapse = ', ')))
   expect_true(all(ncdf_metadata_equal_to_ref), info = sprintf('Metadata differs from reference %s.', paste(rainfall_reference_files[!ncdf_metadata_equal_to_ref], collapse = ', ')))
 })
+
+
+
+# # Extra test
+# dummy = suppressMessages(capture.output(create.indices.from.files(input.files = file.path(input_data_path, 'tg_0.25deg_reg_1950-2016.nc'),
+#                                                                   thresholds.files = file.path(input_data_path, 'EOBS_TH_TG_v14.nc'),
+#                                                                   out.dir = output_data_path,
+#                                                                   author.data = author.data,
+#                                                                   output.filename.template = 'tg_0.25deg_reg_1950-2016.nc',
+#                                                                   base.range=c(2017, 2021),
+#                                                                   parallel=FALSE)))

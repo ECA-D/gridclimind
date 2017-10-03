@@ -4,8 +4,8 @@
 \alias{compute.indices.for.stripe}
 \title{Compute Climdex indices for a subset / stripe}
 \usage{
-compute.indices.for.stripe(subset, cdx.funcs, ts, base.range, dim.axes, v.f.idx,
-  variable.name.map, src.units, t.f.idx, thresholds.name.map,
+compute.indices.for.stripe(subset, metadata.config, cdx.funcs, ts, base.range,
+  dim.axes, v.f.idx, variable.name.map, src.units, t.f.idx, thresholds.name.map,
   projection = NULL, f, thresholds.netcdf)
 }
 \arguments{

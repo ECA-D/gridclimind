@@ -27,6 +27,20 @@
         "has.time": true,
         "q.path": ["tmax", "outbase", "q10"]
       },
+      "tx25thresh": {
+        "name": "tx25thresh",
+        "units": "degrees_C",
+        "longname": "25th_percentile_running_baseline_tasmax",
+        "has.time": true,
+        "q.path": ["tmax", "outbase", "q25"]
+      },
+      "tx75thresh": {
+        "name": "tx75thresh",
+        "units": "degrees_C",
+        "longname": "75th_percentile_running_baseline_tasmax",
+        "has.time": true,
+        "q.path": ["tmax", "outbase", "q75"]
+      },
       "tx90thresh": {
         "name": "tx90thresh",
         "units": "degrees_C",
@@ -41,12 +55,61 @@
         "has.time": true,
         "q.path": ["tmin", "outbase", "q10"]
       },
+      "tn25thresh": {
+        "name": "tn25thresh",
+        "units": "degrees_C",
+        "longname": "25th_percentile_running_baseline_tasmax",
+        "has.time": true,
+        "q.path": ["tmin", "outbase", "q25"]
+      },
+      "tn75thresh": {
+        "name": "tn75thresh",
+        "units": "degrees_C",
+        "longname": "75th_percentile_running_baseline_tasmax",
+        "has.time": true,
+        "q.path": ["tmin", "outbase", "q75"]
+      },
       "tn90thresh": {
         "name": "tn90thresh",
         "units": "degrees_C",
         "longname": "90th_percentile_running_baseline_tasmin",
         "has.time": true,
         "q.path": ["tmin", "outbase", "q90"]
+      },
+      "tg10thresh": {
+        "name": "tg10thresh",
+        "units": "degrees_C",
+        "longname": "10th_percentile_running_baseline_tasavg",
+        "has.time": true,
+        "q.path": ["tavg", "outbase", "q10"]
+      },
+      "tg25thresh": {
+        "name": "tg25thresh",
+        "units": "degrees_C",
+        "longname": "25th_percentile_running_baseline_tasmax",
+        "has.time": true,
+        "q.path": ["tavg", "outbase", "q25"]
+      },
+      "tg75thresh": {
+        "name": "tg75thresh",
+        "units": "degrees_C",
+        "longname": "75th_percentile_running_baseline_tasmax",
+        "has.time": true,
+        "q.path": ["tavg", "outbase", "q75"]
+      },
+      "tg90thresh": {
+        "name": "tg90thresh",
+        "units": "degrees_C",
+        "longname": "90th_percentile_running_baseline_tasavg",
+        "has.time": true,
+        "q.path": ["tavg", "outbase", "q90"]
+      },
+      "r25thresh": {
+        "name": "r25thresh",
+        "units": "mm",
+        "longname": "25th_percentile_baseline_wet_day_pr",
+        "has.time": false,
+        "q.path": ["prec", "q25"]
       },
       "r75thresh": {
         "name": "r75thresh",
@@ -511,6 +574,70 @@
       "supported.time.resolutions": "monthly",
       "include.time.prefix.in.long.name": false,
       "required.variables": "prec"
+    },
+    "cd": {
+      "long.name": "Cold-dry days",
+      "units": "",
+      "base.period.attr": false,
+      "standard.name": "cold_dry_days",
+      "calculation.function.name": "climdex.cd",
+      "additional_arguments": {
+        "precip.thresh": "q25",
+        "precip.op": "<",
+        "temp.thresh": "q25",
+        "temp.op": "<"
+      },
+      "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
+      "include.time.prefix.in.long.name": true,
+      "required.variables": ["prec", "tavg"]
+    },
+    "cw": {
+      "long.name": "Cold-wet days",
+      "units": "",
+      "base.period.attr": false,
+      "standard.name": "cold_wet_days",
+      "calculation.function.name": "climdex.cw",
+      "additional_arguments": {
+        "precip.thresh": "q75",
+        "precip.op": ">",
+        "temp.thresh": "q25",
+        "temp.op": "<"
+      },
+      "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
+      "include.time.prefix.in.long.name": true,
+      "required.variables": ["prec", "tavg"]
+    },
+    "wd": {
+      "long.name": "Warm-dry days",
+      "units": "",
+      "base.period.attr": false,
+      "standard.name": "warm_dry_days",
+      "calculation.function.name": "climdex.wd",
+      "additional_arguments": {
+        "precip.thresh": "q25",
+        "precip.op": "<",
+        "temp.thresh": "q75",
+        "temp.op": ">"
+      },
+      "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
+      "include.time.prefix.in.long.name": true,
+      "required.variables": ["prec", "tavg"]
+    },
+    "ww": {
+      "long.name": "Warm-wet days",
+      "units": "",
+      "base.period.attr": false,
+      "standard.name": "warm_wet_days",
+      "calculation.function.name": "climdex.wd",
+      "additional_arguments": {
+        "precip.thresh": "q75",
+        "precip.op": ">",
+        "temp.thresh": "q75",
+        "temp.op": ">"
+      },
+      "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
+      "include.time.prefix.in.long.name": true,
+      "required.variables": ["prec", "tavg"]
     }
   }
 }

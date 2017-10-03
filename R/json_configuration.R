@@ -39,15 +39,11 @@ get.variable.list.from.json = function(index.ids, time.resolution, json_metadata
   return(result)
 }
 
-get.src.data.required.from.json = function(json_metadata) {
-  source_data_per_index = lapply(json_metadata$index.metadata, '[[', 'required.variables')
-  if (any(sapply(source_data_per_index, length) > 1)) stop('Cannot yet deal with indices that require more than one source variable')
-  possible_source_data = unique(unlist(source_data_per_index))
-  required_data_per_index = lapply(possible_source_data, function(src) {
-    names(source_data_per_index)[source_data_per_index == src]
-  })
-  names(required_data_per_index) = possible_source_data
-  return(required_data_per_index)
+get.indices.for.which.data.is.present.from.json = function(source.data.present, json_metadata) {
+  index_data = json_metadata$index.metadata
+  required.variables = lapply(index_data, '[[', 'required.variables')
+  all_data_present_for_index = sapply(required.variables, function(x) all(x %in% source.data.present))
+  return(names(index_data)[all_data_present_for_index])
 }
 
 get.functions.from.json = function(json_metadata, additional.arguments) {
@@ -88,6 +84,14 @@ get.time.resolution.postfix.from.json = function(json_metadata) {
   return(json_metadata$generic.metadata$time.resolution.postfix)
 }
 
+get.threshold.path.from.json = function(json_metadata) {
+  thold_metadata = json_metadata$generic.metadata$threshold.metadata
+  all_paths = lapply(thold_metadata, '[[', 'q.path')
+  path_length = sapply(all_paths, length)
+  stopifnot(all(path_length %in% c(3,2)))
+  return(list('1d' = all_paths[path_length == 2], '2d' = all_paths[path_length == 3]))
+}
+
 # This function reads the json file matching the global setting 'metadata.id', and expects a matching file to exist
 # in 'extdata/metadata_config_files/'. To add more json files, simply copy one of the existing files and edit the
 # information. To change metadata settings, simply edit the appropriate json file and rebuild the package. People using
@@ -111,11 +115,12 @@ read_json_metadata_config_file = function(json_path) {
   return(list(
     get.variable.metadata = function() get.variable.metadata.from.json(json_metadata),
     get.variable.list = function(index.ids, time.resolution) get.variable.list.from.json(index.ids, time.resolution, json_metadata),
-    get.src.data.required = function() get.src.data.required.from.json(json_metadata),
+    get.indices.for.which.data.is.present = function(source.data.present) get.indices.for.which.data.is.present.from.json(source.data.present, json_metadata),
     get.functions = function(additional.arguments) get.functions.from.json(json_metadata, additional.arguments),
     get.thresholds.metadata = function() get.thresholds.metadata.from.json(json_metadata),
     get.variable.name.map = function() get.variable.name.map.from.json(json_metadata),
     get.thresholds.name.map = function() get.thresholds.name.map.from.json(json_metadata),
-    get.time.resolution.postfix = function() get.time.resolution.postfix.from.json(json_metadata)
+    get.time.resolution.postfix = function() get.time.resolution.postfix.from.json(json_metadata),
+    get.threshold.path = function() get.threshold.path.from.json(json_metadata)
   ))
 }

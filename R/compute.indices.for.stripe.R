@@ -42,7 +42,7 @@
 #' }
 #'
 #' @export
-compute.indices.for.stripe <- function(subset, cdx.funcs, ts, base.range, dim.axes, v.f.idx, variable.name.map, src.units, t.f.idx, thresholds.name.map,
+compute.indices.for.stripe <- function(subset, metadata.config, cdx.funcs, ts, base.range, dim.axes, v.f.idx, variable.name.map, src.units, t.f.idx, thresholds.name.map,
                                        projection=NULL, f, thresholds.netcdf) {
   cat('We are now at latitude', subset[['Y']], '\n')
 
@@ -63,7 +63,7 @@ compute.indices.for.stripe <- function(subset, cdx.funcs, ts, base.range, dim.ax
       ## We don't need to pad this out to full length; cbind will do that for us.
       return(structure(as.list(rep(NA, length(cdx.funcs))), .Names=names(cdx.funcs)))
     } else {
-      indices.input <- c(dat.list, northern.hemisphere=northern.hemisphere[x], list(quantiles=get.quantiles.object(thresholds, x)))
+      indices.input <- c(dat.list, northern.hemisphere=northern.hemisphere[x], list(quantiles=get.quantiles.object(thresholds, x, metadata.config)))
       return(compute.climdex.indices(indices.input, cdx.funcs, ts, base.range))
     }
   }))
