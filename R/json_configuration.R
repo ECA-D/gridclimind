@@ -84,6 +84,14 @@ get.time.resolution.postfix.from.json = function(json_metadata) {
   return(json_metadata$generic.metadata$time.resolution.postfix)
 }
 
+get.threshold.path.from.json = function(json_metadata) {
+  thold_metadata = json_metadata$generic.metadata$threshold.metadata
+  all_paths = lapply(thold_metadata, '[[', 'q.path')
+  path_length = sapply(all_paths, length)
+  stopifnot(all(path_length %in% c(3,2)))
+  return(list('1d' = all_paths[path_length == 2], '2d' = all_paths[path_length == 3]))
+}
+
 # This function reads the json file matching the global setting 'metadata.id', and expects a matching file to exist
 # in 'extdata/metadata_config_files/'. To add more json files, simply copy one of the existing files and edit the
 # information. To change metadata settings, simply edit the appropriate json file and rebuild the package. People using
@@ -112,6 +120,7 @@ read_json_metadata_config_file = function(json_path) {
     get.thresholds.metadata = function() get.thresholds.metadata.from.json(json_metadata),
     get.variable.name.map = function() get.variable.name.map.from.json(json_metadata),
     get.thresholds.name.map = function() get.thresholds.name.map.from.json(json_metadata),
-    get.time.resolution.postfix = function() get.time.resolution.postfix.from.json(json_metadata)
+    get.time.resolution.postfix = function() get.time.resolution.postfix.from.json(json_metadata),
+    get.threshold.path = function() get.threshold.path.from.json(json_metadata)
   ))
 }

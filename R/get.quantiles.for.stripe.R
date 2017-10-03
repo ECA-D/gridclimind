@@ -100,17 +100,13 @@ get.quantiles.for.stripe <- function(subset, ts, base.range, dim.axes, v.f.idx, 
 #' }
 #'
 #' @export
-get.quantiles.object <- function(thresholds, idx) {
+get.quantiles.object <- function(thresholds, idx, metadata.config) {
   if(is.null(thresholds))
     return(NULL)
 
-  thresh.path.2d <- list(tx10thresh=c("tmax", "outbase", "q10"),
-                         tx90thresh=c("tmax", "outbase", "q90"),
-                         tn10thresh=c("tmin", "outbase", "q10"),
-                         tn90thresh=c("tmin", "outbase", "q90"))
-  thresh.path.1d <- list(r75thresh=c("prec", "q75"),
-                         r95thresh=c("prec", "q95"),
-                         r99thresh=c("prec", "q99"))
+  thresh.path = metadata.config$get.threshold.path()
+  thresh.path.2d <- thresh.path[['1d']]
+  thresh.path.1d <- thresh.path[['2d']]
   result <- list()
 
 

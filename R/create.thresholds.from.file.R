@@ -201,13 +201,7 @@ get.thresholds.f.idx <- function(thresholds.files, thresholds.name.map) {
 #'
 #' @export
 get.thresholds.chunk <- function(subset, cdx.funcs, thresholds.netcdf, t.f.idx, thresholds.name.map) {
-  var.thresh.map <- list(tx10thresh=c("tx10p"), tx90thresh=c("tx90p", "WSDI"), tn10thresh=c("tn10p", "CSDI"),
-                         tn90thresh=c("tn90p"), r75thresh=c("r75p"), r95thresh=c("r95p"), r99thresh=c("r99p"))
-
-  cdx.names <- names(cdx.funcs)
-  thresh.var.needed <- names(var.thresh.map)[sapply(var.thresh.map, function(x) { any(unlist(lapply(x, function(substr) { any(grepl(substr, cdx.names)) }))) })]
-  stopifnot(all(thresh.var.needed %in% names(t.f.idx)))
-  return(sapply(thresh.var.needed, function(threshold.var) {
+  return(sapply(names(t.f.idx), function(threshold.var) {
     dim.axes <- ncdf4.helpers::nc.get.dim.axes(thresholds.netcdf[[t.f.idx[threshold.var]]], thresholds.name.map[threshold.var]);
     return(get.data(thresholds.netcdf[[t.f.idx[threshold.var]]], thresholds.name.map[threshold.var], subset, dim.axes=dim.axes))
   }, simplify=FALSE))

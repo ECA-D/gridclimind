@@ -98,7 +98,7 @@ create.indices.from.files <- function(input.files, out.dir, output.filename.temp
     snow::clusterEvalQ(cluster, thresholds.netcdf <<- thresholds.open(thresholds.files))
 
     ## Meat...
-    parLapplyLBFiltered(cluster, subsets, compute.indices.for.stripe, cdx.funcs, f.meta$ts, base.range, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, f.meta$src.units, t.f.idx, thresholds.name.map, f.meta$projection, local.filter.func=function(x, x.sub) {
+    parLapplyLBFiltered(cluster, subsets, compute.indices.for.stripe, metadata.config, cdx.funcs, f.meta$ts, base.range, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, f.meta$src.units, t.f.idx, thresholds.name.map, f.meta$projection, local.filter.func=function(x, x.sub) {
       write.climdex.results(x, x.sub, cdx.ncfile, f.meta$dim.size, cdx.meta$var.name)
     })
 
@@ -110,7 +110,7 @@ create.indices.from.files <- function(input.files, out.dir, output.filename.temp
     ##try(getFromNamespace('nc_set_chunk_cache', 'ncdf4')(1024 * 2048, 1009), silent=TRUE)
 
     ## Meat...
-    lapply(subsets, function(x) { write.climdex.results(compute.indices.for.stripe(x, cdx.funcs, f.meta$ts, base.range, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, f.meta$src.units, t.f.idx, thresholds.name.map, f.meta$projection, f, thresholds.netcdf), x, cdx.ncfile, f.meta$dim.size, cdx.meta$var.name) })
+    lapply(subsets, function(x) { write.climdex.results(compute.indices.for.stripe(x, metadata.config, cdx.funcs, f.meta$ts, base.range, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, f.meta$src.units, t.f.idx, thresholds.name.map, f.meta$projection, f, thresholds.netcdf), x, cdx.ncfile, f.meta$dim.size, cdx.meta$var.name) })
 
     ## Clean-up.
     thresholds.close(thresholds.netcdf)
