@@ -45,36 +45,28 @@ get.quantiles.for.stripe <- function(subset, ts, base.range, dim.axes, v.f.idx, 
   data.list <- sapply(names(v.f.idx), function(x) { gc(); get.data(f[[v.f.idx[x]]], variable.name.map[x], subset, src.units[x], dim.axes) }, simplify=FALSE)
   gc()
 
+  # Constuct input arguments for quantile calculation function
+  potential_data = lapply(names(variable.name.map), function(var) data.list[[var]])
+  names(potential_data) = names(variable.name.map)
+  ts_arguments = lapply(potential_data, function(x) {
+    if (is.null(x)) {
+      return(NULL)
+    } else {
+      return(ts)
+    }
+  })
+  names(ts_arguments) = paste(names(ts_arguments), 'dates', sep = '.')
+  quantile_input_arguments = c(potential_data, ts_arguments, list(base.range = base.range))
+
   r <- 1:(dim(data.list[[1]])[2])
-  if(!is.null(data.list$tmax)) {
-    if(!is.null(data.list$tmin)) {
-      if(!is.null(data.list$prec)) {
-        return(lapply(r, function(x) climind::get.outofbase.quantiles(data.list$tmax[,x], data.list$tmin[,x], data.list$prec[,x], ts, ts, ts, base.range)))
-      } else {
-        return(lapply(r, function(x) climind::get.outofbase.quantiles(data.list$tmax[,x], data.list$tmin[,x], NULL, ts, ts, NULL, base.range)))
-      }
-    } else {
-      if(!is.null(data.list$prec)) {
-        return(lapply(r, function(x) climind::get.outofbase.quantiles(data.list$tmax[,x], NULL, data.list$prec[,x], ts, NULL, ts, base.range)))
-      } else {
-        return(lapply(r, function(x) climind::get.outofbase.quantiles(data.list$tmax[,x], NULL, NULL, ts, NULL, NULL, base.range)))
-      }
-    }
-  } else {
-    if(!is.null(data.list$tmin)) {
-      if(!is.null(data.list$prec)) {
-        return(lapply(r, function(x) climind::get.outofbase.quantiles(NULL, data.list$tmin[,x], data.list$prec[,x], NULL, ts, ts, base.range)))
-      } else {
-        return(lapply(r, function(x) climind::get.outofbase.quantiles(NULL, data.list$tmin[,x], NULL, NULL, ts, NULL, base.range)))
-      }
-    } else {
-      if(!is.null(data.list$prec)) {
-        return(lapply(r, function(x) climind::get.outofbase.quantiles(NULL, NULL, data.list$prec[,x], NULL, NULL, ts, base.range)))
-      } else {
-        stop("Go home and take your shitty input with you.")
-      }
-    }
-  }
+  return(lapply(r, function(x) {
+    concrete_args = quantile_input_arguments
+    concrete_args$tmax = concrete_args$tmax[,x]
+    concrete_args$tmin = concrete_args$tmin[,x]
+    concrete_args$tavg = concrete_args$tavg[,x]
+    concrete_args$prec = concrete_args$prec[,x]
+    return(do.call(climind::get.outofbase.quantiles, concrete_args, quote = TRUE))
+  }))
 }
 
 #' Extract a single quantiles object from a set of thresholds.
