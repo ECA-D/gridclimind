@@ -105,8 +105,8 @@ get.quantiles.object <- function(thresholds, idx, metadata.config) {
     return(NULL)
 
   thresh.path = metadata.config$get.threshold.path()
-  thresh.path.2d <- thresh.path[['1d']]
-  thresh.path.1d <- thresh.path[['2d']]
+  thresh.path.2d <- thresh.path[['2d']]
+  thresh.path.1d <- thresh.path[['1d']]
   result <- list()
 
 
