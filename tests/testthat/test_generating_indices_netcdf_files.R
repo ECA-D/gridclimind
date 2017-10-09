@@ -25,6 +25,10 @@ current_reference_path = file.path(reference_file_path, 'generate_all_indices_te
 reference_files = list.files(current_reference_path)
 file_present_in_output = sapply(reference_files, function(p) file.exists(file.path(output_data_path, p)))
 
+# Check for files that have been generated in the test, but have no reference.
+output_files = list.files(output_data_path, pattern = '*nc')
+files_with_no_reference = setdiff(output_files, reference_files)
+
 ## Check that the contents of the newly generated files equals that of the reference files
 # TRUE means equal
 ncdf_files_equal_to_ref = sapply(reference_files, function(p) {
@@ -41,4 +45,5 @@ test_that('Index files where correctly generated', {
   expect_true(all(file_present_in_output), info = sprintf('Missing files %s.', paste(reference_files[!file_present_in_output], collapse = ', ')))
   expect_true(all(ncdf_files_equal_to_ref), info = sprintf('Files differ from reference %s.', paste(reference_files[!ncdf_files_equal_to_ref], collapse = ', ')))
   expect_true(all(ncdf_metadata_equal_to_ref), info = sprintf('Metadata differs from reference %s.', paste(reference_files[!ncdf_metadata_equal_to_ref], collapse = ', ')))
+  expect_true(length(files_with_no_reference) == 0, info = sprintf('Could not find reference NetCDF files for the following generated index files: %s', paste(files_with_no_reference, collapse = ', ')))
 })
