@@ -55,6 +55,13 @@ compute.indices.for.stripe <- function(subset, metadata.config, cdx.funcs, ts, b
 
   northern.hemisphere <- get.northern.hemisphere.booleans(subset, f[[v.f.idx[1]]], variable.name.map[names(v.f.idx)[1]], projection)
 
+  # Curry the current subset (latitude) into the Huglin function
+  # this needs to be done on the fly, because only in this context do we really
+  # know what the latitude is.
+  latitudes = get.lat(f, v.f.idx, variable.name.map)
+  cur_sub <- latitudes[subset[['Y']]]
+  cdx.funcs <- curry_in_subset_for_huglin(cdx.funcs, cur_sub)
+
   thresholds <- if(is.null(thresholds.netcdf)) NULL else get.thresholds.chunk(subset, cdx.funcs, thresholds.netcdf, t.f.idx, thresholds.name.map)
   return(lapply(1:(dim(data.list[[1]])[2]), function(x) {
     dat.list <- sapply(names(data.list), function(name) { data.list[[name]][,x] }, simplify=FALSE)

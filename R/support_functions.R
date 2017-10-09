@@ -309,10 +309,14 @@ curry_in_subset_for_huglin <- function(cdx.funcs, cur_sub){
 
 # #' Get latitude
 # #' It is used inside compute.indices.for.stripe
-get.lat <- function(open_file_list, variable.name.map) {
-  #var.name <- variable.name.map[[names(v.f.idx)[1]]]
-  y.dim <- ncdf4.helpers::nc.get.dim.for.axis(open_file_list[[1]], variable.name.map, "Y")
-  return(y.dim$vals)
+# This function simply picks the first available variable, and extracts the latitude
+# information from that file. The assupmtion is that the latitude info for all files is
+# the same
+get.lat <- function(open_file_list, v.f.idx, variable.name.map) {
+  var.name <- variable.name.map[[names(v.f.idx)[1]]]
+  relevant.open.file <- open_file_list[[v.f.idx[[names(v.f.idx)[1]]]]]
+  y.dim <- ncdf4.helpers::nc.get.dim.for.axis(relevant.open.file, var.name, "Y")
+  return(y.dim[['vals']])
 }
 
 #' Creates a list of CMIP5-compliant filenames reflecting the input data.
