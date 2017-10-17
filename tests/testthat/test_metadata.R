@@ -14,6 +14,7 @@ output.filename.template = 'rr_0.25deg_reg_1950-2016.nc'
 nc_file_list = list.files(input_data_path, pattern = '*2016.nc', full.names = TRUE)
 open_nc_files = lapply(nc_file_list, ncdf4::nc_open)
 threshold_files = list.files(input_data_path, pattern = '*_TH_*', full.names = TRUE)
+threshold_files = threshold_files[order(basename(tolower(threshold_files)))] # Get correct alphabetical sorting
 
 # Get the various metadata and mappings
 f.meta = create.file.metadata(open_nc_files, variable.name.map)
