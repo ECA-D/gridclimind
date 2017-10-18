@@ -17,8 +17,16 @@
       "tmax": "tx",
       "tmin": "tn",
       "prec": "rr",
-      "tavg": "tg"
-    },
+      "tavg": "tg",
+      "snow": "sd",
+      "snow_new": "dummy_snow_new",
+      "wind": "fg",
+      "wind_gust": "fx",
+      "wind_dir": "dd",
+      "cloud": "cc",
+      "sun": "ss",
+      "sun_rel": "dummy_sun_rel"
+      },
     "threshold.metadata": {
       "tx10thresh": {
         "name": "tx10thresh",

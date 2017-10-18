@@ -45,6 +45,10 @@ get.quantiles.for.stripe <- function(subset, ts, base.range, dim.axes, v.f.idx, 
   data.list <- sapply(names(v.f.idx), function(x) { gc(); get.data(f[[v.f.idx[x]]], variable.name.map[x], subset, src.units[x], dim.axes) }, simplify=FALSE)
   gc()
 
+  # Edit variable name map, only keep variables for which quantiles can be calculated. The limitation is in the
+  # climind::get.outofbase.quantiles function which only supports tmin, tmax, tavg, and prec.
+  variable.name.map = variable.name.map[c('tmax', 'tmin', 'prec', 'tavg')]
+
   # Constuct input arguments for quantile calculation function
   potential_data = lapply(names(variable.name.map), function(var) data.list[[var]])
   names(potential_data) = names(variable.name.map)
