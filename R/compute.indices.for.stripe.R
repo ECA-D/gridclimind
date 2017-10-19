@@ -71,7 +71,7 @@ compute.indices.for.stripe <- function(subset, metadata.config, cdx.funcs, ts, b
       return(structure(as.list(rep(NA, length(cdx.funcs))), .Names=names(cdx.funcs)))
     } else {
       indices.input <- c(dat.list, northern.hemisphere=northern.hemisphere[x], list(quantiles=get.quantiles.object(thresholds, x, metadata.config)))
-      return(compute.climdex.indices(indices.input, cdx.funcs, ts, base.range))
+      return(compute.climdex.indices(indices.input, cdx.funcs, ts, base.range, metadata.config))
     }
   }))
 }

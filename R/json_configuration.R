@@ -92,6 +92,17 @@ get.threshold.path.from.json = function(json_metadata) {
   return(list('1d' = all_paths[path_length == 2], '2d' = all_paths[path_length == 3]))
 }
 
+get.variables.requiring.quantiles.from.json = function(index_names, json_metadata) {
+  postfix_removed = sapply(strsplit(index_names, split = '_'), '[', 1)
+  remove_index_category = sub(json_metadata$generic.metadata$index.category, '', postfix_removed)
+  unique_indices = unique(remove_index_category)
+  indices_requiring_quantiles = sapply(json_metadata$index.metadata[unique_indices], '[[', 'needs.quantiles')
+  indices_requiring_quantiles = names(indices_requiring_quantiles[indices_requiring_quantiles])
+  if (length(indices_requiring_quantiles) == 0) return(character())   # No indices that are needed require quantiles, return empty string
+  variables_requiring_quantiles = sapply(json_metadata$index.metadata[indices_requiring_quantiles], '[[', 'required.variables')
+  return(unique(unlist(variables_requiring_quantiles)))
+}
+
 # This function reads the json file matching the global setting 'metadata.id', and expects a matching file to exist
 # in 'extdata/metadata_config_files/'. To add more json files, simply copy one of the existing files and edit the
 # information. To change metadata settings, simply edit the appropriate json file and rebuild the package. People using
@@ -121,6 +132,7 @@ read_json_metadata_config_file = function(json_path) {
     get.variable.name.map = function() get.variable.name.map.from.json(json_metadata),
     get.thresholds.name.map = function() get.thresholds.name.map.from.json(json_metadata),
     get.time.resolution.postfix = function() get.time.resolution.postfix.from.json(json_metadata),
-    get.threshold.path = function() get.threshold.path.from.json(json_metadata)
+    get.threshold.path = function() get.threshold.path.from.json(json_metadata),
+    get.variables.requiring.quantiles = function(index_names) get.variables.requiring.quantiles.from.json(index_names, json_metadata)
   ))
 }

@@ -47,3 +47,46 @@ test_that('Index files where correctly generated', {
   expect_true(all(ncdf_metadata_equal_to_ref), info = sprintf('Metadata differs from reference %s.', paste(reference_files[!ncdf_metadata_equal_to_ref], collapse = ', ')))
   expect_true(length(files_with_no_reference) == 0, info = sprintf('Could not find reference NetCDF files for the following generated index files: %s', paste(files_with_no_reference, collapse = ', ')))
 })
+
+# Remove old output files, code will not run otherwise
+delete_all_content_in_temp_path()
+
+# Test to see if we can get away with not passing any threshold files.
+test_that('Omitting a quantile that is needed for an index yields an error', {
+  expect_error(suppressMessages(capture.output(create.indices.from.files(input.files = input_files,
+                                                                         thresholds.files = NULL,
+                                                                         out.dir = output_data_path,
+                                                                         author.data = author.data,
+                                                                         climdex.vars.subset = NULL, # Calculate any that the package can calculate based on the input data
+                                                                         output.filename.template = 'rr_0.25deg_reg_1950-2016.nc',
+                                                                         base.range=c(2017, 2021),
+                                                                         parallel=FALSE))))
+})
+
+## Test running the code when no quantiles are passed
+# Remove old output files, code will not run otherwise
+delete_all_content_in_temp_path()
+dummy = suppressMessages(capture.output(create.indices.from.files(input.files = input_files,
+                                                 thresholds.files = NULL,
+                                                 out.dir = output_data_path,
+                                                 author.data = author.data,
+                                                 climdex.vars.subset = 'fd',
+                                                 output.filename.template = 'rr_0.25deg_reg_1950-2016.nc',
+                                                 base.range=c(2017, 2021),
+                                                 parallel=FALSE)))
+
+fd_index_files = list.files(output_data_path, full.names = TRUE)
+fd_reference_files = file.path(current_reference_path, basename(fd_index_files))
+fd_ref_files_exist = sapply(fd_reference_files, file.exists)
+fd_ncdf_header_the_same = sapply(fd_index_files, function(fname) {
+  ncdf_files_metadata_equal(fname, file.path(current_reference_path, basename(fname)))
+})
+fd_ncdf_data_the_same = sapply(fd_index_files, function(fname) {
+  ncdf_files_equal(fname, file.path(current_reference_path, basename(fname)))
+})
+
+test_that('Quantiles can be ignored if they are not needed for the indices that will be calculated', {
+  expect_true(all(fd_ref_files_exist))
+  expect_true(all(fd_ncdf_header_the_same))
+  expect_true(all(fd_ncdf_data_the_same))
+})

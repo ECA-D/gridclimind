@@ -4,7 +4,7 @@
 \alias{compute.climdex.indices}
 \title{Compute Climdex indices using provided data.}
 \usage{
-compute.climdex.indices(in.dat, cdx.funcs, ts, base.range)
+compute.climdex.indices(in.dat, cdx.funcs, ts, base.range, metadata.config)
 }
 \arguments{
 \item{in.dat}{The input data to compute indices on.}
@@ -14,6 +14,8 @@ compute.climdex.indices(in.dat, cdx.funcs, ts, base.range)
 \item{ts}{The associated time data, as created by \code{nc.get.time.series}.}
 
 \item{base.range}{The base range; a vector of two numeric years.}
+
+\item{metadata.config}{object containing the relevant metadata configuration information.}
 }
 \value{
 A list of data for each index.
