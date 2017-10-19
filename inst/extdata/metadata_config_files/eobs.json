@@ -646,6 +646,42 @@
       "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
       "include.time.prefix.in.long.name": true,
       "required.variables": ["prec", "tavg"]
+    },
+    "cc": {
+      "long.name": "Mean Cloud Cover",
+      "units": "",
+      "base.period.attr": false,
+      "standard.name": "mean_cloud_cover",
+      "calculation.function.name": "climdex.cc",
+      "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
+      "include.time.prefix.in.long.name": true,
+      "required.variables": "cloud"
+    },
+    "cc6": {
+      "long.name": "Mostly cloudy days",
+      "units": "",
+      "base.period.attr": false,
+      "standard.name": "mostly_cloudy_days",
+      "calculation.function.name": "climdex.cc6",
+      "additional_arguments": {
+        "unit": "octa"
+      },
+      "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
+      "include.time.prefix.in.long.name": true,
+      "required.variables": "cloud"
+    },
+    "cc2": {
+      "long.name": "Mostly sunny days",
+      "units": "",
+      "base.period.attr": false,
+      "standard.name": "mostly_sunny_days",
+      "calculation.function.name": "climdex.cc2",
+      "additional_arguments": {
+        "unit": "octa"
+      },
+      "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
+      "include.time.prefix.in.long.name": true,
+      "required.variables": "cloud"
     }
   }
 }

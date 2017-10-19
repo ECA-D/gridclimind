@@ -68,6 +68,7 @@ For an example of how to add indices from `climind` into `gridclimind` you can h
             [1] "/var/folders/dm/smk5_rf53bg057ql34rmhnq80000gn/T//RtmpphG0Nw"
 
         Copy the nc file for the index you added to `/your/installation/of/gridclimind/tests/testthat/reference_ncfiles/generate_all_indices_test/`. This could be up to 4 files, depended on the supported time resolutions.
+    3. The reference rds files for the metadata test will change probably. After checking that the change is really related to the addition of a new index, simply delete the offending rds files and rerun the test. This will generate new reference files which contain the new index.
 
     3. Commit the changes in the gridlcimind package to git.
 

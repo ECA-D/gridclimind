@@ -9,7 +9,7 @@ author.data = list(Eobsv ="14.0", base.range="1981-2010")
 delete_all_content_in_temp_path()
 
 # Generate rainfall indices
-input_files = paste(input_data_path, c('rr_0.25deg_reg_1950-2016.nc', 'tn_0.25deg_reg_1950-2016.nc', 'tx_0.25deg_reg_1950-2016.nc', 'tg_0.25deg_reg_1950-2016.nc'), sep = '/')
+input_files = paste(input_data_path, c('rr_0.25deg_reg_1950-2016.nc', 'tn_0.25deg_reg_1950-2016.nc', 'tx_0.25deg_reg_1950-2016.nc', 'tg_0.25deg_reg_1950-2016.nc', 'cc_0.25deg_reg_1950-2016.nc'), sep = '/')
 input_th_files = paste(input_data_path, c('EOBS_TH_rr_v14.nc', 'EOBS_TH_TX_TN_v14.nc', 'EOBS_TH_TG_v14.nc'), sep = '/')
 dummy = suppressMessages(capture.output(create.indices.from.files(input.files = input_files,
                                                  thresholds.files = input_th_files,
