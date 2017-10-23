@@ -11,7 +11,7 @@ climate indices tool for E-OBS data (used only with ecad_indices_stations)
 
 For an example of how to add indices from `climind` into `gridclimind` you can have a look at the 7d185d65 commit in `gridclimind` (‘Added last three compound indices…etc’). In general, adding an index you will have to take the following steps:
 
-1. Add a function to climind which uses the correct interface, i.e.:
+1. Add a function to `climind` which uses the correct interface, i.e.:
 
         function(ci, freq=c("annual”), cur_sub)
 
@@ -68,5 +68,12 @@ For an example of how to add indices from `climind` into `gridclimind` you can h
             [1] "/var/folders/dm/smk5_rf53bg057ql34rmhnq80000gn/T//RtmpphG0Nw"
 
         Copy the nc file for the index you added to `/your/installation/of/gridclimind/tests/testthat/reference_ncfiles/generate_all_indices_test/`. This could be up to 4 files, depended on the supported time resolutions.
+    3. The reference rds files for the metadata test will change probably. After checking that the change is really related to the addition of a new index, simply delete the offending rds files and rerun the test. This will generate new reference files which contain the new index.
 
     3. Commit the changes in the gridlcimind package to git.
+
+## Add new variable
+The list of variables that `gridclimind` is aware of is stored in the metadata `json` file under `generic.metadata$variable.name.map`. There you list how each of the possible input variables is called in the input NetCDF files. Some important notes:
+
+- the names you use in the `variable.name.map` on the left hand side need to match those used in `gridclimind` and `climind`. A good resource here is the `climind::climdexInput.raw` function which uses all of these names. 
+- If a variable is not supported by `climind::climdexInput.raw` there is no way to calculate the indices. You can read the data from the input NetCDF files, but there will be no way to build the input data object for the indices. So, you need to add support for a variable to `climind` first and then add it to the `gridclimind` `variable.name.map`.
