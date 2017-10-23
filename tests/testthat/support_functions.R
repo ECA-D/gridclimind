@@ -11,8 +11,8 @@ check_for_nccmp = function() {
 ncdf_files_equal = function(file1, file2) {
   if (!file.exists(file1) | !file.exists(file2)) return(FALSE)
   check_for_nccmp()
-  diff_result = system(sprintf('nccmp -dNf "%s" "%s"', file1, file2))
-  return(diff_result == 0)
+  diff_result = suppressWarnings(system2('nccmp', c('-dNf', file1, file2), stdout = TRUE, stderr = TRUE))
+  return(length(diff_result) == 0)
 }
 
 ncdf_files_metadata_equal = function(file1, file2) {

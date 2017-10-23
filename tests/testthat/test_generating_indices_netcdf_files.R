@@ -51,19 +51,8 @@ test_that('Index files where correctly generated', {
 # Remove old output files, code will not run otherwise
 delete_all_content_in_temp_path()
 
-# Test to see if we can get away with not passing any threshold files.
-test_that('Omitting a quantile that is needed for an index yields an error', {
-  expect_error(suppressMessages(capture.output(create.indices.from.files(input.files = input_files,
-                                                                         thresholds.files = NULL,
-                                                                         out.dir = output_data_path,
-                                                                         author.data = author.data,
-                                                                         climdex.vars.subset = NULL, # Calculate any that the package can calculate based on the input data
-                                                                         output.filename.template = 'rr_0.25deg_reg_1950-2016.nc',
-                                                                         base.range=c(2017, 2021),
-                                                                         parallel=FALSE))))
-})
-
 ## Test running the code when no quantiles are passed
+## In this case this should work as the fd index does not require quantiles
 # Remove old output files, code will not run otherwise
 delete_all_content_in_temp_path()
 dummy = suppressMessages(capture.output(create.indices.from.files(input.files = input_files,
@@ -89,4 +78,34 @@ test_that('Quantiles can be ignored if they are not needed for the indices that 
   expect_true(all(fd_ref_files_exist))
   expect_true(all(fd_ncdf_header_the_same))
   expect_true(all(fd_ncdf_data_the_same))
+})
+
+## Now run a test that requires indices. Also note that the base period is inside the
+## date range of the data. This is a special case as this rquires inbase quantiles. These
+## cannot be precalculated, so calculating them on-the-fly is the only way to solve the issues.
+# Remove old output files, code will not run otherwise
+delete_all_content_in_temp_path()
+dummy = suppressMessages(capture.output(create.indices.from.files(input.files = input_files,
+                                                                  thresholds.files = NULL,
+                                                                  out.dir = output_data_path,
+                                                                  author.data = author.data,
+                                                                  climdex.vars.subset = 'tn10p',
+                                                                  output.filename.template = 'rr_0.25deg_reg_1950-2016.nc',
+                                                                  base.range=c(1960, 1990),
+                                                                  parallel=FALSE)))
+
+tn10p_index_files = list.files(output_data_path, full.names = TRUE)
+tn10p_reference_files = file.path(current_reference_path, basename(tn10p_index_files))
+tn10p_ref_files_exist = sapply(tn10p_reference_files, file.exists)
+tn10p_ncdf_header_the_same = sapply(tn10p_index_files, function(fname) {
+  ncdf_files_metadata_equal(fname, file.path(current_reference_path, basename(fname)))
+})
+tn10p_ncdf_data_the_same = sapply(tn10p_index_files, function(fname) {
+  ncdf_files_equal(fname, file.path(current_reference_path, basename(fname)))
+})
+
+test_that('Quantiles can be ignored if they are not needed for the indices that will be calculated', {
+  expect_true(all(tn10p_ref_files_exist))
+  expect_true(all(tn10p_ncdf_header_the_same))
+  expect_true(all(!tn10p_ncdf_data_the_same))    # The reference was calculated with only outbase quantiles, so the result should be different now.
 })
