@@ -250,7 +250,7 @@
       "calculation.function.name": "climdex.tn10p",
       "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
       "include.time.prefix.in.long.name": false,
-      "needs.quantiles": false,
+      "needs.quantiles": true,
       "required.variables": "tmin"
     },
     "tx10p": {
@@ -261,7 +261,7 @@
       "calculation.function.name": "climdex.tx10p",
       "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
       "include.time.prefix.in.long.name": false,
-      "needs.quantiles": false,
+      "needs.quantiles": true,
       "required.variables": "tmax"
     },
     "tn90p": {
@@ -272,7 +272,7 @@
       "calculation.function.name": "climdex.tn90p",
       "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
       "include.time.prefix.in.long.name": false,
-      "needs.quantiles": false,
+      "needs.quantiles": true,
       "required.variables": "tmin"
     },
     "tx90p": {
@@ -283,7 +283,7 @@
       "calculation.function.name": "climdex.tx90p",
       "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
       "include.time.prefix.in.long.name": false,
-      "needs.quantiles": false,
+      "needs.quantiles": true,
       "required.variables": "tmax"
     },
     "wsdi": {
