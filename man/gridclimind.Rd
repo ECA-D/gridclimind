@@ -54,4 +54,3 @@ temperature extremes. Journal of Climate 18.11 (2005):1641-.
 }
 \keyword{climate}
 \keyword{ts}
-

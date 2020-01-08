@@ -59,7 +59,7 @@
 #' @export
 create.indices.from.files <- function(input.files, out.dir, output.filename.template, author.data, climdex.vars.subset=NULL, climdex.time.resolution=c("all", "annual", "monthly", "seasonal", "halfyear"),
                                       axis.to.split.on="Y", fclimdex.compatible=TRUE, base.range=c(1961, 1990),
-                                      parallel=4, verbose=FALSE, thresholds.files=NULL, max.vals.millions=20, cluster.type="SOCK") {
+                                      parallel=4, verbose=FALSE, thresholds.files=NULL, max.vals.millions, cluster.type="SOCK") {
   if(!(is.logical(parallel) || is.numeric(parallel)))
     stop("'parallel' option must be logical or numeric.")
 
@@ -87,7 +87,8 @@ create.indices.from.files <- function(input.files, out.dir, output.filename.temp
   cdx.funcs <- get.climdex.functions(climdex.var.list, metadata.config, fclimdex.compatible = fclimdex.compatible)
 
   ## Compute indices, either single process or multi-process using 'parallel'
-  subsets <- ncdf4.helpers::get.cluster.worker.subsets(max.vals.millions * 1000000, f.meta$dim.size, f.meta$dim.axes, axis.to.split.on)
+  max.vals.millions <- f.meta$dim.size[1] * f.meta$dim.size[3]
+  subsets <- ncdf4.helpers::get.cluster.worker.subsets(max.vals.millions, f.meta$dim.size, f.meta$dim.axes, axis.to.split.on)
   if(is.numeric(parallel)) {
     ## Setup...
     lapply(f, ncdf4::nc_close)

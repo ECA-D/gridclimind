@@ -29,4 +29,3 @@ f.meta <- create.file.metadata(f, variable.name.map)
 }
 
 }
-

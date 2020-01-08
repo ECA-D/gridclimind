@@ -4,9 +4,12 @@
 \alias{get.climdex.variable.list}
 \title{Returns a list of Climdex variables given constraints}
 \usage{
-get.climdex.variable.list(source.data.present, metadata.config,
+get.climdex.variable.list(
+  source.data.present,
+  metadata.config,
   time.resolution = c("all", "annual", "monthly", "seasonal", "halfyear"),
-  climdex.vars.subset = NULL)
+  climdex.vars.subset = NULL
+)
 }
 \arguments{
 \item{source.data.present}{A vector of strings naming the data that's present; at least one of (tmin, tmax, prec, tavg).}
@@ -41,4 +44,3 @@ var.list3 <- get.climdex.variable.list("tmax", climdex.vars.subset=sub.vars)
 \seealso{
 \code{\link{create.indices.from.files}}
 }
-

@@ -22,4 +22,3 @@ Returns units, long names, locations within the t data structure, and whether ti
 thresholds.meta <- get.thresholds.metadata("prec")
 
 }
-

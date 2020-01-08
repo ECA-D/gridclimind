@@ -4,8 +4,16 @@
 \alias{get.quantiles.for.stripe}
 \title{Compute Climdex thresholds for a subset / stripe}
 \usage{
-get.quantiles.for.stripe(subset, ts, base.range, dim.axes, v.f.idx,
-  variable.name.map, src.units, f)
+get.quantiles.for.stripe(
+  subset,
+  ts,
+  base.range,
+  dim.axes,
+  v.f.idx,
+  variable.name.map,
+  src.units,
+  f
+)
 }
 \arguments{
 \item{subset}{The subset to use.}
@@ -59,4 +67,3 @@ q <- get.quantiles.for.stripe(list(Y=1), f.meta$ts, c(1991, 2000), f.meta$dim.ax
 }
 
 }
-

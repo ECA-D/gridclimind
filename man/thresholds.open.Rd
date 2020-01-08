@@ -26,4 +26,3 @@ thresh <- thresholds.open(thresholds.files)
 }
 
 }
-

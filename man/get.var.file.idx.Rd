@@ -30,4 +30,3 @@ v.f.idx <- get.var.file.idx(variable.name.map, v.list)
 }
 
 }
-

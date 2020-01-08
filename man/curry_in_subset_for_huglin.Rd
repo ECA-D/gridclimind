@@ -13,4 +13,3 @@ A curry function used only for the Huglin Index
 This function curries the cdx.funcs so that the current subset (cur_sub) is retrieved with the cdx function
 It is placed inside compute.indices.for.stripe
 }
-

@@ -4,12 +4,22 @@
 \alias{create.indices.from.files}
 \title{Create Climdex indices from NetCDF input files.}
 \usage{
-create.indices.from.files(input.files, out.dir, output.filename.template,
-  author.data, climdex.vars.subset = NULL,
-  climdex.time.resolution = c("all", "annual", "monthly", "seasonal",
-  "halfyear"), axis.to.split.on = "Y", fclimdex.compatible = TRUE,
-  base.range = c(1961, 1990), parallel = 4, verbose = FALSE,
-  thresholds.files = NULL, max.vals.millions = 20, cluster.type = "SOCK")
+create.indices.from.files(
+  input.files,
+  out.dir,
+  output.filename.template,
+  author.data,
+  climdex.vars.subset = NULL,
+  climdex.time.resolution = c("all", "annual", "monthly", "seasonal", "halfyear"),
+  axis.to.split.on = "Y",
+  fclimdex.compatible = TRUE,
+  base.range = c(1961, 1990),
+  parallel = 4,
+  verbose = FALSE,
+  thresholds.files = NULL,
+  max.vals.millions,
+  cluster.type = "SOCK"
+)
 }
 \arguments{
 \item{input.files}{A list of filenames of NetCDF files to be used as input. A NetCDF file may contain one or more variables.}
@@ -57,7 +67,7 @@ The indices to be calculated can be specified; if not, they will be determined b
 The metadata is stored in JSON files that are included with the pacakge. Right now, the metadata relevant to EOBS is used by default. To switch to another set of metadata, use the \code{metadata.id}
 global option:
 
-\code{options(metadata.id = 'eobs')}
+    \code{options(metadata.id = 'eobs')}
 
 Note that currently only EOBS metadata is available (\code{metadata.id = 'eobs'}).
 }
@@ -86,4 +96,3 @@ create.indices.from.files(input.files, "out_dir/", input.files[1], author.data,
 \references{
 \url{http://etccdi.pacificclimate.org/list_27_indices.shtml}
 }
-

@@ -38,4 +38,3 @@ var.list2 <- get.climdex.variable.list("prec", time.resolution="annual")
 md <- get.climdex.variable.metadata(var.list2, fn)
 
 }
-

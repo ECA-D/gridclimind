@@ -41,4 +41,3 @@ q <- get.quantiles.object(dat, 2)
 }
 
 }
-

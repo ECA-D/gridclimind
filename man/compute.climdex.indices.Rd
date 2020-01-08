@@ -40,4 +40,3 @@ ts <- as.PCICt(do.call(paste, ec.1018935.tmax[,c("year", "jday")]),
 res <- compute.climdex.indices(in.dat, cdx.funcs, ts, c(1981, 1990), FALSE)
 
 }
-

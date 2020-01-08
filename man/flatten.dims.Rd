@@ -31,4 +31,3 @@ dat <- structure(1:8, .Dim=c(2, 2, 2))
 dat.flat <- flatten.dims(dat, 2:3)
 
 }
-

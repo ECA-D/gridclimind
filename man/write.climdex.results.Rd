@@ -4,8 +4,13 @@
 \alias{write.climdex.results}
 \title{Write out computed climdex results}
 \usage{
-write.climdex.results(climdex.results, chunk.subset, cdx.ncfile, dim.size,
-  cdx.varname)
+write.climdex.results(
+  climdex.results,
+  chunk.subset,
+  cdx.ncfile,
+  dim.size,
+  cdx.varname
+)
 }
 \arguments{
 \item{climdex.results}{The results to write out.}
@@ -53,4 +58,3 @@ write.climdex.results(cdx, list(Y=1), cdx.ncfile, f.meta$dim.size, cdx.meta$varn
 }
 
 }
-

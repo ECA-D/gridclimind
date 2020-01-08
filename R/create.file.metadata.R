@@ -33,6 +33,7 @@ create.file.metadata <- function(f, variable.name.map) {
   ## Get projection
   projection <- ncdf4.helpers::nc.get.proj4.string(f[[1]], v.list[[1]][1])
   stopifnot(!is.null(projection))
+
   if(projection == "")
     projection <- NULL
 

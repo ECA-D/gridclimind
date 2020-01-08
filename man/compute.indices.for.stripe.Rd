@@ -4,9 +4,22 @@
 \alias{compute.indices.for.stripe}
 \title{Compute Climdex indices for a subset / stripe}
 \usage{
-compute.indices.for.stripe(subset, metadata.config, cdx.funcs, ts, base.range,
-  dim.axes, v.f.idx, variable.name.map, src.units, t.f.idx, thresholds.name.map,
-  projection = NULL, f, thresholds.netcdf)
+compute.indices.for.stripe(
+  subset,
+  metadata.config,
+  cdx.funcs,
+  ts,
+  base.range,
+  dim.axes,
+  v.f.idx,
+  variable.name.map,
+  src.units,
+  t.f.idx,
+  thresholds.name.map,
+  projection = NULL,
+  f,
+  thresholds.netcdf
+)
 }
 \arguments{
 \item{subset}{The subset to use.}
@@ -67,4 +80,3 @@ cdx <- compute.indices.for.stripe(list(Y=1), cdx.funcs, f.meta$ts, c(1981, 1990)
 }
 
 }
-

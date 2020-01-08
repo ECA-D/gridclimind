@@ -26,4 +26,3 @@ This function takes a variable list (as created by \code{\link{get.climdex.varia
 cdx.funcs <- get.climdex.functions(get.climdex.variable.list(c("tmax", "tmin")))
 
 }
-

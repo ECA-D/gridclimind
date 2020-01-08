@@ -24,8 +24,13 @@
       "wind_gust": "fx",
       "wind_dir": "dd",
       "cloud": "cc",
-      "sun": "ss",
-      "sun_rel": "dummy_sun_rel"
+      "ss": "ss",
+      "sun_rel": "dummy_sun_rel",
+      "dp": "dp",
+      "vp": "vp",
+      "rs": "rs",
+      "ws": "ws",
+      "rh": "rh"
       },
     "threshold.metadata": {
       "tx10thresh": {
@@ -453,23 +458,23 @@
       "needs.quantiles": false,
       "required.variables": "prec"
     },
-    "r95ptot": {
+    "r95pfrac": {
       "long.name": "Precipitation fraction due to very wet days (daily precipitation exceeds 95th percentile)",
       "units": "%",
       "base.period.attr": true,
       "standard.name": "precipitation_fraction_exceeding_95th_percentile",
-      "calculation.function.name": "climdex.r95ptot",
+      "calculation.function.name": "climdex.r95pfrac",
       "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
       "include.time.prefix.in.long.name": true,
       "needs.quantiles": true,
       "required.variables": "prec"
     },
-    "r99ptot": {
+    "r99pfrac": {
       "long.name": "Precipitation fraction due to extremely wet days (daily precipitation exceeds 99th percentile)",
       "units": "%",
       "base.period.attr": true,
       "standard.name": "precipitation_fraction_exceeding_99th_percentile",
-      "calculation.function.name": "climdex.r99ptot",
+      "calculation.function.name": "climdex.r99pfrac",
       "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
       "include.time.prefix.in.long.name": true,
       "needs.quantiles": true,
@@ -514,45 +519,45 @@
       "needs.quantiles": false,
       "required.variables": "prec"
     },
-    "r75p": {
+    "r75ptot": {
       "long.name": "Total Precipitation when Daily Precipitation Exceeds the 75th Percentile of Wet Day Precipitation",
       "units": "mm",
       "base.period.attr": false,
       "standard.name": "total_precipitation_exceeding_75th_percentile",
-      "calculation.function.name": "climdex.r75p",
+      "calculation.function.name": "climdex.r75ptot",
       "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
       "include.time.prefix.in.long.name": true,
       "needs.quantiles": true,
       "required.variables": "prec"
     },
-    "r95p": {
+    "r95ptot": {
       "long.name": "Total Precipitation when Daily Precipitation Exceeds the 95th Percentile of Wet Day Precipitation",
       "units": "mm",
       "base.period.attr": false,
       "standard.name": "total_precipitation_exceeding_95th_percentile",
-      "calculation.function.name": "climdex.r95p",
+      "calculation.function.name": "climdex.r95ptot",
       "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
       "include.time.prefix.in.long.name": true,
       "needs.quantiles": true,
       "required.variables": "prec"
     },
-    "r99p": {
+    "r99ptot": {
       "long.name": "Total Precipitation when Daily Precipitation Exceeds the 99th Percentile of Wet Day Precipitation",
       "units": "mm",
       "base.period.attr": false,
       "standard.name": "total_precipitation_exceeding_99th_percentile",
-      "calculation.function.name": "climdex.r99p",
+      "calculation.function.name": "climdex.r99ptot",
       "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
       "include.time.prefix.in.long.name": true,
       "needs.quantiles": true,
       "required.variables": "prec"
     },
-    "r75ptot": {
+    "r75pfrac": {
       "long.name": "Precipitation fraction due to moderate wet days (daily precipitation exceeds 75th percentile)",
       "units": "%",
       "base.period.attr": false,
       "standard.name": "precipitation_fraction_exceeding_75th_percentile",
-      "calculation.function.name": "climdex.r75ptot",
+      "calculation.function.name": "climdex.r75pfrac",
       "supported.time.resolutions": ["annual", "monthly", "seasonal", "halfyear"],
       "include.time.prefix.in.long.name": true,
       "needs.quantiles": true,

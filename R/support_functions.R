@@ -101,14 +101,13 @@ put.history.att <- function(f, v, definemode=FALSE) {
 }
 
 put.ETCCDI.atts <- function(f, freq, orig.title, author.data, definemode=FALSE) {
-  ncdf4::ncatt_put(f, 0, "title", paste("climate impact indices computed using E-OBS", author.data$Eobsv, collapse = "-",sep=""), definemode=definemode)
-  ncdf4::ncatt_put(f, 0, "EOBS_version", author.data$Eobsv, definemode = definemode)
-  ncdf4::ncatt_put(f, 0, "Indices_references", "http://ecad.eu/documents/WCDMP_72_TD_1500_en_1.pdf", definemode=definemode)
-  ncdf4::ncatt_put(f, 0, "EOBS_references", "http://www.ecad.eu/download/ensembles/Haylock_et_al_2008.pdf", definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "title", paste("climate impact indices computed using ", author.data$data, collapse = "-",sep=""), definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "data_version", author.data$vers, definemode = definemode)
+  ncdf4::ncatt_put(f, 0, "Indices_references", "http://surfobs.climate.copernicus.eu/userguidance/indicesdictionary.php", definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "data_references", author.data$data_ref, definemode=definemode)
   ncdf4::ncatt_put(f, 0, "index_calculation_frequency", freq, definemode=definemode)
-  ncdf4::ncatt_put(f, 0, "institute", "KNMI", definemode=definemode)
-  ncdf4::ncatt_put(f, 0, "webpage", "www.ecad.eu, http://www.ecad.eu/utils/mapserver/eobs_maps_indices.php", definemode=definemode)
-  ncdf4::ncatt_put(f, 0, "contact", "eca@knmi.nl", definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "institute", author.data$inst, definemode=definemode)
+  ncdf4::ncatt_put(f, 0, "contact", author.data$contact, definemode=definemode)
   ncdf4::ncatt_put(f, 0, "file_created", format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz="GMT"), definemode=definemode)
   ncdf4::ncatt_put(f, 0, "climind_version", as.character(packageVersion("climind")), definemode=definemode)
 
@@ -228,7 +227,8 @@ flatten.dims <- function(dat, reduce.dims, names.subset) {
 #'
 #' Retrieve and convert data to correct units and dimensions.
 #'
-#' This function retrieves NetCDF data for the specified subset from the specified file and variable; converts from \code{src.units} to \code{dest.units}, transposes the data to (T, S) dimensionality, and returns the result.
+#' This function retrieves NetCDF data for the specified subset from the specified file and variable; converts from \code{src.units} to \code{dest.units}, transposes the data to (T, S) dimensionality,
+#' and returns the result.
 #'
 #' @param f The NetCDF file to retrieve data from; an object of class \code{ncdf4}.
 #' @param v The variable to retrieve data from.
@@ -340,12 +340,12 @@ get.lat <- function(open_file_list, v.f.idx, variable.name.map) {
 #' filenames <- create.climdex.cmip5.filenames(fn.split, c("rx5dayETCCDI_mon", "tn90pETCCDI_yr"))
 #' }
 #'
-#'# create.climdex.cmip5.filenames <- function(fn.split, vars.list) {
-#   time.res <- c("yr", "mon")[grepl("_mon$", vars.list) + 1]
-#   time.range <- substr(fn.split[c('tstart', 'tend')], 1, 4)
-#
-#   paste(paste(vars.list, fn.split['model'], fn.split['emissions'], fn.split['run'], sapply(time.res, function(x) { paste(time.range, switch(x, yr=c("", ""), mon=c("01", "12")), sep="", collapse="-") }), sep="_"), ".nc", sep="")
-# }
+#' create.climdex.cmip5.filenames <- function(fn.split, vars.list) {
+#' time.res <- c("yr", "mon")[grepl("_mon$", vars.list) + 1]
+#' time.range <- substr(fn.split[c('tstart', 'tend')], 1, 4)
+#'
+#' paste(paste(vars.list, fn.split['model'], fn.split['emissions'], fn.split['run'], sapply(time.res, function(x) { paste(time.range, switch(x, yr=c("", ""), mon=c("01", "12")), sep="", collapse="-") }), sep="_"), ".nc", sep="")
+#' }
 # TODO: this has to change to accomodate seas & halfyears
 
 create.climdex.eobs.filenames <- function(fn.split, vars.list) {

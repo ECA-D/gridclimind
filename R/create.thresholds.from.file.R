@@ -3,7 +3,10 @@
 #'
 #' Create Climdex thresholds used for computing threshold-based indices
 #'
-#' For many applications, one may want to compute thresholds on one data set, then apply them to another. This is usually the case when comparing GCM (Global Climate Model) results for future time periods to either historical reanalysis data or historical / pre-industrial control runs from models. The purpose of this function is to compute these thresholds on the data supplied, saving them to the file specified. Then these thresholds can be used with \code{\link{create.indices.from.files}} to compute indices using the thresholds computed using this code.
+#' For many applications, one may want to compute thresholds on one data set, then apply them to another. This is usually the case when comparing GCM (Global Climate Model)
+#' results for future time periods to either historical reanalysis data or historical / pre-industrial control runs from models.
+#' The purpose of this function is to compute these thresholds on the data supplied, saving them to the file specified.
+#' Then these thresholds can be used with \code{\link{create.indices.from.files}} to compute indices using the thresholds computed using this code.
 #'
 #' The metadata is stored in JSON files that are included with the pacakge. Right now, the metadata relevant to EOBS is used by default. To switch to another set of metadata, use the \code{metadata.id}
 #' global option:
@@ -35,7 +38,7 @@
 #'
 #' @export
 create.thresholds.from.file <- function(input.files, output.file, author.data,
-                                        axis.to.split.on="Y", base.range=c(1961, 1990), parallel=4, verbose=FALSE, max.vals.millions=20, cluster.type="SOCK") {
+                                        axis.to.split.on="Y", base.range=c(1961, 1990), parallel=4, verbose=FALSE, max.vals.millions, cluster.type="SOCK") {
   if(!(is.logical(parallel) || is.numeric(parallel)))
     stop("'parallel' option must be logical or numeric.")
 
@@ -56,7 +59,8 @@ create.thresholds.from.file <- function(input.files, output.file, author.data,
   thresholds.netcdf <- create.thresholds.file(output.file, f, f.meta$ts, f.meta$v.f.idx, variable.name.map, base.range, f.meta$dim.size, f.meta$dim.axes, threshold.dat, author.data)
 
   cluster <- set.up.cluster(parallel, cluster.type)
-  subsets <- ncdf4.helpers::get.cluster.worker.subsets(max.vals.millions * 1000000, f.meta$dim.size, f.meta$dim.axes, axis.to.split.on)
+  max.vals.millions <- f.meta$dim.size[1] * f.meta$dim.size[3]
+  subsets <- ncdf4.helpers::get.cluster.worker.subsets(max.vals.millions, f.meta$dim.size, f.meta$dim.axes, axis.to.split.on)
 
   write.thresholds.data <- function(out.list, out.sub) {
     lapply(names(threshold.dat), function(n) {

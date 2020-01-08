@@ -4,8 +4,13 @@
 \alias{get.thresholds.chunk}
 \title{Retrieve thresholds for a subset}
 \usage{
-get.thresholds.chunk(subset, cdx.funcs, thresholds.netcdf, t.f.idx,
-  thresholds.name.map)
+get.thresholds.chunk(
+  subset,
+  cdx.funcs,
+  thresholds.netcdf,
+  t.f.idx,
+  thresholds.name.map
+)
 }
 \arguments{
 \item{subset}{The subset to use.}
@@ -42,4 +47,3 @@ dat <- get.thresholds.chunk(list(Y=1), cdx.funcs, thresholds.netcdf, t.f.idx, th
 }
 
 }
-

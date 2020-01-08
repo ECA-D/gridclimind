@@ -26,10 +26,10 @@ The retrieved and massaged data.
 Retrieve and convert data to correct units and dimensions.
 }
 \details{
-This function retrieves NetCDF data for the specified subset from the specified file and variable; converts from \code{src.units} to \code{dest.units}, transposes the data to (T, S) dimensionality, and returns the result.
+This function retrieves NetCDF data for the specified subset from the specified file and variable; converts from \code{src.units} to \code{dest.units}, transposes the data to (T, S) dimensionality,
+and returns the result.
 }
 \examples{
 \donttest{get.data(f, "pr", list(Y=3), "kg m-2 s-1", "kg m-2 s-1", c(X="lon",Y="lat",T="time"))}
 
 }
-

@@ -34,4 +34,3 @@ bools <- get.northern.hemisphere.booleans(list(X=1:2, Y=1:2), f[[1]], f.v[[1]], 
 }
 
 }
-

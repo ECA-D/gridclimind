@@ -4,8 +4,18 @@
 \alias{create.thresholds.file}
 \title{Creates Climdex thresholds output file.}
 \usage{
-create.thresholds.file(thresholds.file, f, ts, v.f.idx, variable.name.map,
-  base.range, dim.size, dim.axes, threshold.dat, author.data)
+create.thresholds.file(
+  thresholds.file,
+  f,
+  ts,
+  v.f.idx,
+  variable.name.map,
+  base.range,
+  dim.size,
+  dim.axes,
+  threshold.dat,
+  author.data
+)
 }
 \arguments{
 \item{thresholds.file}{The filename to be used for the thresholds file.}
@@ -56,4 +66,3 @@ thresh.file <- create.thresholds.file("thresh.nc", f, f.meta$ts, f.meta$v.f.idx,
 }
 
 }
-

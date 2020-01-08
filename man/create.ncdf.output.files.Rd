@@ -4,8 +4,18 @@
 \alias{create.ncdf.output.files}
 \title{Creates output files for Climdex variables.}
 \usage{
-create.ncdf.output.files(cdx.dat, f, v.f.idx, variable.name.map, ts,
-  time.origin, base.range, out.dir, author.data, metadata.config)
+create.ncdf.output.files(
+  cdx.dat,
+  f,
+  v.f.idx,
+  variable.name.map,
+  ts,
+  time.origin,
+  base.range,
+  out.dir,
+  author.data,
+  metadata.config
+)
 }
 \arguments{
 \item{cdx.dat}{The variable description data, as created by \code{\link{get.climdex.variable.metadata}}.}
@@ -55,4 +65,3 @@ cdx.ncfile <- create.ncdf.output.files(cdx.meta, f, f.meta$v.f.idx, variable.nam
 }
 
 }
-
