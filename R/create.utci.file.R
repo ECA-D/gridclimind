@@ -1,23 +1,23 @@
-#' Creates pet output file.
+#' Creates utci output file.
 #'
-#' Creates pet output file.
+#' Creates utci output file.
 #'
-#' This function creates a file suitable for outputting pet to.
+#' This function creates a file suitable for outputting utci to.
 #'
-#' @param pet.file The filename to be used for the pet file.
+#' @param utci.file The filename to be used for the utci file.
 #' @param f The file(s) being used as sources for metadata.
 #' @param ts The associated time data, as created by \code{nc.get.time.series}.
 #' @param v.f.idx A mapping from variables to files, as created by \code{\link{get.var.file.idx}}.
 #' @param variable.name.map A mapping from standardized names (tmax, tmin, etc) to NetCDF variable names.
 #' @param dim.size Dimension sizes for the input.
 #' @param dim.axes Dimension axes for the input.
-#' @param pet.dat pet metadata
+#' @param utci.dat utci metadata
 #' @param author.data A vector containing named elements describing the author; see \code{\link{create.indices.from.files}}.
 #' @return An object of class \code{ncdf4}.
 #'
 #'
 #' @export
-create.pet.file <- function(pet.file, f, ts, v.f.idx, variable.name.map, dim.size, dim.axes, pet.dat, author.data) {
+create.utci.file <- function(utci.file, f, ts, v.f.idx, variable.name.map, dim.size, dim.axes, utci.dat, author.data) {
 
   exemplar.file <- f[[v.f.idx[1]]]
   exemplar.var.name <- variable.name.map[names(v.f.idx)[1]]
@@ -52,11 +52,11 @@ create.pet.file <- function(pet.file, f, ts, v.f.idx, variable.name.map, dim.siz
   mv = -9999
 
   # Define the data
-  out.var = ncdf4::ncvar_def( "pet", units="mm/day", list(dimX,dimY,dimT), mv, prec="float", longname = "Potential Evapotranspiration")
+  out.var = ncdf4::ncvar_def( "utci", units="Deg C", list(dimX,dimY,dimT), mv, prec="float", longname = "Universal Thermal Climate Index")
 
   ############################################################################
   ## Create file
-  pet.netcdf <- ncdf4::nc_create(pet.file, out.var, force_v4=TRUE)
+  utci.netcdf <- ncdf4::nc_create(utci.file, out.var, force_v4=TRUE)
 
-  return(pet.netcdf)
+  return(utci.netcdf)
 }

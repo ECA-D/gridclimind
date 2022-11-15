@@ -1,9 +1,9 @@
-## Run PETr to estimate PET using Makkink method
-#' Create PET
+## Run to estimate UTCI
+#' Create Climdex UTCI
 #'
-#' Create PET
+#' Create Climdex UTCI
 #'
-#' The purpose of this function is to compute PET using the Makkink method on the data supplied, saving them to the file specified.
+#' The purpose of this function is to compute UTCI on the data supplied, saving them to the file specified.
 #'
 #' The metadata is stored in JSON files that are included with the pacakge. Right now, the metadata relevant to EOBS is used by default. To switch to another set of metadata, use the \code{metadata.id}
 #' global option:
@@ -25,17 +25,19 @@
 #'
 #' @examples
 #' \dontrun{
-#' ## Prepare input data and calculate pet for file.
-#' input.files <- c(paste0(in.dir,"tn_0.50deg_regular_1971-2016.nc"),
-#' paste0(in.dir,"tx_0.50deg_regular_1971-2016.nc"),
-#' paste0(in.dir,"rs_0.50deg_regular_1971-2016.nc"))
+#' ## Prepare input data and calculate utci for file.
+#' input.files <- c(paste0(in.dir,"tn_0.50deg_regular_1979-2018.nc"),
+#' paste0(in.dir,"tx_0.50deg_regular_1979-2018.nc"),
+#' paste0(in.dir,"rh_0.50deg_regular_1979-2018.nc"),
+#' paste0(in.dir,"rs_0.50deg_regular_1979-2018.nc"),
+#' paste0(in.dir,"ws_0.50deg_regular_1979-2018.nc"))
 #' author.data <- list(institution="Looney Bin", institution_id="LBC")
-#' create.pet.from.files(input.files, out.file, input.files[1], author.data,  parallel=3)
+#' create.utci.from.files(input.files, out.file, input.files[1], author.data,  parallel=3)
 #' }
 #'
 #' @export
-create.pet.makkink.from.files <- function(input.files, output.file, author.data,  climdex.time.resolution="daily", axis.to.split.on="Y", parallel=4,
-                                         verbose=FALSE, cluster.type="SOCK") {
+create.utci.from.files <- function(input.files, output.file, author.data,  climdex.time.resolution="daily", axis.to.split.on="Y", parallel=4,
+                                  verbose=FALSE, cluster.type="SOCK") {
   if(!(is.logical(parallel) || is.numeric(parallel)))
     stop("'parallel' option must be logical or numeric.")
 
@@ -45,32 +47,32 @@ create.pet.makkink.from.files <- function(input.files, output.file, author.data,
   metadata.config = read_json_metadata_config_file()
   variable.name.map = metadata.config$get.variable.name.map()
 
-  # Edit variable name map, only keep variables for pet calculation.
-  variable.name.map = variable.name.map[c('tmin', 'tmax', 'rs')]
+  # Edit variable name map, only keep variables for utci calculation.
+  variable.name.map = variable.name.map[c('tmin', 'tmax', 'rh', 'rs', 'ws')]
 
   f <- lapply(input.files, ncdf4::nc_open)
   f.meta <- create.file.metadata(f, variable.name.map)
 
   ## Create the output file
-  pet.netcdf <- create.pet.file(output.file, f, f.meta$ts, f.meta$v.f.idx, variable.name.map, f.meta$dim.size, f.meta$dim.axes,
-                                pet.dat, author.data)
+  utci.netcdf <- create.utci.file(output.file, f, f.meta$ts, f.meta$v.f.idx, variable.name.map, f.meta$dim.size, f.meta$dim.axes,
+                                utci.dat, author.data)
   cluster <- set.up.cluster(parallel, cluster.type)
   max.vals.millions <- f.meta$dim.size[1] * f.meta$dim.size[3]
   subsets <- ncdf4.helpers::get.cluster.worker.subsets(max.vals.millions, f.meta$dim.size, f.meta$dim.axes, axis.to.split.on)
 
-  write.pet.data <- function(out.list, out.sub) {
+  write.utci.data <- function(out.list, out.sub) {
     dat <- out.list
     output <- t(matrix(unlist(dat),  ncol = f.meta$dim.size[1], byrow = FALSE))
-    ncdf4.helpers::nc.put.var.subset.by.axes(pet.netcdf, "pet", output, out.sub)
+    ncdf4.helpers::nc.put.var.subset.by.axes(utci.netcdf, "utci", output, out.sub)
 
     gc()
   }
 
-  compute.pet.for.stripe <- function(subset, ts, dim.axes, v.f.idx, variable.name.map) {
+  compute.utci.for.stripe <- function(subset, ts, dim.axes, v.f.idx, variable.name.map) {
     cat('We are now at latitude', subset[['Y']], '\n')
     # need to know what the latitude is.
-    latitudes <- ncdf4.helpers::nc.get.dim.for.axis(pet.netcdf, "pet", "Y")
-    longitudes <- ncdf4.helpers::nc.get.dim.for.axis(pet.netcdf, "pet", "X")
+    latitudes <- ncdf4.helpers::nc.get.dim.for.axis(utci.netcdf, "utci", "Y")
+    longitudes <- ncdf4.helpers::nc.get.dim.for.axis(utci.netcdf, "utci", "X")
     lats <- latitudes[['vals']]
     lat <- lats[subset[['Y']]]
     lons <- longitudes[['vals']]
@@ -78,7 +80,7 @@ create.pet.makkink.from.files <- function(input.files, output.file, author.data,
     data.list <- sapply(names(v.f.idx), function(x) { gc(); get.data(f[[v.f.idx[x]]], variable.name.map[x], subset, src.units[x], dim.axes) }, simplify=FALSE)
     gc()
 
-    # Constuct input arguments for pet calculation function
+    # Constuct input arguments for utci calculation function
     potential_data = lapply(names(variable.name.map), function(var) data.list[[var]])
     names(potential_data) = names(variable.name.map)
     ts_arguments = lapply(potential_data, function(x) {
@@ -89,18 +91,20 @@ create.pet.makkink.from.files <- function(input.files, output.file, author.data,
       }
     })
     names(ts_arguments) = paste(names(ts_arguments), 'dates', sep = '.')
-    pet_input_arguments = c(potential_data, ts_arguments, "lons", "lat")
-    pet_input_arguments$lat <- lat
-    pet_input_arguments$lons <- lons
-    #browser()
+    utci_input_arguments = c(potential_data, ts_arguments, "lons", "lat")
+    utci_input_arguments$lat <- lat
+    utci_input_arguments$lons <- lons
+
     r <- 1:(dim(data.list[[1]])[2])
     return(lapply(r, function(x) {
-      concrete_args = pet_input_arguments
+      concrete_args = utci_input_arguments
       concrete_args$tmin = concrete_args$tmin[,x]
       concrete_args$tmax = concrete_args$tmax[,x]
+      concrete_args$rh = concrete_args$rh[,x]
       concrete_args$rs = concrete_args$rs[,x]
+      concrete_args$ws = concrete_args$ws[,x]
       concrete_args$lons <- concrete_args$lons[[x]]
-      return(PETr::pet_makkink(concrete_args))
+      return(UTCIr::calc_UTCI(concrete_args))
     }))
   }
 
@@ -111,18 +115,18 @@ create.pet.makkink.from.files <- function(input.files, output.file, author.data,
     snow::clusterEvalQ(cluster, f <<- lapply(input.files, ncdf4::nc_open, readunlim=FALSE))
 
     ## Compute subsets and fire jobs off; collect and write out chunk-at-a-time
-    parLapplyLBFiltered(cluster, subsets, compute.pet.for.stripe, f.meta$ts, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, local.filter.func=write.pet.data)
+    parLapplyLBFiltered(cluster, subsets, compute.utci.for.stripe, f.meta$ts, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map, local.filter.func=write.utci.data)
 
     snow::stopCluster(cluster)
   } else {
 
-    lapply(subsets, function(x) { write.pet.data(compute.pet.for.stripe(x, f.meta$ts, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map), x) })
+    lapply(subsets, function(x) { write.utci.data(compute.utci.for.stripe(x, f.meta$ts, f.meta$dim.axes, f.meta$v.f.idx, variable.name.map), x) })
     lapply(f, ncdf4::nc_close)
   }
   ## Close all the files
-  ncdf4::nc_close(pet.netcdf)
+  ncdf4::nc_close(utci.netcdf)
 
-  cat("Finished computing PET\n")
+  cat("Finished computing UTCI\n")
   invisible(0)
 }
 

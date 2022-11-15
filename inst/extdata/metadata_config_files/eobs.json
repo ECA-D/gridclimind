@@ -30,7 +30,8 @@
       "vp": "vp",
       "rs": "rs",
       "ws": "ws",
-      "rh": "rh"
+      "rh": "rh",
+      "pet": "pet"
       },
     "threshold.metadata": {
       "tx10thresh": {
