@@ -17,7 +17,7 @@ Imports:
     udunits2 (>= 0.6),
     functional (>= 0.4),
     proj4 (>= 1.0-8),
-    scPDSI,
+    scPDSIr,
     PETr,
     UTCIr
 Suggests:
